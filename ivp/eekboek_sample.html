@@ -1,0 +1,2523 @@
+<!-- $Header: /cvsroot/autodoc/autodoc/html.tmpl,v 1.1.1.1 2004/05/12 16:00:34 rbt Exp $ -->
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+   "http://www.w3.org/TR/html4/strict.dtd">
+
+<html>
+  <head>
+    <title>Index for eekboek_sample</title>
+    <style type="text/css">
+	BODY {
+		color:	#000000; 
+		background-color: #FFFFFF;
+		font-family: Helvetica, sans-serif; 
+	}
+
+	P {
+		margin-top: 5px;
+		margin-bottom: 5px;
+	}
+
+	P.w3ref {
+		font-size: 8pt;
+		font-style: italic;
+		text-align: right;
+	}
+
+	P.detail {
+		font-size: 10pt;
+	}
+
+	.error {
+		color: #FFFFFF;
+		background-color: #FF0000;
+	}
+
+	H1, H2, H3, H4, H5, H6 {
+	}
+
+	OL {
+		list-style-type: upper-alpha;
+	}
+
+	UL.topic {
+		list-style-type: upper-alpha;
+	}
+
+	LI.topic {
+		font-weight : bold;
+	}
+
+	HR {
+		color: #00FF00;
+		background-color: #808080;
+	}
+
+	TABLE {
+		border-width: medium;
+		padding: 3px;
+		background-color: #000000;
+		width: 90%;
+	}
+
+	CAPTION {
+		text-transform: capitalize;
+		font-weight : bold;
+		font-size: 14pt;
+	}
+
+	TH {
+		color: #FFFFFF;
+		background-color: #000000;
+		text-align: left;
+	}
+
+	TR {
+		color: #000000;
+		background-color: #000000;
+		vertical-align: top;
+	}
+
+	TR.tr0 {
+		background-color: #F0F0F0;
+	}
+
+	TR.tr1 {
+		background-color: #D8D8D8;
+	}
+
+	TD {
+		font-size: 12pt;
+	}
+
+	TD.col0 {
+		font-weight : bold;
+		width: 20%;
+	}
+
+	TD.col1 {
+		font-style: italic;
+		width: 15%;
+	}
+
+	TD.col2 {
+		font-size: 12px;
+	}
+    </style>
+    <link rel="stylesheet" type="text/css" media="all" href="all.css">
+    <link rel="stylesheet" type="text/css" media="screen" href="screen.css">
+    <link rel="stylesheet" type="text/css" media="print" href="print.css">
+    <meta HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+  </head>
+  <body>
+
+    <!-- Primary Index -->
+	<p><br><br>Dumped on 2005-12-08</p>
+<h1><a name="index">Index of database - eekboek_sample</a></h1>
+<ul>
+    
+    <li><a name="public.schema">public</a></li><ul>
+    	<li><a href="#public.table.accounts">accounts</a></li><li><a href="#public.table.boekjaarbalans">boekjaarbalans</a></li><li><a href="#public.table.boekjaren">boekjaren</a></li><li><a href="#public.table.boekstukken">boekstukken</a></li><li><a href="#public.table.boekstukregels">boekstukregels</a></li><li><a href="#public.table.btwtabel">btwtabel</a></li><li><a href="#public.table.constants">constants</a></li><li><a href="#public.table.dagboeken">dagboeken</a></li><li><a href="#public.table.journal">journal</a></li><li><a href="#public.table.metadata">metadata</a></li><li><a href="#public.table.relaties">relaties</a></li><li><a href="#public.table.standaardrekeningen">standaardrekeningen</a></li><li><a href="#public.table.verdichtingen">verdichtingen</a></li>
+  	
+    </ul>
+    
+</ul>
+
+    <!-- Schema Creation -->
+    <!-- publicpublic -->
+
+		
+		
+        <hr>
+		<h2>Table:
+			<a name="public.table.accounts">accounts</a>
+		</h2>
+        
+
+
+        <table width="100%" cellspacing="0" cellpadding="3">
+                <caption>accounts Structure</caption>
+                <tr>
+                <th>F-Key</th>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Description</th>
+                </tr>
+            
+            <tr class="tr0">
+				<td>
+                
+                  
+                
+                </td>
+            	<td>acc_id</td>
+            	<td>integer</td>
+                <td><i>
+				
+					PRIMARY KEY
+					
+
+					
+				
+
+				
+				
+				</i>
+				
+				</td>
+			 </tr>
+            
+            <tr class="tr1">
+				<td>
+                
+                </td>
+            	<td>acc_desc</td>
+            	<td>text</td>
+                <td><i>
+				
+
+				NOT NULL
+				
+				</i>
+				
+				</td>
+			 </tr>
+            
+            <tr class="tr0">
+				<td>
+                
+                  
+                  <a href="#public.table.verdichtingen">verdichtingen.vdi_id</a>
+                  
+                
+                </td>
+            	<td>acc_struct</td>
+            	<td>integer</td>
+                <td><i>
+				
+					
+
+					
+				
+
+				
+				
+				</i>
+				
+				</td>
+			 </tr>
+            
+            <tr class="tr1">
+				<td>
+                
+                </td>
+            	<td>acc_balres</td>
+            	<td>boolean</td>
+                <td><i>
+				
+
+				
+				
+				</i>
+				
+				</td>
+			 </tr>
+            
+            <tr class="tr0">
+				<td>
+                
+                </td>
+            	<td>acc_debcrd</td>
+            	<td>boolean</td>
+                <td><i>
+				
+
+				
+				
+				</i>
+				
+				</td>
+			 </tr>
+            
+            <tr class="tr1">
+				<td>
+                
+                </td>
+            	<td>acc_kstomz</td>
+            	<td>boolean</td>
+                <td><i>
+				
+
+				
+				
+				</i>
+				
+				</td>
+			 </tr>
+            
+            <tr class="tr0">
+				<td>
+                
+                  
+                  <a href="#public.table.btwtabel">btwtabel.btw_id</a>
+                  
+                
+                </td>
+            	<td>acc_btw</td>
+            	<td>smallint</td>
+                <td><i>
+				
+					
+
+					
+				
+
+				
+				
+				</i>
+				
+				</td>
+			 </tr>
+            
+            <tr class="tr1">
+				<td>
+                
+                </td>
+            	<td>acc_ibalance</td>
+            	<td>integer</td>
+                <td><i>
+				
+
+				
+				
+				</i>
+				
+				</td>
+			 </tr>
+            
+            <tr class="tr0">
+				<td>
+                
+                </td>
+            	<td>acc_balance</td>
+            	<td>integer</td>
+                <td><i>
+				
+
+				
+				
+				</i>
+				
+				</td>
+			 </tr>
+            
+        </table>
+
+		
+		
+		
+
+        <!-- Constraint List -->
+		
+
+        <!-- Foreign Key Discovery -->
+		
+			<p>Tables referencing this one via Foreign Key Constraints:</p>
+		
+			<ul>	
+				<li><a href="#public.table.boekjaarbalans">boekjaarbalans</a></li>
+			</ul>
+		
+			<ul>	
+				<li><a href="#public.table.boekstukregels">boekstukregels</a></li>
+			</ul>
+		
+			<ul>	
+				<li><a href="#public.table.dagboeken">dagboeken</a></li>
+			</ul>
+		
+			<ul>	
+				<li><a href="#public.table.journal">journal</a></li>
+			</ul>
+		
+			<ul>	
+				<li><a href="#public.table.relaties">relaties</a></li>
+			</ul>
+		
+			<ul>	
+				<li><a href="#public.table.standaardrekeningen">standaardrekeningen</a></li>
+			</ul>
+		
+		
+
+	<!-- View Definition -->
+	
+
+	<!-- List off permissions -->
+	
+
+	<p>
+		<a href="#index">Index</a> -
+		<a href="#public.schema">Schema public</a>
+    </p>
+	
+        <hr>
+		<h2>Table:
+			<a name="public.table.boekjaarbalans">boekjaarbalans</a>
+		</h2>
+        
+
+
+        <table width="100%" cellspacing="0" cellpadding="3">
+                <caption>boekjaarbalans Structure</caption>
+                <tr>
+                <th>F-Key</th>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Description</th>
+                </tr>
+            
+            <tr class="tr0">
+				<td>
+                
+                  
+                  <a href="#public.table.boekjaren">boekjaren.bky_code</a>
+                  
+                
+                </td>
+            	<td>bkb_bky</td>
+            	<td>character varying(4)</td>
+                <td><i>
+				
+					
+
+					
+				
+
+				
+				
+				</i>
+				
+				</td>
+			 </tr>
+            
+            <tr class="tr1">
+				<td>
+                
+                </td>
+            	<td>bkb_end</td>
+            	<td>date</td>
+                <td><i>
+				
+
+				
+				
+				</i>
+				
+				</td>
+			 </tr>
+            
+            <tr class="tr0">
+				<td>
+                
+                  
+                  <a href="#public.table.accounts">accounts.acc_id</a>
+                  
+                
+                </td>
+            	<td>bkb_acc_id</td>
+            	<td>integer</td>
+                <td><i>
+				
+					
+
+					
+				
+
+				
+				
+				</i>
+				
+				</td>
+			 </tr>
+            
+            <tr class="tr1">
+				<td>
+                
+                </td>
+            	<td>bkb_balance</td>
+            	<td>integer</td>
+                <td><i>
+				
+
+				
+				
+				</i>
+				
+				</td>
+			 </tr>
+            
+        </table>
+
+		
+		
+		
+
+        <!-- Constraint List -->
+		
+
+        <!-- Foreign Key Discovery -->
+		
+
+	<!-- View Definition -->
+	
+
+	<!-- List off permissions -->
+	
+
+	<p>
+		<a href="#index">Index</a> -
+		<a href="#public.schema">Schema public</a>
+    </p>
+	
+        <hr>
+		<h2>Table:
+			<a name="public.table.boekjaren">boekjaren</a>
+		</h2>
+        
+
+
+        <table width="100%" cellspacing="0" cellpadding="3">
+                <caption>boekjaren Structure</caption>
+                <tr>
+                <th>F-Key</th>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Description</th>
+                </tr>
+            
+            <tr class="tr0">
+				<td>
+                
+                  
+                
+                </td>
+            	<td>bky_code</td>
+            	<td>character varying(4)</td>
+                <td><i>
+				
+					PRIMARY KEY
+					
+
+					
+				
+
+				
+				
+				</i>
+				
+				</td>
+			 </tr>
+            
+            <tr class="tr1">
+				<td>
+                
+                </td>
+            	<td>bky_name</td>
+            	<td>text</td>
+                <td><i>
+				
+
+				NOT NULL
+				
+				</i>
+				
+				</td>
+			 </tr>
+            
+            <tr class="tr0">
+				<td>
+                
+                </td>
+            	<td>bky_begin</td>
+            	<td>date</td>
+                <td><i>
+				
+
+				NOT NULL
+				
+				</i>
+				
+				</td>
+			 </tr>
+            
+            <tr class="tr1">
+				<td>
+                
+                </td>
+            	<td>bky_end</td>
+            	<td>date</td>
+                <td><i>
+				
+
+				NOT NULL
+				
+				</i>
+				
+				</td>
+			 </tr>
+            
+            <tr class="tr0">
+				<td>
+                
+                </td>
+            	<td>bky_btwperiod</td>
+            	<td>smallint</td>
+                <td><i>
+				
+
+				
+				
+				</i>
+				
+				</td>
+			 </tr>
+            
+            <tr class="tr1">
+				<td>
+                
+                </td>
+            	<td>bky_opened</td>
+            	<td>date</td>
+                <td><i>
+				
+
+				
+				
+				</i>
+				
+				</td>
+			 </tr>
+            
+            <tr class="tr0">
+				<td>
+                
+                </td>
+            	<td>bky_closed</td>
+            	<td>date</td>
+                <td><i>
+				
+
+				
+				
+				</i>
+				
+				</td>
+			 </tr>
+            
+        </table>
+
+		
+		
+		
+
+        <!-- Constraint List -->
+		
+        <p>&nbsp;</p>
+		<table width="100%" cellspacing="0" cellpadding="3">
+            <caption>boekjaren Constraints</caption>
+            <tr>
+            	<th>Name</th>
+            	<th>Constraint</th>
+            </tr>
+			
+            <tr class="tr0">
+				<td>bky_btwperiod</td>
+                <td>CHECK (((((bky_btwperiod = 0) OR (bky_btwperiod = 1)) OR (bky_btwperiod = 4)) OR (bky_btwperiod = 12)))</td>
+            </tr>
+			
+		</table>
+		
+
+        <!-- Foreign Key Discovery -->
+		
+			<p>Tables referencing this one via Foreign Key Constraints:</p>
+		
+			<ul>	
+				<li><a href="#public.table.boekjaarbalans">boekjaarbalans</a></li>
+			</ul>
+		
+			<ul>	
+				<li><a href="#public.table.boekstukken">boekstukken</a></li>
+			</ul>
+		
+			<ul>	
+				<li><a href="#public.table.metadata">metadata</a></li>
+			</ul>
+		
+		
+
+	<!-- View Definition -->
+	
+
+	<!-- List off permissions -->
+	
+
+	<p>
+		<a href="#index">Index</a> -
+		<a href="#public.schema">Schema public</a>
+    </p>
+	
+        <hr>
+		<h2>Table:
+			<a name="public.table.boekstukken">boekstukken</a>
+		</h2>
+        
+
+
+        <table width="100%" cellspacing="0" cellpadding="3">
+                <caption>boekstukken Structure</caption>
+                <tr>
+                <th>F-Key</th>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Description</th>
+                </tr>
+            
+            <tr class="tr0">
+				<td>
+                
+                  
+                
+                </td>
+            	<td>bsk_id</td>
+            	<td>serial</td>
+                <td><i>
+				
+					PRIMARY KEY
+					
+
+					
+				
+
+				
+				
+				</i>
+				
+				</td>
+			 </tr>
+            
+            <tr class="tr1">
+				<td>
+                
+                  
+                
+                </td>
+            	<td>bsk_nr</td>
+            	<td>integer</td>
+                <td><i>
+				
+					
+
+					
+                       UNIQUE#1
+                    
+				
+
+				NOT NULL
+				
+				</i>
+				
+				</td>
+			 </tr>
+            
+            <tr class="tr0">
+				<td>
+                
+                </td>
+            	<td>bsk_desc</td>
+            	<td>text</td>
+                <td><i>
+				
+
+				NOT NULL
+				
+				</i>
+				
+				</td>
+			 </tr>
+            
+            <tr class="tr1">
+				<td>
+                
+                  
+                  <a href="#public.table.dagboeken">dagboeken.dbk_id</a>
+                  
+                
+                  
+                
+                </td>
+            	<td>bsk_dbk_id</td>
+            	<td>character varying(4)</td>
+                <td><i>
+				
+					
+
+					
+				
+					
+
+					
+                       UNIQUE#1
+                    
+				
+
+				
+				
+				</i>
+				
+				</td>
+			 </tr>
+            
+            <tr class="tr0">
+				<td>
+                
+                </td>
+            	<td>bsk_date</td>
+            	<td>date</td>
+                <td><i>
+				
+
+				
+				
+				</i>
+				
+				</td>
+			 </tr>
+            
+            <tr class="tr1">
+				<td>
+                
+                  
+                  <a href="#public.table.boekjaren">boekjaren.bky_code</a>
+                  
+                
+                  
+                
+                </td>
+            	<td>bsk_bky</td>
+            	<td>character varying(4)</td>
+                <td><i>
+				
+					
+
+					
+				
+					
+
+					
+                       UNIQUE#1
+                    
+				
+
+				
+				
+				</i>
+				
+				</td>
+			 </tr>
+            
+            <tr class="tr0">
+				<td>
+                
+                </td>
+            	<td>bsk_amount</td>
+            	<td>integer</td>
+                <td><i>
+				
+
+				
+				
+				</i>
+				
+				</td>
+			 </tr>
+            
+            <tr class="tr1">
+				<td>
+                
+                </td>
+            	<td>bsk_open</td>
+            	<td>integer</td>
+                <td><i>
+				
+
+				
+				
+				</i>
+				
+				</td>
+			 </tr>
+            
+        </table>
+
+		
+		
+		
+
+        <!-- Constraint List -->
+		
+
+        <!-- Foreign Key Discovery -->
+		
+			<p>Tables referencing this one via Foreign Key Constraints:</p>
+		
+			<ul>	
+				<li><a href="#public.table.boekstukregels">boekstukregels</a></li>
+			</ul>
+		
+			<ul>	
+				<li><a href="#public.table.journal">journal</a></li>
+			</ul>
+		
+		
+
+	<!-- View Definition -->
+	
+
+	<!-- List off permissions -->
+	
+
+	<p>
+		<a href="#index">Index</a> -
+		<a href="#public.schema">Schema public</a>
+    </p>
+	
+        <hr>
+		<h2>Table:
+			<a name="public.table.boekstukregels">boekstukregels</a>
+		</h2>
+        
+
+
+        <table width="100%" cellspacing="0" cellpadding="3">
+                <caption>boekstukregels Structure</caption>
+                <tr>
+                <th>F-Key</th>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Description</th>
+                </tr>
+            
+            <tr class="tr0">
+				<td>
+                
+                  
+                
+                </td>
+            	<td>bsr_id</td>
+            	<td>serial</td>
+                <td><i>
+				
+					PRIMARY KEY
+					
+
+					
+				
+
+				
+				
+				</i>
+				
+				</td>
+			 </tr>
+            
+            <tr class="tr1">
+				<td>
+                
+                  
+                
+                </td>
+            	<td>bsr_nr</td>
+            	<td>integer</td>
+                <td><i>
+				
+					
+
+					
+                       UNIQUE#1
+                    
+				
+
+				
+				
+				</i>
+				
+				</td>
+			 </tr>
+            
+            <tr class="tr0">
+				<td>
+                
+                </td>
+            	<td>bsr_date</td>
+            	<td>date</td>
+                <td><i>
+				
+
+				
+				
+				</i>
+				
+				</td>
+			 </tr>
+            
+            <tr class="tr1">
+				<td>
+                
+                  
+                  <a href="#public.table.boekstukken">boekstukken.bsk_id</a>
+                  
+                
+                  
+                
+                </td>
+            	<td>bsr_bsk_id</td>
+            	<td>integer</td>
+                <td><i>
+				
+					
+
+					
+				
+					
+
+					
+                       UNIQUE#1
+                    
+				
+
+				
+				
+				</i>
+				
+				</td>
+			 </tr>
+            
+            <tr class="tr0">
+				<td>
+                
+                </td>
+            	<td>bsr_desc</td>
+            	<td>text</td>
+                <td><i>
+				
+
+				
+				
+				</i>
+				
+				</td>
+			 </tr>
+            
+            <tr class="tr1">
+				<td>
+                
+                </td>
+            	<td>bsr_amount</td>
+            	<td>integer</td>
+                <td><i>
+				
+
+				
+				
+				</i>
+				
+				</td>
+			 </tr>
+            
+            <tr class="tr0">
+				<td>
+                
+                  
+                  <a href="#public.table.btwtabel">btwtabel.btw_id</a>
+                  
+                
+                </td>
+            	<td>bsr_btw_id</td>
+            	<td>smallint</td>
+                <td><i>
+				
+					
+
+					
+				
+
+				
+				
+				</i>
+				
+				</td>
+			 </tr>
+            
+            <tr class="tr1">
+				<td>
+                
+                  
+                  <a href="#public.table.accounts">accounts.acc_id</a>
+                  
+                
+                </td>
+            	<td>bsr_btw_acc</td>
+            	<td>integer</td>
+                <td><i>
+				
+					
+
+					
+				
+
+				
+				
+				</i>
+				
+				</td>
+			 </tr>
+            
+            <tr class="tr0">
+				<td>
+                
+                </td>
+            	<td>bsr_type</td>
+            	<td>smallint</td>
+                <td><i>
+				
+
+				
+				
+				</i>
+				
+				</td>
+			 </tr>
+            
+            <tr class="tr1">
+				<td>
+                
+                  
+                  <a href="#public.table.accounts">accounts.acc_id</a>
+                  
+                
+                </td>
+            	<td>bsr_acc_id</td>
+            	<td>integer</td>
+                <td><i>
+				
+					
+
+					
+				
+
+				
+				
+				</i>
+				
+				</td>
+			 </tr>
+            
+            <tr class="tr0">
+				<td>
+                
+                  
+                  <a href="#public.table.relaties">relaties.rel_code</a>
+                  
+                
+                </td>
+            	<td>bsr_rel_code</td>
+            	<td>character(10)</td>
+                <td><i>
+				
+					
+
+					
+				
+
+				
+				
+				</i>
+				
+				</td>
+			 </tr>
+            
+            <tr class="tr1">
+				<td>
+                
+                  
+                  <a href="#public.table.boekstukken">boekstukken.bsk_id</a>
+                  
+                
+                </td>
+            	<td>bsr_paid</td>
+            	<td>integer</td>
+                <td><i>
+				
+					
+
+					
+				
+
+				
+				
+				</i>
+				
+				</td>
+			 </tr>
+            
+        </table>
+
+		
+		
+		
+
+        <!-- Constraint List -->
+		
+        <p>&nbsp;</p>
+		<table width="100%" cellspacing="0" cellpadding="3">
+            <caption>boekstukregels Constraints</caption>
+            <tr>
+            	<th>Name</th>
+            	<th>Constraint</th>
+            </tr>
+			
+            <tr class="tr0">
+				<td>bsr_type</td>
+                <td>CHECK ((((bsr_type &gt;= 0) AND (bsr_type &lt;= 2)) OR (bsr_type = 9)))</td>
+            </tr>
+			
+		</table>
+		
+
+        <!-- Foreign Key Discovery -->
+		
+
+	<!-- View Definition -->
+	
+
+	<!-- List off permissions -->
+	
+
+	<p>
+		<a href="#index">Index</a> -
+		<a href="#public.schema">Schema public</a>
+    </p>
+	
+        <hr>
+		<h2>Table:
+			<a name="public.table.btwtabel">btwtabel</a>
+		</h2>
+        
+
+
+        <table width="100%" cellspacing="0" cellpadding="3">
+                <caption>btwtabel Structure</caption>
+                <tr>
+                <th>F-Key</th>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Description</th>
+                </tr>
+            
+            <tr class="tr0">
+				<td>
+                
+                  
+                
+                </td>
+            	<td>btw_id</td>
+            	<td>smallint</td>
+                <td><i>
+				
+					PRIMARY KEY
+					
+
+					
+				
+
+				
+				
+				</i>
+				
+				</td>
+			 </tr>
+            
+            <tr class="tr1">
+				<td>
+                
+                </td>
+            	<td>btw_desc</td>
+            	<td>text</td>
+                <td><i>
+				
+
+				NOT NULL
+				
+				</i>
+				
+				</td>
+			 </tr>
+            
+            <tr class="tr0">
+				<td>
+                
+                </td>
+            	<td>btw_perc</td>
+            	<td>integer</td>
+                <td><i>
+				
+
+				NOT NULL
+				
+				</i>
+				
+				</td>
+			 </tr>
+            
+            <tr class="tr1">
+				<td>
+                
+                </td>
+            	<td>btw_tariefgroep</td>
+            	<td>smallint</td>
+                <td><i>
+				
+
+				NOT NULL
+				
+				</i>
+				
+				</td>
+			 </tr>
+            
+            <tr class="tr0">
+				<td>
+                
+                </td>
+            	<td>btw_incl</td>
+            	<td>boolean</td>
+                <td><i>
+				
+
+				
+				
+				</i>
+				
+				</td>
+			 </tr>
+            
+        </table>
+
+		
+		
+		
+
+        <!-- Constraint List -->
+		
+        <p>&nbsp;</p>
+		<table width="100%" cellspacing="0" cellpadding="3">
+            <caption>btwtabel Constraints</caption>
+            <tr>
+            	<th>Name</th>
+            	<th>Constraint</th>
+            </tr>
+			
+            <tr class="tr0">
+				<td>btw_tariefgroep</td>
+                <td>CHECK (((btw_tariefgroep &gt;= 0) AND (btw_tariefgroep &lt;= 2)))</td>
+            </tr>
+			
+		</table>
+		
+
+        <!-- Foreign Key Discovery -->
+		
+			<p>Tables referencing this one via Foreign Key Constraints:</p>
+		
+			<ul>	
+				<li><a href="#public.table.accounts">accounts</a></li>
+			</ul>
+		
+			<ul>	
+				<li><a href="#public.table.boekstukregels">boekstukregels</a></li>
+			</ul>
+		
+		
+
+	<!-- View Definition -->
+	
+
+	<!-- List off permissions -->
+	
+
+	<p>
+		<a href="#index">Index</a> -
+		<a href="#public.schema">Schema public</a>
+    </p>
+	
+        <hr>
+		<h2>Table:
+			<a name="public.table.constants">constants</a>
+		</h2>
+        
+
+
+        <table width="100%" cellspacing="0" cellpadding="3">
+                <caption>constants Structure</caption>
+                <tr>
+                <th>F-Key</th>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Description</th>
+                </tr>
+            
+            <tr class="tr0">
+				<td>
+                
+                  
+                
+                </td>
+            	<td>name</td>
+            	<td>text</td>
+                <td><i>
+				
+					PRIMARY KEY
+					
+
+					
+				
+
+				
+				
+				</i>
+				
+				</td>
+			 </tr>
+            
+            <tr class="tr1">
+				<td>
+                
+                </td>
+            	<td>value</td>
+            	<td>text</td>
+                <td><i>
+				
+
+				
+				
+				</i>
+				
+				</td>
+			 </tr>
+            
+        </table>
+
+		
+		
+		
+
+        <!-- Constraint List -->
+		
+
+        <!-- Foreign Key Discovery -->
+		
+
+	<!-- View Definition -->
+	
+
+	<!-- List off permissions -->
+	
+
+	<p>
+		<a href="#index">Index</a> -
+		<a href="#public.schema">Schema public</a>
+    </p>
+	
+        <hr>
+		<h2>Table:
+			<a name="public.table.dagboeken">dagboeken</a>
+		</h2>
+        
+
+
+        <table width="100%" cellspacing="0" cellpadding="3">
+                <caption>dagboeken Structure</caption>
+                <tr>
+                <th>F-Key</th>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Description</th>
+                </tr>
+            
+            <tr class="tr0">
+				<td>
+                
+                  
+                
+                </td>
+            	<td>dbk_id</td>
+            	<td>character varying(4)</td>
+                <td><i>
+				
+					PRIMARY KEY
+					
+
+					
+				
+
+				
+				
+				</i>
+				
+				</td>
+			 </tr>
+            
+            <tr class="tr1">
+				<td>
+                
+                </td>
+            	<td>dbk_desc</td>
+            	<td>text</td>
+                <td><i>
+				
+
+				NOT NULL
+				
+				</i>
+				
+				</td>
+			 </tr>
+            
+            <tr class="tr0">
+				<td>
+                
+                </td>
+            	<td>dbk_type</td>
+            	<td>smallint</td>
+                <td><i>
+				
+
+				NOT NULL
+				
+				</i>
+				
+				</td>
+			 </tr>
+            
+            <tr class="tr1">
+				<td>
+                
+                  
+                  <a href="#public.table.accounts">accounts.acc_id</a>
+                  
+                
+                </td>
+            	<td>dbk_acc_id</td>
+            	<td>integer</td>
+                <td><i>
+				
+					
+
+					
+				
+
+				
+				
+				</i>
+				
+				</td>
+			 </tr>
+            
+        </table>
+
+		
+		
+		
+
+        <!-- Constraint List -->
+		
+        <p>&nbsp;</p>
+		<table width="100%" cellspacing="0" cellpadding="3">
+            <caption>dagboeken Constraints</caption>
+            <tr>
+            	<th>Name</th>
+            	<th>Constraint</th>
+            </tr>
+			
+            <tr class="tr0">
+				<td>dbk_types</td>
+                <td>CHECK (((dbk_type &gt;= 1) AND (dbk_type &lt;= 5)))</td>
+            </tr>
+			
+		</table>
+		
+
+        <!-- Foreign Key Discovery -->
+		
+			<p>Tables referencing this one via Foreign Key Constraints:</p>
+		
+			<ul>	
+				<li><a href="#public.table.boekstukken">boekstukken</a></li>
+			</ul>
+		
+			<ul>	
+				<li><a href="#public.table.journal">journal</a></li>
+			</ul>
+		
+			<ul>	
+				<li><a href="#public.table.relaties">relaties</a></li>
+			</ul>
+		
+		
+
+	<!-- View Definition -->
+	
+
+	<!-- List off permissions -->
+	
+
+	<p>
+		<a href="#index">Index</a> -
+		<a href="#public.schema">Schema public</a>
+    </p>
+	
+        <hr>
+		<h2>Table:
+			<a name="public.table.journal">journal</a>
+		</h2>
+        
+
+
+        <table width="100%" cellspacing="0" cellpadding="3">
+                <caption>journal Structure</caption>
+                <tr>
+                <th>F-Key</th>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Description</th>
+                </tr>
+            
+            <tr class="tr0">
+				<td>
+                
+                </td>
+            	<td>jnl_date</td>
+            	<td>date</td>
+                <td><i>
+				
+
+				NOT NULL
+				
+				</i>
+				
+				</td>
+			 </tr>
+            
+            <tr class="tr1">
+				<td>
+                
+                  
+                  <a href="#public.table.dagboeken">dagboeken.dbk_id</a>
+                  
+                
+                  
+                
+                </td>
+            	<td>jnl_dbk_id</td>
+            	<td>character varying(4)</td>
+                <td><i>
+				
+					
+
+					
+				
+					
+
+					
+                       UNIQUE#1
+                    
+				
+
+				
+				
+				</i>
+				
+				</td>
+			 </tr>
+            
+            <tr class="tr0">
+				<td>
+                
+                  
+                  <a href="#public.table.boekstukken">boekstukken.bsk_id</a>
+                  
+                
+                  
+                
+                </td>
+            	<td>jnl_bsk_id</td>
+            	<td>integer</td>
+                <td><i>
+				
+					
+
+					
+				
+					
+
+					
+                       UNIQUE#1
+                    
+				
+
+				NOT NULL
+				
+				</i>
+				
+				</td>
+			 </tr>
+            
+            <tr class="tr1">
+				<td>
+                
+                </td>
+            	<td>jnl_bsr_date</td>
+            	<td>date</td>
+                <td><i>
+				
+
+				NOT NULL
+				
+				</i>
+				
+				</td>
+			 </tr>
+            
+            <tr class="tr0">
+				<td>
+                
+                  
+                
+                </td>
+            	<td>jnl_bsr_seq</td>
+            	<td>integer</td>
+                <td><i>
+				
+					
+
+					
+                       UNIQUE#1
+                    
+				
+
+				NOT NULL
+				
+				</i>
+				
+				</td>
+			 </tr>
+            
+            <tr class="tr1">
+				<td>
+                
+                  
+                  <a href="#public.table.accounts">accounts.acc_id</a>
+                  
+                
+                </td>
+            	<td>jnl_acc_id</td>
+            	<td>integer</td>
+                <td><i>
+				
+					
+
+					
+				
+
+				
+				
+				</i>
+				
+				</td>
+			 </tr>
+            
+            <tr class="tr0">
+				<td>
+                
+                </td>
+            	<td>jnl_amount</td>
+            	<td>integer</td>
+                <td><i>
+				
+
+				
+				
+				</i>
+				
+				</td>
+			 </tr>
+            
+            <tr class="tr1">
+				<td>
+                
+                </td>
+            	<td>jnl_desc</td>
+            	<td>text</td>
+                <td><i>
+				
+
+				
+				
+				</i>
+				
+				</td>
+			 </tr>
+            
+            <tr class="tr0">
+				<td>
+                
+                  
+                  <a href="#public.table.relaties">relaties.rel_code</a>
+                  
+                
+                </td>
+            	<td>jnl_rel</td>
+            	<td>character(10)</td>
+                <td><i>
+				
+					
+
+					
+				
+
+				
+				
+				</i>
+				
+				</td>
+			 </tr>
+            
+        </table>
+
+		
+		
+		
+
+        <!-- Constraint List -->
+		
+
+        <!-- Foreign Key Discovery -->
+		
+
+	<!-- View Definition -->
+	
+
+	<!-- List off permissions -->
+	
+
+	<p>
+		<a href="#index">Index</a> -
+		<a href="#public.schema">Schema public</a>
+    </p>
+	
+        <hr>
+		<h2>Table:
+			<a name="public.table.metadata">metadata</a>
+		</h2>
+        
+
+
+        <table width="100%" cellspacing="0" cellpadding="3">
+                <caption>metadata Structure</caption>
+                <tr>
+                <th>F-Key</th>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Description</th>
+                </tr>
+            
+            <tr class="tr0">
+				<td>
+                
+                </td>
+            	<td>adm_scm_majversion</td>
+            	<td>smallint</td>
+                <td><i>
+				
+
+				NOT NULL
+				
+				</i>
+				
+				</td>
+			 </tr>
+            
+            <tr class="tr1">
+				<td>
+                
+                </td>
+            	<td>adm_scm_minversion</td>
+            	<td>smallint</td>
+                <td><i>
+				
+
+				NOT NULL
+				
+				</i>
+				
+				</td>
+			 </tr>
+            
+            <tr class="tr0">
+				<td>
+                
+                </td>
+            	<td>adm_scm_revision</td>
+            	<td>smallint</td>
+                <td><i>
+				
+
+				NOT NULL
+				
+				</i>
+				
+				</td>
+			 </tr>
+            
+            <tr class="tr1">
+				<td>
+                
+                  
+                  <a href="#public.table.boekjaren">boekjaren.bky_code</a>
+                  
+                
+                </td>
+            	<td>adm_bky</td>
+            	<td>character varying(4)</td>
+                <td><i>
+				
+					
+
+					
+				
+
+				
+				
+				</i>
+				
+				</td>
+			 </tr>
+            
+            <tr class="tr0">
+				<td>
+                
+                </td>
+            	<td>adm_btwbegin</td>
+            	<td>date</td>
+                <td><i>
+				
+
+				
+				
+				</i>
+				
+				</td>
+			 </tr>
+            
+        </table>
+
+		
+		
+		
+
+        <!-- Constraint List -->
+		
+
+        <!-- Foreign Key Discovery -->
+		
+
+	<!-- View Definition -->
+	
+
+	<!-- List off permissions -->
+	
+
+	<p>
+		<a href="#index">Index</a> -
+		<a href="#public.schema">Schema public</a>
+    </p>
+	
+        <hr>
+		<h2>Table:
+			<a name="public.table.relaties">relaties</a>
+		</h2>
+        
+
+
+        <table width="100%" cellspacing="0" cellpadding="3">
+                <caption>relaties Structure</caption>
+                <tr>
+                <th>F-Key</th>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Description</th>
+                </tr>
+            
+            <tr class="tr0">
+				<td>
+                
+                  
+                
+                </td>
+            	<td>rel_code</td>
+            	<td>character(10)</td>
+                <td><i>
+				
+					PRIMARY KEY
+					
+
+					
+				
+
+				
+				
+				</i>
+				
+				</td>
+			 </tr>
+            
+            <tr class="tr1">
+				<td>
+                
+                </td>
+            	<td>rel_desc</td>
+            	<td>text</td>
+                <td><i>
+				
+
+				NOT NULL
+				
+				</i>
+				
+				</td>
+			 </tr>
+            
+            <tr class="tr0">
+				<td>
+                
+                </td>
+            	<td>rel_debcrd</td>
+            	<td>boolean</td>
+                <td><i>
+				
+
+				
+				
+				</i>
+				
+				</td>
+			 </tr>
+            
+            <tr class="tr1">
+				<td>
+                
+                </td>
+            	<td>rel_btw_status</td>
+            	<td>smallint</td>
+                <td><i>
+				
+
+				
+				
+				</i>
+				
+				</td>
+			 </tr>
+            
+            <tr class="tr0">
+				<td>
+                
+                  
+                  <a href="#public.table.dagboeken">dagboeken.dbk_id</a>
+                  
+                
+                </td>
+            	<td>rel_ledger</td>
+            	<td>character varying(4)</td>
+                <td><i>
+				
+					
+
+					
+				
+
+				
+				
+				</i>
+				
+				</td>
+			 </tr>
+            
+            <tr class="tr1">
+				<td>
+                
+                  
+                  <a href="#public.table.accounts">accounts.acc_id</a>
+                  
+                
+                </td>
+            	<td>rel_acc_id</td>
+            	<td>integer</td>
+                <td><i>
+				
+					
+
+					
+				
+
+				
+				
+				</i>
+				
+				</td>
+			 </tr>
+            
+        </table>
+
+		
+		
+		
+
+        <!-- Constraint List -->
+		
+        <p>&nbsp;</p>
+		<table width="100%" cellspacing="0" cellpadding="3">
+            <caption>relaties Constraints</caption>
+            <tr>
+            	<th>Name</th>
+            	<th>Constraint</th>
+            </tr>
+			
+            <tr class="tr0">
+				<td>rel_btw_status</td>
+                <td>CHECK (((rel_btw_status &gt;= 0) AND (rel_btw_status &lt;= 3)))</td>
+            </tr>
+			
+		</table>
+		
+
+        <!-- Foreign Key Discovery -->
+		
+			<p>Tables referencing this one via Foreign Key Constraints:</p>
+		
+			<ul>	
+				<li><a href="#public.table.boekstukregels">boekstukregels</a></li>
+			</ul>
+		
+			<ul>	
+				<li><a href="#public.table.journal">journal</a></li>
+			</ul>
+		
+		
+
+	<!-- View Definition -->
+	
+
+	<!-- List off permissions -->
+	
+
+	<p>
+		<a href="#index">Index</a> -
+		<a href="#public.schema">Schema public</a>
+    </p>
+	
+        <hr>
+		<h2>Table:
+			<a name="public.table.standaardrekeningen">standaardrekeningen</a>
+		</h2>
+        
+
+
+        <table width="100%" cellspacing="0" cellpadding="3">
+                <caption>standaardrekeningen Structure</caption>
+                <tr>
+                <th>F-Key</th>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Description</th>
+                </tr>
+            
+            <tr class="tr0">
+				<td>
+                
+                  
+                  <a href="#public.table.accounts">accounts.acc_id</a>
+                  
+                
+                </td>
+            	<td>std_acc_deb</td>
+            	<td>integer</td>
+                <td><i>
+				
+					
+
+					
+				
+
+				
+				
+				</i>
+				
+				</td>
+			 </tr>
+            
+            <tr class="tr1">
+				<td>
+                
+                  
+                  <a href="#public.table.accounts">accounts.acc_id</a>
+                  
+                
+                </td>
+            	<td>std_acc_crd</td>
+            	<td>integer</td>
+                <td><i>
+				
+					
+
+					
+				
+
+				
+				
+				</i>
+				
+				</td>
+			 </tr>
+            
+            <tr class="tr0">
+				<td>
+                
+                  
+                  <a href="#public.table.accounts">accounts.acc_id</a>
+                  
+                
+                </td>
+            	<td>std_acc_btw_ih</td>
+            	<td>integer</td>
+                <td><i>
+				
+					
+
+					
+				
+
+				
+				
+				</i>
+				
+				</td>
+			 </tr>
+            
+            <tr class="tr1">
+				<td>
+                
+                  
+                  <a href="#public.table.accounts">accounts.acc_id</a>
+                  
+                
+                </td>
+            	<td>std_acc_btw_il</td>
+            	<td>integer</td>
+                <td><i>
+				
+					
+
+					
+				
+
+				
+				
+				</i>
+				
+				</td>
+			 </tr>
+            
+            <tr class="tr0">
+				<td>
+                
+                  
+                  <a href="#public.table.accounts">accounts.acc_id</a>
+                  
+                
+                </td>
+            	<td>std_acc_btw_vh</td>
+            	<td>integer</td>
+                <td><i>
+				
+					
+
+					
+				
+
+				
+				
+				</i>
+				
+				</td>
+			 </tr>
+            
+            <tr class="tr1">
+				<td>
+                
+                  
+                  <a href="#public.table.accounts">accounts.acc_id</a>
+                  
+                
+                </td>
+            	<td>std_acc_btw_vl</td>
+            	<td>integer</td>
+                <td><i>
+				
+					
+
+					
+				
+
+				
+				
+				</i>
+				
+				</td>
+			 </tr>
+            
+            <tr class="tr0">
+				<td>
+                
+                  
+                  <a href="#public.table.accounts">accounts.acc_id</a>
+                  
+                
+                </td>
+            	<td>std_acc_btw_ok</td>
+            	<td>integer</td>
+                <td><i>
+				
+					
+
+					
+				
+
+				
+				
+				</i>
+				
+				</td>
+			 </tr>
+            
+            <tr class="tr1">
+				<td>
+                
+                  
+                  <a href="#public.table.accounts">accounts.acc_id</a>
+                  
+                
+                </td>
+            	<td>std_acc_winst</td>
+            	<td>integer</td>
+                <td><i>
+				
+					
+
+					
+				
+
+				
+				
+				</i>
+				
+				</td>
+			 </tr>
+            
+        </table>
+
+		
+		
+		
+
+        <!-- Constraint List -->
+		
+
+        <!-- Foreign Key Discovery -->
+		
+
+	<!-- View Definition -->
+	
+
+	<!-- List off permissions -->
+	
+
+	<p>
+		<a href="#index">Index</a> -
+		<a href="#public.schema">Schema public</a>
+    </p>
+	
+        <hr>
+		<h2>Table:
+			<a name="public.table.verdichtingen">verdichtingen</a>
+		</h2>
+        
+
+
+        <table width="100%" cellspacing="0" cellpadding="3">
+                <caption>verdichtingen Structure</caption>
+                <tr>
+                <th>F-Key</th>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Description</th>
+                </tr>
+            
+            <tr class="tr0">
+				<td>
+                
+                  
+                
+                </td>
+            	<td>vdi_id</td>
+            	<td>integer</td>
+                <td><i>
+				
+					PRIMARY KEY
+					
+
+					
+				
+
+				
+				
+				</i>
+				
+				</td>
+			 </tr>
+            
+            <tr class="tr1">
+				<td>
+                
+                </td>
+            	<td>vdi_desc</td>
+            	<td>text</td>
+                <td><i>
+				
+
+				NOT NULL
+				
+				</i>
+				
+				</td>
+			 </tr>
+            
+            <tr class="tr0">
+				<td>
+                
+                </td>
+            	<td>vdi_balres</td>
+            	<td>boolean</td>
+                <td><i>
+				
+
+				
+				
+				</i>
+				
+				</td>
+			 </tr>
+            
+            <tr class="tr1">
+				<td>
+                
+                </td>
+            	<td>vdi_kstomz</td>
+            	<td>boolean</td>
+                <td><i>
+				
+
+				
+				
+				</i>
+				
+				</td>
+			 </tr>
+            
+            <tr class="tr0">
+				<td>
+                
+                  
+                  <a href="#public.table.verdichtingen">verdichtingen.vdi_id</a>
+                  
+                
+                </td>
+            	<td>vdi_struct</td>
+            	<td>integer</td>
+                <td><i>
+				
+					
+
+					
+				
+
+				
+				
+				</i>
+				
+				</td>
+			 </tr>
+            
+        </table>
+
+		
+		
+		
+
+        <!-- Constraint List -->
+		
+
+        <!-- Foreign Key Discovery -->
+		
+			<p>Tables referencing this one via Foreign Key Constraints:</p>
+		
+			<ul>	
+				<li><a href="#public.table.accounts">accounts</a></li>
+			</ul>
+		
+			<ul>	
+				<li><a href="#public.table.verdichtingen">verdichtingen</a></li>
+			</ul>
+		
+		
+
+	<!-- View Definition -->
+	
+
+	<!-- List off permissions -->
+	
+
+	<p>
+		<a href="#index">Index</a> -
+		<a href="#public.schema">Schema public</a>
+    </p>
+	
+
+	<!-- We've gone through the table structure, now lets take a look at user functions -->
+	
+
+
+<p class="w3ref">Generated by <a href="http://www.rbt.ca/autodoc/">PostgreSQL Autodoc</a></p>
+<p class="w3ref"><a href="http://validator.w3.org/check/referer">W3C HTML 4.01 Strict</a></p>
+</body></html>

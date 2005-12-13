@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="iso-8859-15"?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+ <head>
+  <title>EekBoek</title>
+  <link rel="stylesheet" href="../css/site.css">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-15">
+  <meta name="robots" content="all">
+ </head>
+
+ <body bgcolor="#FFFFFF"
+       text="#000000" link="#0000FF"
+       vlink="#0000FF" alink="#C81900" background="../images/bg.gif" >
+  <table width="100%" border="0" cellpadding="0" cellspacing="5">
+
+  <tr valign="top">
+    <td width="161" align="left">
+      <a href="../index.html"><img src="../images/eb.jpg" alt="EekBoek Boekhouden" border="0" width="149" height="87" /></a>
+
+    </td>
+    <td>
+              <h1 class="title">EekBoek</h1>
+<div class="info">
+  Electronisch Boekhouden voor het MKB
+</div>
+
+          </td>
+  </tr>
+
+  <tr>
+    <td>
+      <a href="../index.html"><img src="../images/ebname.jpg" alt="EekBoek" border="0" width="151" height="22" /></a>
+
+    </td>
+    <td>
+      <table width="100%" border="0" cellpadding="0" cellspacing="0">
+  <tr valign="middle">
+    <td align="left">
+      <table border="0" cellpadding="0" cellspacing="2">
+  <tr valign="middle">
+
+    <td class="info"></td>
+    <td><a href="../intro/index.html" class="menu">Inleiding</a>
+</td>
+	<td> &#xbb; </td>
+    <td class="info"></td>
+    <td><a href="../intro/working.html" class="menu">Werkwijze</a>
+</td>
+	
+  </tr>
+</table>
+
+    </td>
+    <td align="right">
+      
+    </td>
+  </tr>
+</table>
+
+    </td>
+  </tr>
+
+  <tr>
+    <td>
+      <hr />
+
+    </td>
+    <td>
+      <hr />
+
+    </td>
+  </tr>
+
+  <tr valign="top">
+    <td>
+      <div class="sidemenu">
+<table border="0" cellpadding="0" cellspacing="0">
+  <tr>
+    <td align="left" class="menutitle">Documentatie
+    </td>
+  </tr>
+  <tr>
+    <td><hr />
+</td>
+  </tr>
+  <tr valign="top">
+    <td align="left">
+      <a href="../intro/index.html" class="menuselect">Inleiding</a>
+<br />
+&nbsp;-&nbsp;<a href="../intro/working.html" class="menuselect">Werkwijze</a>
+<br />
+&nbsp;-&nbsp;<a href="../intro/backups.html" class="menu">Backups</a>
+<br />
+<br />
+<a href="../ebshell/index.html" class="menu">De EekBoek shell</a>
+<br />
+<a href="../setup/index.html" class="menu">Opzetten administratie</a>
+<br />
+<a href="../debcrd.html" class="menu">Relaties</a>
+<br />
+<a href="../bookings/index.html" class="menu">Boekingen</a>
+<br />
+<a href="../reports/index.html" class="menu">Overzichten</a>
+<br />
+<a href="../yearend.html" class="menu">Jaarafsluiting</a>
+<br />
+          </td>
+  </tr>
+</table>
+</div>
+
+    </td>
+    <td>
+      
+
+<h2>Werkwijze</h2>
+
+<p>Zoals verderop in deze documentatie wordt beschreven, wordt een
+EekBoek administratie bepaald door twee zaken: het <dfn>schema</dfn>
+en de <dfn>mutaties</dfn>.</p>
+
+<p>Het schema bepaalt de <em>structuur</em> van de administratie,
+zoals het rekeningschema, de dagboeken en BTW tarieven. Het schema wordt
+aangemaakt en onderhouden in de vorm van een tekstbestand, dat bij
+het aanmaken van de administratie eenmalig wordt geladen. Meer
+hierover in <a href="../setup/schema.html#acc">Het vullen van de database
+met de administratiegegevens</a>.</p>
+
+<p>De mutaties (in bredere zin) bepalen de <em>inhoud</em> van de
+administratie, zoals de debiteuren en crediteuren, openingsbalans, en
+de eigenlijke boekingen.</p>
+
+<p>Vanwege de batch-faciliteit van de <a
+href="../ebshell/index.html">EekBoek shell</a> is het mogelijk ook
+alle mutaties te onderhouden in een tekstbestand. Met een enkele druk
+op de knop kan te allen tijde de gehele administratie opnieuw worden
+opgebouwd door het verwerken van het schema en het mutatiebestand.</p>
+
+<p>Natuurlijk is het ook mogelijk om incrementeel te werken, en steeds
+interactief met de <a href="../ebshell/index.html">EekBoek
+shell</a> mutaties toe te voegen. Of een combinatie: elke nieuwe
+mutatie toevoegen aan het mutatiebestand en dan alleen de nieuw
+toegevoegde mutaties via de batch-faciliteit verwerken. De meeste
+tekst-editors beschikken over de mogelijkheid om een deel van een
+tekstbestand naar een programma te sturen.</p>
+
+<p>De EekBoek grafische shell (GUI), op dit moment nog in
+ontwikkeling, werkt uiteraard incrementeel.</p>
+
+<p>Te zijner tijd zal EekBoek ook de voorziening bieden om de actuele
+inhoud van een administratie weer geheel weg te schrijven naar een
+volledig mutatiebestand. En daarmee is de cirkel weer rond.</p>
+
+    </td>
+  </tr>
+
+  <tr>
+    <td>
+      <hr />
+
+    </td>
+    <td>
+      <hr />
+
+    </td>
+  </tr>
+
+  <tr valign="bottom">
+    <td valign="middle">
+      <a href="http://www.perl.org/"><img src="../images/perl_powered.png" alt="Powered by Perl" border="0" width="134" height="48" /></a>
+
+    </td>
+    <td align="center">
+      <p class="info">Copyright &copy; 2005 <a href="http://www.squirrel.nl">Squirrel Consultancy</a>. All Rights Reserved.<br />
+Deze site is gemaakt met de 
+<a href='http://www.squirrel.nl/people/jvromans/tt2site/'>TT2Site
+Site Builder</a>.<br />
+intro/working.html laatste aanpassing 13 december 2005, 20:06:07
+</p>
+
+    </td>
+  </tr>
+
+</table>
+
+ </body>
+</html>

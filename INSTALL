@@ -1,0 +1,39 @@
+Installatie Eekboek Boekhoudpakket (command line versie)
+========================================================
+
+Nodig: Perl5.8.x met DBI (zit standaard in Perl)
+       PostgreSQL
+
+Perl modules (zelf te installeren):
+       DBD::Pg 1.41 of later
+       Term::ReadLine::Gnu
+       (Text::CSV_XS voor de Exact importprogramma's)
+
+Bouwen:
+
+   $ perl Makefile.PL
+   $ make all test
+
+Het is niet nodig om EekBoek te installeren om het te kunnen
+gebruiken. Wil je toch installeren:
+
+   $ su
+   # make install
+
+Installatie verwijderen:
+
+   Zoek uit waar de spullen zijn neergezet onder /usr/lib/perl5.
+   De gehele directory EB kun je weghalen, evenals het script
+   /usr/bin/ebshell.
+
+Liefhebbers van RPM kunnen de meeegeleverde EekBoek.spec file gebruiken.
+
+Voor het uitwisselen van ervaringen, vragen om ondersteuning en zo:
+gebruik de mailing list http://lists.sourceforge.net/lists/listinfo/eekboek-users.
+
+----------------------------------------------------------------------------
+Johan Vromans                                           jvromans@squirrel.nl
+Squirrel Consultancy                                  Exloo, the Netherlands
+http://www.squirrel.nl                              http://johan.vromans.org
+PGP Key 2048/4783B14D                   http://johan.vromans.org/pgpkey.html
+----------------------- "Arms are made for hugging" ------------------------

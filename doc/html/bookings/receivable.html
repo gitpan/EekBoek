@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="iso-8859-15"?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+ <head>
+  <title>EekBoek</title>
+  <link rel="stylesheet" href="../css/site.css">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-15">
+  <meta name="robots" content="all">
+ </head>
+
+ <body bgcolor="#FFFFFF"
+       text="#000000" link="#0000FF"
+       vlink="#0000FF" alink="#C81900" background="../images/bg.gif" >
+  <table width="100%" border="0" cellpadding="0" cellspacing="5">
+
+  <tr valign="top">
+    <td width="161" align="left">
+      <a href="../index.html"><img src="../images/eb.jpg" alt="EekBoek Boekhouden" border="0" width="149" height="87" /></a>
+
+    </td>
+    <td>
+              <h1 class="title">EekBoek</h1>
+<div class="info">
+  Electronisch Boekhouden voor het MKB
+</div>
+
+          </td>
+  </tr>
+
+  <tr>
+    <td>
+      <a href="../index.html"><img src="../images/ebname.jpg" alt="EekBoek" border="0" width="151" height="22" /></a>
+
+    </td>
+    <td>
+      <table width="100%" border="0" cellpadding="0" cellspacing="0">
+  <tr valign="middle">
+    <td align="left">
+      <table border="0" cellpadding="0" cellspacing="2">
+  <tr valign="middle">
+
+    <td class="info"></td>
+    <td><a href="../bookings/index.html" class="menu">Boekingen</a>
+</td>
+	<td> &#xbb; </td>
+    <td class="info"></td>
+    <td><a href="../bookings/receivable.html" class="menu">Verkoopfakturen</a>
+</td>
+	
+  </tr>
+</table>
+
+    </td>
+    <td align="right">
+      
+    </td>
+  </tr>
+</table>
+
+    </td>
+  </tr>
+
+  <tr>
+    <td>
+      <hr />
+
+    </td>
+    <td>
+      <hr />
+
+    </td>
+  </tr>
+
+  <tr valign="top">
+    <td>
+      <div class="sidemenu">
+<table border="0" cellpadding="0" cellspacing="0">
+  <tr>
+    <td align="left" class="menutitle">Documentatie
+    </td>
+  </tr>
+  <tr>
+    <td><hr />
+</td>
+  </tr>
+  <tr valign="top">
+    <td align="left">
+      <a href="../intro/index.html" class="menu">Inleiding</a>
+<br />
+<a href="../ebshell/index.html" class="menu">De EekBoek shell</a>
+<br />
+<a href="../setup/index.html" class="menu">Opzetten administratie</a>
+<br />
+<a href="../debcrd.html" class="menu">Relaties</a>
+<br />
+<a href="../bookings/index.html" class="menuselect">Boekingen</a>
+<br />
+&nbsp;-&nbsp;<a href="../bookings/payable.html" class="menu">Inkoopfakturen</a>
+<br />
+&nbsp;-&nbsp;<a href="../bookings/receivable.html" class="menuselect">Verkoopfakturen</a>
+<br />
+&nbsp;-&nbsp;<a href="../bookings/bank.html" class="menu">Bankafschriften</a>
+<br />
+&nbsp;-&nbsp;<a href="../bookings/cash.html" class="menu">Kas</a>
+<br />
+&nbsp;-&nbsp;<a href="../bookings/memorial.html" class="menu">Memoriaal</a>
+<br />
+<br />
+<a href="../reports/index.html" class="menu">Overzichten</a>
+<br />
+<a href="../yearend.html" class="menu">Jaarafsluiting</a>
+<br />
+          </td>
+  </tr>
+</table>
+</div>
+
+    </td>
+    <td>
+      <h2>Verkoopfakturen</h2>
+
+<p>Verkoopfakturen worden geboekt in een dagboek van het type Verkoop.
+Zo'n dagboek heet typisch 'Verkoop' of 'Verkopen'. De keuze van de
+naam is vrij, en er mogen meerdere verkoopdagboeken tegelijk zijn.</p>
+
+<p>De naam van de boekingsopdracht is gelijk aan die van het dagboek.
+We nemen hier als voorbeeld het dagboek 'Verkopen'.</p>
+
+<p>Zoals alle boekingen bestaat ook de verkoopboeking uit twee delen: de
+<dfn>boekstukkop</dfn> en een of meer <dfn>boekstukregels</dfn>.</p>
+
+<p>Syntaxvoorbeeld van een boekstukkop:</p>
+
+<blockquote class="code">verkopen:12 11-09-2005 Consultancy ACME</blockquote>
+
+<p>De onderdelen:</p>
+
+<table border="1" width="100%" cellpadding="5">
+  <tr valign="top">
+    <td><code>verkopen:12</code></td>
+    <td>Het boekstuknummer. Dit bestaat uit de naam van het dagboek
+	en het (vrij te kiezen) boekstuknummer, gescheiden door een
+	dubbele punt '<code>:</code>'.
+	<br>Het volgnummer mag worden weggelaten, in welk geval
+	EekBoek zelf een volgnummer toekent. Het verdient echter
+	aanbeveling om altijd expliciet een volgnummer op te geven.
+    </td>
+  </tr>
+  <tr valign="top">
+    <td><code>11-09-2005</code></td>
+    <td>De boekingsdatum in <a href="../date.html">een van de ondersteunde vormen</a>.</td>
+  </tr>
+  <tr valign="top">
+    <td><code>Consultancy</code></td>
+    <td>De omschrijving van dit boekstuk.
+	<br>Indien deze spaties bevat moeten er aanhalingstekens
+	omheen worden geplaatst.
+    </td>
+  </tr>
+  <tr valign="top">
+    <td><code>ACME</code></td>
+    <td>De code van de debiteur. Conventioneel wordt deze in
+	hoofdletters gegeven, maar dit is niet vereist.</td>
+  </tr>
+</table>
+
+<p>Syntaxvoorbeeld van een boekingsregel:</p>
+
+<blockquote class="code">Werkzaamheden 369,82 8104</blockquote>
+
+<p>De onderdelen:</p>
+
+<table border="1" width="100%" cellpadding="5">
+  <tr valign="top">
+    <td><code>Werkzaamheden</code></td>
+    <td>De omschrijving van deze boekstukregel.
+	<br>Indien deze spaties bevat moeten er aanhalingstekens
+	omheen worden geplaatst.
+    </td>
+  </tr>
+  <tr valign="top">
+    <td><code>369,82</code></td>
+    <td>Het bedrag.
+	<br>Een te ontvangen bedrag wordt als positief bedrag opgegeven,
+	een debitering als negatief bedrag.
+    </td>
+  </tr>
+  <tr valign="top">
+    <td><code>8104</code></td>
+    <td>De grootboekrekening waarop dit bedrag moet worden
+	geboekt.</td>
+  </tr>
+</table>
+
+<p>Zoals gezegd kan een boekstuk meerdere regels bevatten. Dit wordt
+voornamelijk bepaald door de aard van de faktuur. De som van alle
+bedragen is het boekstuktotaal. Dit wordt geboekt op de vaste
+tegenrekening voor verkoopboekingen (zie <a
+href="../stdacc.html">Koppelingen</a>).</p>
+
+
+
+<p>Indien aan de grootboekrekening een BTW-tarief is gekoppeld, zal
+dit voor deze boeking worden doorberekend. Het opgegeven bedrag is dan
+het te boeken bedrag inclusief BTW. Het is mogelijk hiervan af te
+wijken door expliciet een BTW-code toe te voegen aan het bedrag in de
+vorm '<code>@<var>X</var></code>', waarbij <var>X</var> de gewenste
+BTW-code is. BTW-code '<code>0</code>' betekent altijd 'geen BTW',
+zodat de toevoeging '<code>@0</code>' aangeeft dat er geen BTW van
+toepassing is op deze boeking. Met de symbolische codes
+'<code>H</code>' en '<code>L</code>' kan worden gekozen voor het hoge
+resp. lage BTW tarief. Voor de overige codes hangt het resultaat af
+van de definitie van de BTW-codes.</p>
+
+
+<p>Tot slot is het mogelijk het boekstuktotaal te verifiëren door aan
+de boekingsopdracht de optie '<code>--totaal=<var>bedrag</var></code>'
+toe te voegen.</p>
+
+
+    </td>
+  </tr>
+
+  <tr>
+    <td>
+      <hr />
+
+    </td>
+    <td>
+      <hr />
+
+    </td>
+  </tr>
+
+  <tr valign="bottom">
+    <td valign="middle">
+      <a href="http://www.perl.org/"><img src="../images/perl_powered.png" alt="Powered by Perl" border="0" width="134" height="48" /></a>
+
+    </td>
+    <td align="center">
+      <p class="info">Copyright &copy; 2005 <a href="http://www.squirrel.nl">Squirrel Consultancy</a>. All Rights Reserved.<br />
+Deze site is gemaakt met de 
+<a href='http://www.squirrel.nl/people/jvromans/tt2site/'>TT2Site
+Site Builder</a>.<br />
+bookings/receivable.html laatste aanpassing 08 december 2005, 09:45:50
+</p>
+
+    </td>
+  </tr>
+
+</table>
+
+ </body>
+</html>

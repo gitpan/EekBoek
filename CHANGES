@@ -1,0 +1,221 @@
+0.21
+
+	Meer dan 9 hoofdverdichtingen en meer dan 89 verdichtingen
+	mogelijk.
+	Twee voorbeeld-schema's: eenmanszaak en bvnv.
+	adm_relatie neemt nu een fully-qualified boekstuknummer:
+	adm_relatie inkopen:1998:1245 1998-12-31 "Consultancy" SCS 1877.09
+
+0.20	12-12-2005 11:55
+
+	Aanzet documentatie op web site.
+	Opdracht "relaties" kan meerdere relaties tegelijk aanmaken.
+	BTW intracomm. in aangifte.
+	Bugfixes jaareinde.
+	ebshell command line opties --boekjaar, --db (alias voor
+	--dataset) en --journaal (preferred voor --journal).
+	Waarschuwing voor relaties met BTW intra en BTW verlegd (nog
+	niet (geheel)) ondersteund.
+	Dagboek-ids kunnen nu alfanumeriek (max. 4 tekens) zijn.
+	Invoeren syntax Dagboek:BoekjaarCode:VolgNummer voor boekstukken.
+	*** INCOMPATIBLE DATABASE CHANGES *** GEEN MIGRATIE ***
+
+0.19	30-11-2005 21:45
+
+	sample renamed naar ivp.
+	example aangemaakt.
+	spec file generatie in tarball.
+	Uitfasering van dubbele vlaggetjes in schema.
+	Temporary disable Build.PL building.
+
+0.18	21-11-2005 17:04
+
+	Emergency fix voor PostgreSQL temp tables probleem.
+	PATH fix in sample/setup.csh.
+
+0.17	19-11-2005 23:18
+
+	HTML uitvoer-plugins voor Balans en Resultaat.
+	HTML uitvoer-plugin voor Journaal.
+	HTML uitvoer-plugin voor Grootboek.
+
+0.16	16-11-2005 15:25
+
+	Aanvang invoering universele uitvoer-plugins voor rapporten.
+	Meer help: "help periodes" en "help rapporten".
+	btwaangifte heeft nu een --definitief optie. Is netter.
+	Openstaande posten worden gegroepeerd per dagboek.
+	Openstaande posten per einddatum.
+	Relatiecodes worden nu case-insensitive herkend.
+
+	Meerdere boekjaren per administratie (experimenteel).
+
+0.15	08-10-2005 18:20
+
+	BTW aangifte nu ook naar bestand (optie --output=...) en in
+	HTML formaat (optie --html).
+	Lange boekstukomschrijvingen worden in het journaal en
+	grootboek over meerdere regels afgedrukt.
+	Wijziging boekstuknummer in numeriek.
+	Bugfix: BTW aangifte gebruikte harde nummers voor BTW
+	rekeningen.
+
+0.14	03-10-2005 23:09
+
+	Automatische migratie van database naar een nieuwe versie.
+	(EB::Tools::SQLEngine): Afvangen transactionele commandos.
+	(Shell) Correct completions after "help".
+	(EB::Booking::*) Partiële boekingen.
+
+0.13	30-09-2005 18:40
+
+	(EB::Report::Open) Overzicht openstaande posten.
+	(Shell) Niewe opdracht: "openstaand".
+	(Utils) Meer ISO-achtige periodeformaten:
+	YYYY-MM-DD/YYY-MM-DD, YYYY-MM-DD/MM-DD en YYYY-MM-DD/DD.
+	(Shell) Experimentele invoer-completion op
+	debiteur/crediteurcodes en grootboekrekeningen.
+
+0.12	29-09-2005 22:05
+
+	(Shell) Periode-selectie (--periode=XXX) voor (sommige) commando's.
+	(Grootboek) Periode-selectie.
+	(Journaal) Periode-selectie.
+	(Relatie) Dagboek-selectie met --dagboek.
+
+	Periode-aanduidingen zijn erg flexibel. B.v. als 2003 het
+	huidige boekjaar is, dan zijn de volgende aanduidingen equivalent:
+
+	  2003-01-01 - 2003-03-31
+	  01-01-2003 - 31-03-2003
+	  01-01 - 31-03
+	  januari - maart
+	  jan - mrt (korte namen)
+	  m1 - m3 (maandnummers)
+	  k1 (eerste kwartaal)
+
+	Eveneens:
+
+	  2003-02-01 - 2003-02-28
+	  01-02-2003 - 28-02-2003
+	  01-02 - 28-02
+	  februari
+	  feb
+	  m2
+
+	Verder is toegestaan:
+
+	  jaar       (01-01 - 31-12)
+
+	Een subset hiervan is ook bruikbaar voor b.v. btw aangifte.
+
+0.11	28-09-2005 22:59
+
+	(BKM.IV) Datumcontrole op boekingen. Boekingen moeten in het
+	huidige boekjaar vallen. 
+	(BTWAangfite) Als er definitief BTW aangifte is gedaan kan
+	er niet meer worden geboekt in die periode. Een BTW aangifte
+	wordt definitief door toevoeging van het woord "definitief"
+	aan de opdracht, b.v.:
+
+	  btwaangifte augustus definitief
+
+	Introductie database migratie. Om te migreren van database
+	versie 1.0.0 (EekBoek 0.10) naar 1.0.1 (EekBoek 0.11) kan het
+	script migrate/1_0_0_to_1_0_1.sql worden gebruikt:
+
+	  pg_dump -c $EB_DB_NAME > backup.sql
+	  psql $EB_DB_NAME < migrate/1_0_0_to_1_0_1.sql
+
+	(Wordt later wsl. geautomatiseerd)
+
+	(EB::Tools::Schema,EB::Tools::SQLEngine) Afsplitsen SQL
+	engine. 
+
+0.10	27-09-2005 23:09
+
+	(IV, BKM) Her-invoering van de mogelijkheid om BTW te boeken
+	op 'std' boekingen. Zie de beschrijving in
+	samples/mutaties.eb. BTW tariefcodewijzigingen kunnen nu ook
+	zijn "@H" en "@L" voor hoog resp. laagtarief.
+
+	Correctie van de dependencies in Makefile.PL.
+
+0.09	26-09-2005 22:34
+
+	Belangrijkste wijziging: Uitfaseren van de rol van de D/C
+	setting van grootboekrekeningen tijdens het boekingsproces.
+
+	Tot nu toe werd de richting van een boeking bepaald door het
+	dagboek en de Debet/Credit setting van de betreffende
+	grootboekrekening. Dit werd door enkele testers als
+	contra-intuïtief ervaren en daarom heb ik in overleg een
+	nieuwe manier geïmplementeerd.
+
+	Consequenties voor bestaande mutatie-bestanden:
+
+	- Inkoop / Verkoop boekingen: geen consequenties.
+
+	- Bank / Kas / Memoriaal:
+	  - 'deb' boekingen: geen
+	  - 'crd' boekingen: het bedrag moet nu negatief worden
+	    opgegeven (het saldo vermindert immers)
+	  - 'std' boekingen: Boekingen met BTW zijn niet langer
+	    toegestaan. Deze zijn boekhoudtechnisch nl. vrijwel altijd
+	    incorrect, en doorgaans illegaal. Als je perse een 'std'
+	    boeking met BTW wilt, dan kun je die met de hand
+	    uitsplitsen.
+
+	Zie de beschrijving in samples/mutaties.eb.
+
+0.08	22-09-2005 15:45
+
+	(BKM) BKM boekingen kunnen nu een datum per boekstukregel krijgen.
+	(Grootboek) Opdracht 'grootboek' kan selectief worden uitgevoerd op een of
+	meer rekeningen.
+	(EB::Utils) Nieuw: Utility functies.
+
+0.07	21-09-2005 12:25
+
+	(IV,BKM) Datum ook als DD-MM-JJJJ en DD-MM.
+	(IV,BKM) --totaal optie.
+	(IV,BKM) Melding over balansrekening vervalt.
+	(IV,BKM) Melding over D/C conflict niet langer fataal.
+	(EB::Locale) Alles onder I18n (gettext).
+	Alle tools printen een banner.
+	(EB): Nieuwe, algemene module. Handelt Globals en Locale af.
+	(EB::Booking::Delete) Verwijderen boekstukken.
+	(EB::Booking::Decode) Decoderen boekstukken.
+	(EB::Shell) Nieuwe opdracht: "verwijder".
+	(EB::Shell) Nieuwe opdracht: "toon".
+
+0.06	02-09-2005 19:15
+
+	(EB::Tools::Schema) Schema handling.
+	(ebshell) Schema initialisatie.
+	(Makefile.PL, build_common.inc) Installer
+	Introductie EB library (@INC/EB).
+
+0.05	30-08-2005 10:50
+
+	(Shell) Alle shell spul van Shell:: -> EB::Shell::
+	(EB::Shell::Base) Opvangen ontbreken van Term::Size.
+	(Term::Size): Verwijderd.
+	(opening, schema) tools -> EB::Tools
+	(ebshell.pl) Integratie nieuwe stijl opening
+	(dvimport, newdb, ...) Nieuwe stijl opening
+
+0.04	28-08-2005 16:34
+
+	(Schema) Tabel BTWTariefgroepen afgeschaft.
+	(Database) Geen pgplsql (CREATE LANGUAGE) meer nodig.
+	(Schema) CHECK constraints toegevoegd.
+	(sample/setup.sh) Opvangen ontbreken van PERL5LIB
+	(sample/setup.csh) Opvangen ontbreken van PERL5LIB
+	(sample/newdb.sh) Creëer database met Latin1 encoding.
+	(Term::Size) Stub voor mogelijk ontbrekende module.
+
+0.03	15-08-2005 22:42
+
+	(schema) Volledige database setup uitgaande van schema.dat.
+

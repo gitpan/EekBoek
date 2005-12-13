@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="iso-8859-15"?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+ <head>
+  <title>EekBoek</title>
+  <link rel="stylesheet" href="../css/site.css">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-15">
+  <meta name="robots" content="all">
+ </head>
+
+ <body bgcolor="#FFFFFF"
+       text="#000000" link="#0000FF"
+       vlink="#0000FF" alink="#C81900" background="../images/bg.gif" >
+  <table width="100%" border="0" cellpadding="0" cellspacing="5">
+
+  <tr valign="top">
+    <td width="161" align="left">
+      <a href="../index.html"><img src="../images/eb.jpg" alt="EekBoek Boekhouden" border="0" width="149" height="87" /></a>
+
+    </td>
+    <td>
+              <h1 class="title">EekBoek</h1>
+<div class="info">
+  Electronisch Boekhouden voor het MKB
+</div>
+
+          </td>
+  </tr>
+
+  <tr>
+    <td>
+      <a href="../index.html"><img src="../images/ebname.jpg" alt="EekBoek" border="0" width="151" height="22" /></a>
+
+    </td>
+    <td>
+      <table width="100%" border="0" cellpadding="0" cellspacing="0">
+  <tr valign="middle">
+    <td align="left">
+      <table border="0" cellpadding="0" cellspacing="2">
+  <tr valign="middle">
+
+    <td class="info"></td>
+    <td><a href="../setup/index.html" class="menu">Opzetten administratie</a>
+</td>
+	<td> &#xbb; </td>
+    <td class="info"></td>
+    <td><a href="../setup/createdb.html" class="menu">Aanmaken database</a>
+</td>
+	
+  </tr>
+</table>
+
+    </td>
+    <td align="right">
+      
+    </td>
+  </tr>
+</table>
+
+    </td>
+  </tr>
+
+  <tr>
+    <td>
+      <hr />
+
+    </td>
+    <td>
+      <hr />
+
+    </td>
+  </tr>
+
+  <tr valign="top">
+    <td>
+      <div class="sidemenu">
+<table border="0" cellpadding="0" cellspacing="0">
+  <tr>
+    <td align="left" class="menutitle">Documentatie
+    </td>
+  </tr>
+  <tr>
+    <td><hr />
+</td>
+  </tr>
+  <tr valign="top">
+    <td align="left">
+      <a href="../intro/index.html" class="menu">Inleiding</a>
+<br />
+<a href="../ebshell/index.html" class="menu">De EekBoek shell</a>
+<br />
+<a href="../setup/index.html" class="menuselect">Opzetten administratie</a>
+<br />
+&nbsp;-&nbsp;<a href="../setup/createdb.html" class="menuselect">Aanmaken database</a>
+<br />
+&nbsp;-&nbsp;<a href="../setup/schema.html" class="menu">Administratiegegevens</a>
+<br />
+&nbsp;-&nbsp;<a href="../setup/opening.html" class="menu">Opening</a>
+<br />
+<br />
+<a href="../debcrd.html" class="menu">Relaties</a>
+<br />
+<a href="../bookings/index.html" class="menu">Boekingen</a>
+<br />
+<a href="../reports/index.html" class="menu">Overzichten</a>
+<br />
+<a href="../yearend.html" class="menu">Jaarafsluiting</a>
+<br />
+          </td>
+  </tr>
+</table>
+</div>
+
+    </td>
+    <td>
+      
+
+<h2>Het aanmaken van de database</h2>
+
+<p>Elke administratie wordt opgeslagen in een eigen database. De
+eerste stap in het opzetten van een administratie is daarom het
+aanmaken van de database. Deze handeling moet buiten EekBoek worden
+uitgevoerd, omdat er geen database-onafhankelijke manier is om
+databases aan te maken.</p>
+
+<p>EekBoek databases dragen namen die alle beginnen met het
+voorvoegsel '<code>eekboek_</code>', dit om ze te kunnen onderscheiden
+van andere, niet-EekBoek databases die op het systeem aanwezig kunnen
+zijn.</p>
+
+<p>Het aanmaken van een '<code>test</code>' database in PostgreSQL
+kan met de volgende systeemopdracht:</p>
+
+<blockquote class="code">createdb eekboek_test</blockquote>
+
+<p>PostgreSQL werkt standaard met UNICODE data. Indien de
+administratiegegevens zijn gesteld in de ISO Latin1 tekenset dient bij
+het aanmaken van de database de command line optie '<code>-E</code>'
+te worden meegegeven:</p>
+
+<blockquote class="code">createdb -E latin1 eekboek_test</blockquote>
+
+    </td>
+  </tr>
+
+  <tr>
+    <td>
+      <hr />
+
+    </td>
+    <td>
+      <hr />
+
+    </td>
+  </tr>
+
+  <tr valign="bottom">
+    <td valign="middle">
+      <a href="http://www.perl.org/"><img src="../images/perl_powered.png" alt="Powered by Perl" border="0" width="134" height="48" /></a>
+
+    </td>
+    <td align="center">
+      <p class="info">Copyright &copy; 2005 <a href="http://www.squirrel.nl">Squirrel Consultancy</a>. All Rights Reserved.<br />
+Deze site is gemaakt met de 
+<a href='http://www.squirrel.nl/people/jvromans/tt2site/'>TT2Site
+Site Builder</a>.<br />
+setup/createdb.html laatste aanpassing 08 december 2005, 09:52:22
+</p>
+
+    </td>
+  </tr>
+
+</table>
+
+ </body>
+</html>

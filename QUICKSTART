@@ -1,0 +1,149 @@
+WAARSCHUWING: DIT IS BETA SOFTWARE.
+
+Eekboek Boekhoudpakket (command line versie)
+============================================
+
+Je moet de mogelijkheid hebben om PostgreSQL databases aan te maken.
+Dat kun je bereiken met (veronderstel dat je user 'piet' bent):
+
+   $ su 
+   # su - postgres
+   # createuser -d piet
+   # exit
+   $ exit
+
+Verificatie installatie. Dit vereist de mogelijkheid om bestanden te
+kunnen aanmaken in de sample directory.
+
+   $ cd sample
+   $ sh ./verify.sh
+
+Er mogen geen fouten of verschillen optreden -- inspecteer na afloop
+ook newdb.log en mutaties.log
+
+Zie verderop hoe een eigen administratie op te zetten.
+
+Werken met de sample administatie:
+
+   $ cd sample
+
+   $ source setup.csh		-- C shells, niet-geïnstalleerde versie
+   $ . ./setup.sh		-- Bourne shells, niet-geïnstalleerde versie
+
+   $ sh ./newdb.sh                        -- creeer database, relaties, opening
+   $ pg_dump -c $EB_NAME > reset.sql      -- hersteldatabase aanmaken
+
+   Deze 2 commando's zitten gerieflijk onder de alias "rebuild"
+
+   $ ebshell < mutaties.eb                -- importeren mutaties
+
+   $ ebshell				  -- shell interactief
+
+   $ sh ./reset.sh                        -- herstel database
+				          -- als na 'rebuild'
+
+Let op: De sample administratie heeft een kunstmatige 'huidige datum'
+van 2004-12-31. Hierdoor kunnen nieuwe rapporten eenvoudig worden
+vergeleken met de oude omdat de datum niet wijzigt. Als je dat niet
+wilt, moet je de environment variabele EB_SQL_NOW verwijderen.
+
+WAARSCHUWING: DIT IS BETA SOFTWARE.
+
+De EekBoek shell werkt als volgt:
+
+   $ ebshell             -- interactief
+   $ ebshell < file      -- batch
+   $ ebshell -c command  -- single command
+
+Voor commando's -> gebruik "help".
+
+De shell ondersteunt readline en history.
+
+Tips:
+
+   $ ebshell --journal
+   toont na elke (relevante) aktie de betreffende journaalpost 
+
+   $ ebshell --echo < file
+   toont tijdens de verwerking de commando's uit de file
+
+De opdrachten 'toon' en 'verwijder' plaatsen het getoonde resp,
+verwijderde boekstuk in de shell historie, zodat het met een pijltje
+omhoog teruggehaald kan worden. Hiermee kunnen boekstukken worden
+gewijzigd, b.v.
+
+   eb> verwijder postbank:24
+   Boekstuk 96 verwijderd
+   eb>[pijltje omhoog]
+   eb> postbank:24 2005-07-14 "KPN" crd "KPN Juli 2005" 344.61
+   <<wijzig Juli -> Juni>>
+   eb> postbank:24 2005-07-14 "KPN" crd "KPN Juni 2005" 344.61 [Enter]
+
+WAT WIL IK VAN JE HOREN
+=======================
+
+Problemen bij het opzetten en installeren.
+
+Probeer je eigen boekingen erin uit te voeren. Wat ontbreekt er nog?
+Wat kan er handiger?
+
+Ik voer mijn eigen boekhouding, plus die van de Stichting Perl
+Promotie Nederland, geheel uit met dit programma. Hoe ver kom jij?
+
+HINTS
+=====
+
+Boekingen
+---------
+De opdracht om een boeking uit te voeren in een dagboek is hetzelfde
+als de naam van het dagboek in onderkast letters. Dus voor dagboek
+"Postbank" is de opdracht "postbank".
+
+Boekstuknummering
+-----------------
+Boekstukken kunnen automatisch worden genummerd. Experts raden dat
+echter af, omdat er officieel wordt geëist dat boekstuknummers altijd
+opeenvolgend zijn. Boekstukken worden aangegeven in de vorm
+Dagboek:Volgnummer (b.v. postbank:24).
+
+Voor met name bank- en giroboekingen is het handig om het volgnummer
+van de afschrijving als volgnummer op te geven. Tevens kan voor bank-,
+kas- en giroboekingen het eindsaldo na elke boeking worden geverifiëerd. 
+De opdracht wordt dan: de postbank:24 --saldo 10357,48 ...
+
+OPZETTEN EIGEN ADMINISTRATIE
+============================
+
+Voorlopig gaan we uit van het draaien vanuit de uitgepakte omgeving,
+waarin "make all test" is uitgevoerd (zie boven).
+
+Maak een directory aan onder de uitpakdirectory en kopieer daarin
+vanuit de example directory:
+
+   setup.csh of setup.sh
+   newdb.sh
+
+Kopieer het sample schema:
+
+   $ ebshell --data eekboek_sample -c dump_schema > schema.dat
+
+Pas setup.sh aan (met name de database naam (moet met eekboek_
+beginnen)) en voer deze uit.
+
+Pas schema.dat aan naar eigen wens.
+
+Creeer "opening.eb" voor de openingsbalans (zie sample/opening.eb).
+
+Creeer "relaties.eb" voor de relaties (zie sample/relaties.eb).
+
+Probeer voorzichtig "sh newdb.sh"...
+
+Voor het uitwisselen van ervaringen, vragen om ondersteuning en zo:
+gebruik de mailing list http://lists.sourceforge.net/lists/listinfo/eekboek-users.
+
+----------------------------------------------------------------------------
+Johan Vromans                                           jvromans@squirrel.nl
+Squirrel Consultancy                                  Exloo, the Netherlands
+http://www.squirrel.nl                              http://johan.vromans.org
+PGP Key 2048/4783B14D                   http://johan.vromans.org/pgpkey.html
+----------------------- "Arms are made for hugging" ------------------------
