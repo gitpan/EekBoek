@@ -51,8 +51,6 @@ ivp/balans0.txt
 ivp/balans1.txt
 ivp/balans2.txt
 ivp/btw.txt
-ivp/eekboek_sample.html
-ivp/eekboek_sq20045.html
 ivp/grootboek.txt
 ivp/grootboek0.txt
 ivp/grootboek1.txt
@@ -125,7 +123,6 @@ lib/EB/Tools/Opening.pm
 lib/EB/Tools/Schema.pm
 lib/EB/Tools/SQLEngine.pm
 lib/EB/Utils.pm
-lib/EekBoek.pm
 Makefile.PL
 MANIFEST
 META.yml

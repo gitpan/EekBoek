@@ -1,4 +1,4 @@
-package EB;
+package EekBoek;
 
 $VERSION = '0.22';
 
