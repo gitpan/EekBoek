@@ -1,5 +1,5 @@
 %define modname EekBoek
-%define modversion 0.21
+%define modversion 0.21_01
 
 Name: %modname
 Version: %modversion
@@ -45,6 +45,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %{_bindir}/ebshell
 %{_libdir}/perl5/site_perl/*/EB
+%{_libdir}/perl5/site_perl/*/EekBoek.pm
 %{_libdir}/perl5/site_perl/*/EB.pm
 %{_libdir}/perl5/site_perl/*/*/auto/eekboek
 %{_mandir}/man3/*

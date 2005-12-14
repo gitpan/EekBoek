@@ -23,8 +23,8 @@ gebruiken. Wil je toch installeren:
 Installatie verwijderen:
 
    Zoek uit waar de spullen zijn neergezet onder /usr/lib/perl5.
-   De gehele directory EB kun je weghalen, evenals het script
-   /usr/bin/ebshell.
+   De gehele directory EB kun je weghalen, evenals EekBoek.pm, EB.pm
+   en het programma /usr/bin/ebshell.
 
 Liefhebbers van RPM kunnen de meeegeleverde EekBoek.spec file gebruiken.
 
