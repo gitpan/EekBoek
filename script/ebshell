@@ -1,12 +1,12 @@
 #!/usr/bin/perl
 
-my $RCS_Id = '$Id: ebshell.pl,v 1.7 2005/12/03 13:23:48 jv Exp $ ';
+my $RCS_Id = '$Id: ebshell.pl,v 1.8 2005/12/14 16:21:07 jv Exp $ ';
 
 # Author          : Johan Vromans
 # Created On      : Thu Jul  7 15:53:48 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Wed Dec 14 16:03:04 2005
-# Update Count    : 177
+# Last Modified On: Wed Dec 14 17:14:09 2005
+# Update Count    : 179
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -163,17 +163,17 @@ EndOfUsage
 
 =head1 NAME
 
-ebshell - EekBoek * Accounting shell
+ebshell - EekBoek * Bookkeeping shell
 
 =head1 SYNOPSIS
 
-EekBoek is a accounting package for small and medium-size businesses.
+EekBoek is a bookkeeping package for small and medium-size businesses.
 Unlike other accounting software, EekBoek has both a command-line
-interface (CLI) and a graphical user-interface (GUI). Furthermore,
-it has a complete Perl API to create your own custom applications.
+interface (CLI) and a graphical user-interface (GUI). Furthermore, it
+has a complete Perl API to create your own custom applications.
 
 EekBoek is designed for the Dutch/European market and currently
-available in dutch only. An English translation is in the works (help
+available in Dutch only. An English translation is in the works (help
 appreciated).
 
 =head1 DESCRIPTION

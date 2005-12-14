@@ -1,10 +1,10 @@
 # EB.pm -- 
-# RCS Info        : $Id: EB.pm,v 1.23 2005/12/13 20:15:03 jv Exp $
+# RCS Info        : $Id: EB.pm,v 1.24 2005/12/14 16:20:54 jv Exp $
 # Author          : Johan Vromans
 # Created On      : Fri Sep 16 18:38:45 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Wed Dec 14 14:02:07 2005
-# Update Count    : 91
+# Last Modified On: Wed Dec 14 17:14:05 2005
+# Update Count    : 93
 # Status          : Unknown, Use with caution!
 
 our $app;
@@ -92,17 +92,17 @@ __END__
 
 =head1 NAME
 
-EB - EekBoek * Accounting software for small and medium-size businesses
+EB - EekBoek * Bookkeeping software for small and medium-size businesses
 
 =head1 SYNOPSIS
 
-EekBoek is a accounting package for small and medium-size businesses.
+EekBoek is a bookkeeping package for small and medium-size businesses.
 Unlike other accounting software, EekBoek has both a command-line
-interface (CLI) and a graphical user-interface (GUI). Furthermore,
-it has a complete Perl API to create your own custom applications.
+interface (CLI) and a graphical user-interface (GUI). Furthermore, it
+has a complete Perl API to create your own custom applications.
 
 EekBoek is designed for the Dutch/European market and currently
-available in dutch only. An English translation is in the works (help
+available in Dutch only. An English translation is in the works (help
 appreciated).
 
 =head1 DESCRIPTION
