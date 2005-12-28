@@ -1,4 +1,10 @@
-0.23
+0.24
+
+	Overzichten voor Debiteuren en Crediteuren.
+	Environment variabelen EB_DB_USER, EB_DB_PASSWORD, EB_DB_HOST
+	en EB_DB_PORT voor database access.
+
+0.23	23-12-2005 11:41
 
 	Kleine bugfixes.
 	Enkele documentatie updates.

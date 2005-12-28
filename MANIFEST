@@ -25,6 +25,8 @@ doc/html/intro/working.html
 doc/html/period.html
 doc/html/reports/balans.html
 doc/html/reports/btw.html
+doc/html/reports/crediteuren.html
+doc/html/reports/debiteuren.html
 doc/html/reports/grootboek.html
 doc/html/reports/index.html
 doc/html/reports/journaal.html
@@ -103,6 +105,7 @@ lib/EB/Report/Balres.pm
 lib/EB/Report/Balres/Html.pm
 lib/EB/Report/BTWAangifte.pm
 lib/EB/Report/BTWAangifte/Html.pm
+lib/EB/Report/Debcrd.pm
 lib/EB/Report/GenBase.pm
 lib/EB/Report/Grootboek.pm
 lib/EB/Report/Grootboek/Html.pm
@@ -111,6 +114,7 @@ lib/EB/Report/Journal.pm
 lib/EB/Report/Journal/Html.pm
 lib/EB/Report/Open.pm
 lib/EB/Report/Proof.pm
+lib/EB/Report/Text.pm
 lib/EB/schema/bvnv.dat
 lib/EB/schema/eekboek.sql
 lib/EB/schema/eenmanszaak.dat

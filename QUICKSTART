@@ -13,9 +13,9 @@ Dat kun je bereiken met (veronderstel dat je user 'piet' bent):
    $ exit
 
 Verificatie installatie. Dit vereist de mogelijkheid om bestanden te
-kunnen aanmaken in de sample directory.
+kunnen aanmaken in de ivp directory.
 
-   $ cd sample
+   $ cd ivp
    $ sh ./verify.sh
 
 Er mogen geen fouten of verschillen optreden -- inspecteer na afloop
@@ -23,9 +23,9 @@ ook newdb.log en mutaties.log
 
 Zie verderop hoe een eigen administratie op te zetten.
 
-Werken met de sample administatie:
+Werken met de voorbeeldadministatie van de ivp:
 
-   $ cd sample
+   $ cd ivp   (indien nodig)
 
    $ source setup.csh		-- C shells, niet-geïnstalleerde versie
    $ . ./setup.sh		-- Bourne shells, niet-geïnstalleerde versie
@@ -42,10 +42,10 @@ Werken met de sample administatie:
    $ sh ./reset.sh                        -- herstel database
 				          -- als na 'rebuild'
 
-Let op: De sample administratie heeft een kunstmatige 'huidige datum'
-van 2004-12-31. Hierdoor kunnen nieuwe rapporten eenvoudig worden
-vergeleken met de oude omdat de datum niet wijzigt. Als je dat niet
-wilt, moet je de environment variabele EB_SQL_NOW verwijderen.
+Let op: Deze voorbeeldadministratie heeft een kunstmatige 'huidige
+datum' van 2004-12-31. Hierdoor kunnen nieuwe rapporten eenvoudig
+worden vergeleken met de oude omdat de datum niet wijzigt. Als je dat
+niet wilt, moet je de environment variabele EB_SQL_NOW verwijderen.
 
 WAARSCHUWING: DIT IS BETA SOFTWARE.
 
@@ -123,7 +123,7 @@ vanuit de example directory:
    setup.csh of setup.sh
    newdb.sh
 
-Kopieer het sample schema:
+Kopieer het schema van de voorbeeldadministratie:
 
    $ ebshell --data eekboek_sample -c dump_schema > schema.dat
 
