@@ -1,12 +1,11 @@
 %define modname EekBoek
-%define modversion 0.24
+%define modversion 0.25
 
 Name: %modname
 Version: %modversion
 Release: 1
 Source: http://www.squirrel.nl/eekboek/dl/%{name}-%{version}.tar.gz
 BuildArch: noarch
-Provides: perl(EB) %modname = %version
 URL: http://www.squirrel.nl/eekboek/
 BuildRoot: %{_tmppath}/rpm-buildroot-%{name}-%{version}-%{release}
 Prefix: %{_prefix}

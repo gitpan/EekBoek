@@ -1,4 +1,12 @@
-0.24
+0.25
+
+	Toepassen regeling Kleine Ondernemers.
+	Nieuwe reporter backend. Alle rapporten kennen nu ook een
+	HTML variant.
+	Kleine bugfixes.
+	Enkele documentatie updates.
+
+0.24	28-12-2005 23:26
 
 	Overzichten voor Debiteuren en Crediteuren.
 	Environment variabelen EB_DB_USER, EB_DB_PASSWORD, EB_DB_HOST

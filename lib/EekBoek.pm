@@ -1,6 +1,6 @@
 package EekBoek;
 
-$VERSION = '0.22';
+$VERSION = '0.25';
 
 # NOTE: This is a documentation-only module.
 
@@ -37,7 +37,7 @@ Web site: L<http://www.squirrel.nl/eekboek>.
 
 =head1 COPYRIGHT AND DISCLAIMER
 
-This program is Copyright 2005 by Squirrel Consultancy. All
+This program is Copyright 2005-2006 by Squirrel Consultancy. All
 rights reserved.
 
 This program is free software; you can redistribute it and/or modify
@@ -55,4 +55,4 @@ GNU General Public License or the Artistic License for more details.
 
 1;
 
-# $Id: EekBoek.pm,v 1.1 2005/12/14 16:20:31 jv Exp $
+# $Id: EekBoek.pm,v 1.2 2005/12/28 22:32:03 jv Exp $
