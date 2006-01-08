@@ -6,6 +6,7 @@ doc/html/bookings/index.html
 doc/html/bookings/memorial.html
 doc/html/bookings/payable.html
 doc/html/bookings/receivable.html
+doc/html/cmdref.html
 doc/html/css/site.css
 doc/html/date.html
 doc/html/debcrd.html
@@ -91,6 +92,7 @@ lib/EB/css/debrept.css
 lib/EB/css/eekboek.css
 lib/EB/css/grootboek.css
 lib/EB/css/journaal.css
+lib/EB/css/openstaand.css
 lib/EB/css/proef.css
 lib/EB/css/result.css
 lib/EB/DB.pm
@@ -114,6 +116,7 @@ lib/EB/Report/Journal.pm
 lib/EB/Report/Open.pm
 lib/EB/Report/Proof.pm
 lib/EB/Report/Reporter.pm
+lib/EB/Report/Reporter/Csv.pm
 lib/EB/Report/Reporter/Html.pm
 lib/EB/Report/Reporter/Text.pm
 lib/EB/schema/bvnv.dat

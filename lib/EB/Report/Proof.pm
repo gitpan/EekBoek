@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-my $RCS_Id = '$Id: Proof.pm,v 1.12 2006/01/04 21:59:13 jv Exp $ ';
+my $RCS_Id = '$Id: Proof.pm,v 1.14 2006/01/08 18:52:16 jv Exp $ ';
 
 package main;
 
@@ -12,8 +12,8 @@ package EB::Report::Proof;
 # Author          : Johan Vromans
 # Created On      : Sat Jun 11 13:44:43 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Sat Dec 31 21:59:29 2005
-# Update Count    : 284
+# Last Modified On: Sun Jan  8 19:35:03 2006
+# Update Count    : 297
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -25,6 +25,7 @@ use warnings;
 
 use EB;
 use EB::Finance;
+use EB::Report;
 
 ################ Subroutines ################
 
@@ -66,8 +67,9 @@ sub perform {
     my $rep = EB::Report::GenBase->backend($self, $opts);
 
     my $rr;
-    my $date = $dbh->adm("begin");
-    my $now = $ENV{EB_SQL_NOW} || iso8601date();
+    $rep->{periodex} = 1;
+    my ($begin, $end) = @{$rep->{periode}};
+    my $table = EB::Report->GetTAccountsAll($begin, $end);
 
     $rep->start(_T("Proef- en Saldibalans"));
 
@@ -94,7 +96,10 @@ sub perform {
 	  ("SELECT jnl_amount,jnl_desc".
 	   " FROM Journal".
 	   " WHERE jnl_acc_id = ?".
-	   " ORDER BY jnl_bsr_date", $acc_id);
+	   " AND jnl_date >= ? AND jnl_date <= ?".
+	   " ORDER BY jnl_bsr_date",
+	   $acc_id, $begin, $end,
+	  );
 	while ( my $rr = $sth->fetchrow_arrayref ) {
 	    my ($amount, $desc) = @$rr;
 	    $did++;
@@ -118,11 +123,13 @@ sub perform {
 	my @tot = (0) x 4;
 	my $sth = $dbh->sql_exec
 	  ("SELECT acc_id, acc_desc, acc_balance, acc_ibalance".
-	   " FROM Accounts".
+	   " FROM ${table}".
 	   " WHERE acc_struct = ?".
 	   " AND ( acc_ibalance <> 0".
-	   "       OR acc_id IN ( SELECT DISTINCT jnl_acc_id FROM Journal ))".
-	   " ORDER BY acc_id", $vd->[0]);
+	   "       OR acc_id IN ( SELECT DISTINCT jnl_acc_id FROM Journal".
+	   "                      WHERE jnl_date >= ? AND jnl_date <= ? ))".
+	   " ORDER BY acc_id",
+	   $vd->[0], $begin, $end);
 	while ( my $rr = $sth->fetchrow_arrayref ) {
 	    my ($acc_id, $acc_desc, $acc_balance, $acc_ibalance) = @$rr;
 	    my @t = $journaal->($acc_id, $acc_desc, $acc_ibalance);
@@ -260,10 +267,11 @@ sub perform {
 	my @tot = (0) x 4;
 	my $sth = $dbh->sql_exec
 	  ("SELECT acc_id, acc_desc, acc_balance, acc_ibalance".
-	   " FROM Accounts".
+	   " FROM ${table}".
 	   " WHERE ( acc_ibalance <> 0".
-	   "         OR acc_id IN ( SELECT DISTINCT jnl_acc_id FROM Journal ))".
-	   " ORDER BY acc_id");
+	   "         OR acc_id IN ( SELECT DISTINCT jnl_acc_id FROM Journal".
+	  "                         WHERE jnl_date >= ? AND jnl_date <= ? ))".
+	   " ORDER BY acc_id", $begin, $end);
 	while ( my $rr = $sth->fetchrow_arrayref ) {
 	    my ($acc_id, $acc_desc, $acc_balance, $acc_ibalance) = @$rr;
 	    my @t = $journaal->($acc_id, $acc_desc, $acc_ibalance);
@@ -329,6 +337,27 @@ sub style {
 
     $cell = "_style" unless defined($cell);
     return $stylesheet->{$row}->{$cell};
+}
+
+package EB::Report::Proof::Csv;
+
+use EB;
+use base qw(EB::Report::Reporter::Csv);
+
+sub new {
+    my ($class, $opts) = @_;
+    $class->SUPER::new($opts->{STYLE}, $opts->{LAYOUT});
+}
+
+package EB::Report::Proof::Html;
+
+use EB;
+use base qw(EB::Report::Reporter::Html);
+use strict;
+
+sub new {
+    my ($class, $opts) = @_;
+    $class->SUPER::new($opts->{STYLE}, $opts->{LAYOUT});
 }
 
 package EB::Report::Proof::XXXText;

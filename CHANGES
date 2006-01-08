@@ -1,4 +1,11 @@
-0.25
+0.26
+	Aanpassingen voor BTW aangifte met --periode en --boekjaar.
+	Alle rapporten kennen nu ook een CSV variant.
+	Debiteuren: Fix voor openstaande inkoopfacturen.
+	adm_naam niet langer toegestaan bij openen boekjaar.
+	CSS Style sheet voor openstaande posten.
+
+0.25	05-01-2006 10:24
 
 	Toepassen regeling Kleine Ondernemers.
 	Nieuwe reporter backend. Alle rapporten kennen nu ook een
