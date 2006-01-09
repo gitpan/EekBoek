@@ -1,3 +1,9 @@
+0.27
+	Uitgebreider rapport over Openstaande posten.
+	Jaareinde kan nu ook de openingsopdrachten voor het komende
+	boekjaar aanmaken.
+	Stylesheet fixes voor Preoef- en Saldibalans.
+
 0.26
 	Aanpassingen voor BTW aangifte met --periode en --boekjaar.
 	Alle rapporten kennen nu ook een CSV variant.
