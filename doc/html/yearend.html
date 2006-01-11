@@ -118,12 +118,6 @@ boekingen in het nieuwe jaar uit te voeren.</p>
 
 <p>De opdracht '<code>adm_open</code>' kan worden voorafgegaan door:</p>
 
-<blockquote class="code">adm_naam <var>naam</var></blockquote>
-
-<p>Hiermee wordt aan het nieuwe boekjaar een nieuwe naam toegekend.
-Als deze opdracht niet is gebruikt blijft de huidige naam
-gehandhaafd.</p>
-
 <blockquote class="code">adm_boekjaarcode <var>code</var></blockquote>
 
 <p>Hiermee wordt aan het nieuwe boekjaar expliciet een code toegekend.
@@ -175,6 +169,17 @@ ongedaan te maken met de opdracht:</p>
 niet meer worden geboekt in het afgesloten jaar, en de afsluiting kan
 uiteraard niet meer worden verwijderd.</p>
 
+<p>De jaarafsluiting produceert twee rapporten: het journaal van de
+afboekingen, en een overzicht van (eventuele) openstaande posten.</p>
+
+<p>Indien gewenst kan de jaarafsluiting uit opdrachten aanmaken om het
+nieuwe boekjaar te openen in een aparte administratie:
+
+<blockquote class="code">jaareinde --boekjaar=<var>code</var> --eb=<var>bestand</var> </blockquote>
+
+<p>De in het opgegeven bestand geplaatste opdrachten omvatten het
+invoeren van de openingsbalans, en de openstaande posten.</p>
+
     </td>
   </tr>
 
@@ -195,11 +200,11 @@ uiteraard niet meer worden verwijderd.</p>
 
     </td>
     <td align="center">
-      <p class="info">Copyright &copy; 2005 <a href="http://www.squirrel.nl">Squirrel Consultancy</a>. All Rights Reserved.<br />
+      <p class="info">Copyright &copy; 2005-2006 <a href="http://www.squirrel.nl">Squirrel Consultancy</a>. All Rights Reserved.<br />
 Deze site is gemaakt met de 
 <a href='http://www.squirrel.nl/people/jvromans/tt2site/'>TT2Site
 Site Builder</a>.<br />
-yearend.html laatste aanpassing 08 december 2005, 19:44:51
+yearend.html laatste aanpassing 10 januari 2006, 14:12:05
 </p>
 
     </td>

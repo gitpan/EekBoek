@@ -85,3 +85,7 @@ blockquote.code {
     white-space: pre;
     font-family: "Courier New", Courier, monospace;
 }
+
+dl dt {
+    font-weight: bold;
+}

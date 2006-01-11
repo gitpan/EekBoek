@@ -142,13 +142,27 @@ opdrachten accepteren als regel de volgende opties:</p>
   <tr valign="top">
     <td><code>--periode=<var>periode</var></code></td>
     <td>De rapportage wordt uitgevoerd over de opgegeven <a
-	href="../period.html">periode</a>.</td>
+	href="../period.html">periode</a>.
+	<br>Het hangt af van de rapportage of een
+	<code>--periode</code> of <code>--per</code> optie is toegestaan.
+    </td>
   </tr>
   <tr valign="top">
     <td><code>--per=<var>datum</var></code></td>
-    <td>De rapportage wordt uitgevoerd met de opgegeven einddatum.</td>
+    <td>De rapportage wordt uitgevoerd met de opgegeven
+	<a href="../date.html">einddatum</a>.
+	<br>Het hangt af van de rapportage of een
+	<code>--periode</code> of <code>--per</code> optie is toegestaan.
+    </td>
   </tr>
   <tr valign="top">
+    <td><code>--boekjaar=<var>code</var></code></td>
+    <td>Het boekjaar waarover de rapportage moet worden aangemaakt.
+	<br>Deze optie kan niet worden gebruikt samen met
+	<code>--per</code> of <code>--periode</code>.
+    </td>
+  </tr>
+    <tr valign="top">
     <td><code>--output=<var>file</var></code></td>
     <td>De uitvoer wordt naar het opgegeven bestand geschreven. De
 	extensie van de bestandsnaam bepaalt de vorm waarin de
@@ -156,12 +170,15 @@ opdrachten accepteren als regel de volgende opties:</p>
   </tr>
   <tr valign="top">
     <td><code>--page=<var>regels</var></code></td>
-    <td>Voor tekstuele rapportages, het aantal regels per pagina.</td>
+    <td>Voor tekstuele rapportages, het aantal regels per pagina.
+	<br>(Experimenteel)
+    </td>
   </tr>
   <tr valign="top">
     <td><code>--gen-<var>type</var></code></td>
     <td>Bepaalt de vorm waarin de
-	rapportage plaatsvindt. <code>--gen-text</code> is altijd
+	rapportage plaatsvindt. <code>--gen-text</code>, <code>--gen-csv</code> en
+	<code>--gen-html</code> zijn vrijwel altijd
 	mogelijk, overige waarden hangen af van de voor deze
 	rapportage ondersteunde plug-ins.</td>
   </tr>
@@ -172,7 +189,10 @@ opdrachten accepteren als regel de volgende opties:</p>
 	<br>Indien geen stylesheet wordt opgegeven wordt een
 	stylesheet genoemd naar de rapportage gebruikt. Bijvoorbeeld,
 	voor een balans rapportage wordt stylesheet
-	'<var>css/balans.css</var>' gebruikt. </td>
+	'<code>css/balans.css</code>' gebruikt. Met de optie
+	<code>--style=other</code> zou de gebruikte stylesheet worden:
+	'<code>css/other.css</code>'
+    </td>
   </tr>
 </table>
 
@@ -197,9 +217,9 @@ opdrachten accepteren als regel de volgende opties:</p>
     <td>Rapportage in HTML vorm.</td>
   </tr>
   <tr valign="top">
-    <td><code>--gen-odf</code></td>
-    <td><code>.odc</code></td>
-    <td>Rapportage in OpenDocument (OpenOffice.org Calc) vorm.</td>
+    <td><code>--gen-csv</code></td>
+    <td><code>.csv</code></td>
+    <td>Rapportage in CSV (generieke spreadsheet import) vorm.</td>
   </tr>
 </table>
 
@@ -211,6 +231,8 @@ opdrachten accepteren als regel de volgende opties:</p>
   <li><a href="result.html">Resultatenrekening</a></li>
   <li><a href="journaal.html">Journaal</a></li>
   <li><a href="grootboek.html">Grootboek</a></li>
+  <li><a href="debrept.html">Debiteurenboekingen</a></li>
+  <li><a href="crdrept.html">Crediteurenboekingen</a></li>
   <li><a href="unpaid.html">Openstaande posten</a></li>
   <li><a href="btw.html">BTW aangifte</a></li>
 </ul>
@@ -235,11 +257,11 @@ opdrachten accepteren als regel de volgende opties:</p>
 
     </td>
     <td align="center">
-      <p class="info">Copyright &copy; 2005 <a href="http://www.squirrel.nl">Squirrel Consultancy</a>. All Rights Reserved.<br />
+      <p class="info">Copyright &copy; 2005-2006 <a href="http://www.squirrel.nl">Squirrel Consultancy</a>. All Rights Reserved.<br />
 Deze site is gemaakt met de 
 <a href='http://www.squirrel.nl/people/jvromans/tt2site/'>TT2Site
 Site Builder</a>.<br />
-reports/index.html laatste aanpassing 12 december 2005, 10:09:54
+reports/index.html laatste aanpassing 10 januari 2006, 22:52:07
 </p>
 
     </td>

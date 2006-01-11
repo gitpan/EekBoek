@@ -1,10 +1,17 @@
-0.27
+0.28
+
+	Lay-out fix Balans/Resultaatrekening.
+	Documentatie-updates.
+
+0.27	09-01-2005 18:48
+
 	Uitgebreider rapport over Openstaande posten.
 	Jaareinde kan nu ook de openingsopdrachten voor het komende
 	boekjaar aanmaken.
-	Stylesheet fixes voor Preoef- en Saldibalans.
+	Stylesheet fixes voor Proef- en Saldibalans.
 
-0.26
+0.26	08-01-2005 19:56
+
 	Aanpassingen voor BTW aangifte met --periode en --boekjaar.
 	Alle rapporten kennen nu ook een CSV variant.
 	Debiteuren: Fix voor openstaande inkoopfacturen.

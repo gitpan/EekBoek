@@ -129,12 +129,181 @@
     <td>
       
 
-<h2>In voorbereiding</h2>
+<h2>De Verlies/Winst Rekening</h2>
 
 <p>De "Verlies/Winst Rekening", "Resultatenrekening" of
 "Exploitatierekening" is een staat van opbrengsten en kosten (of baten
 en lasten), over de hele periode van het boekjaar.<p>
 
+
+
+<h3>Definities</h3>
+
+<p>De <var>balanswaarde</var> van een grootboekrekening is de waarde
+ingevoerd op de openingsbalans, vermeerderd met de waarde van alle op
+deze grootboekrekening uitgevoerde boekingen.</p>
+
+<p>Het <var>resultaat</var> van een grootboekrekening is de waarde op
+het einde van de rapportage-periode verminderd met de waarde aan het
+begin van de rapportage-periode.</p>
+
+<h2>Syntaxis</h2>
+
+<blockquote class="code">result <var>opties</var></blockquote>
+
+<h3>Opties</h3>
+
+<table border="1" width="100%" cellpadding="5">
+  <tr valign="top">
+    <td><code>--periode=<var>periodeaanduiding</var></code></td>
+    <td>De <a href="../period.html">begin- en einddatum</a> voor dit rapport. Deze datums moeten liggen tussen
+	het begin van de administratie en de huidige datum.
+    </td>
+  </tr>
+  <tr valign="top">
+    <td><code>--boekjaar=<var>code</var></code></td>
+    <td>Het boekjaar waarover de rapportage moet worden aangemaakt.
+	<br>Deze optie kan niet worden gebruikt samen met <code>--periode</code>.
+    </td>
+  </tr>
+  <tr valign="top">
+    <td><code>--detail=<var>N</var></code></td>
+    <td>Selecteert de verdichte vorm van rapportage, en bepaalt
+	de mate van detail:
+	<br>0&nbsp;&nbsp;Geen detail, alleen totaal per hoofdverdichting.
+	<br>1&nbsp;&nbsp;Geen detail, alleen totaal per verdichting.
+	<br>2&nbsp;&nbsp;Alle resultaatrekeningen.
+	<p>Zonder detailselectie wordt de onverdichte vorm van
+	verlies/winst-rapportage aangemaakt.</p>
+    </td>
+  </tr>
+  <tr valign="top">
+    <td><code>--verdicht</code></td>
+    <td>Een verkorte vorm voor <code>--detail=2</code>.
+    </td>
+  </tr>
+    <tr valign="top">
+    <td><code>--output=<var>file</var></code></td>
+    <td>De uitvoer wordt naar het opgegeven bestand geschreven. De
+	extensie van de bestandsnaam bepaalt de vorm waarin de
+	rapportage plaatsvindt.</td>
+  </tr>
+  <tr valign="top">
+    <td><code>--page=<var>regels</var></code></td>
+    <td>Voor tekstuele rapportages, het aantal regels per pagina.
+	<br>(Experimenteel)
+    </td>
+  </tr>
+  <tr valign="top">
+    <td><code>--gen-<var>type</var></code></td>
+    <td>Bepaalt de vorm waarin de
+	rapportage plaatsvindt. <code>--gen-text</code>, <code>--gen-csv</code> en
+	<code>--gen-html</code> zijn vrijwel altijd
+	mogelijk, overige waarden hangen af van de voor deze
+	rapportage ondersteunde plug-ins.</td>
+  </tr>
+  <tr valign="top">
+    <td><code>--style=<var>name</var></code></td>
+    <td>Voor HTML uitvoer: specificeert de naam van de te gebruiken
+	stylesheet.
+	<br>Indien geen stylesheet wordt opgegeven wordt een
+	stylesheet genoemd naar de rapportage gebruikt. Bijvoorbeeld,
+	voor een balans rapportage wordt stylesheet
+	'<code>css/balans.css</code>' gebruikt. Met de optie
+	<code>--style=other</code> zou de gebruikte stylesheet worden:
+	'<code>css/other.css</code>'
+    </td>
+  </tr>
+
+</table>
+
+<p>Zonder datum-opties wordt een rapportage op grootboekrekening
+aangemaakt over het lopende boekjaar.</p>
+
+<h2>Uitvoer (rapportage op grootboekrekening)</h2>
+
+<blockquote class="code">                            Verlies/Winst
+Periode: 2004-01-01 t/m 2004-12-31
+EekBoek Demo Administratie 2004                    EekBoek, 2004-12-31
+
+RekNr   Grootboekrekening                             Debet     Credit
+----------------------------------------------------------------------
+        ...
+4900    Telefoon- en faxkosten                       530,62
+        ...
+8000    Omzet advisering BTW hoog                              1200,00
+        ...
+        << Winst >>                                 7079,82
+----------------------------------------------------------------------
+        TOTAAL Resultaten                           8700,00    8700,00
+</blockquote>
+
+<h3>Kopregels</h3>
+
+<p>Regel 1: De naam van dit rapport.
+<br>Regel 2: De rapportage-periode.
+<br>Regel 3: Links de naam van de administratie en rechts de
+programma-versie met de rapportagedatum.</p>
+
+<h3>Kolommen</h3>
+
+<dl>
+  <dt>RekNr</dt>
+  <dd>Het rekeningnummer van de grootboekrekening.</dd>
+  <dt>Grootboekrekening</dt>
+  <dd>De omschrijving van de grootboekrekening.</dd>
+  <dt>Debet</dt>
+  <dd>De debet waarde van het resultaat.</dd>
+  <dt>Credit</dt>
+  <dd>De credet waarde van het resultaat.</dd>
+</dl>
+
+<h2>Uitvoer (verdichte rapportage)</h2>
+
+<blockquote class="code">                            Verlies/Winst
+Periode: 2004-01-01 t/m 2004-12-31
+EekBoek Demo Administratie 2004                    EekBoek, 2004-12-31
+
+RekNr   Verdichting/Grootboekrekening                 Debet     Credit
+----------------------------------------------------------------------
+5       Bedrijfsopbrengsten
+51       Netto omzet
+8000      Omzet advisering BTW hoog                            1200,00
+8200      Omzet editing                                        1000,00
+8300      Omzet cursussen                                      6500,00
+51       Totaal Netto omzet                                    8700,00
+
+5       Totaal Bedrijfsopbrengsten                             8700,00
+        ...
+        << Winst >>                                 7079,82
+----------------------------------------------------------------------
+        TOTAAL Resultaten                           8700,00    8700,00
+</blockquote>
+
+<h3>Kopregels</h3>
+
+<p>Regel 1: De naam van dit rapport.
+<br>Regel 2: De rapportage-periode.
+<br>Regel 3: Links de naam van de administratie en rechts de
+programma-versie met de rapportagedatum.</p>
+
+<h3>Kolommen</h3>
+
+<dl>
+  <dt>RekNr</dt>
+  <dd>Het rekeningnummer van de grootboekrekening.</dd>
+  <dt>Verdichting/Grootboekrekening</dt>
+  <dd>De verdichting, dan wel de omschrijving van de
+      grootboekrekening.
+      <br>Verdichtingen zijn ingesprongen ten opzichte van de
+      hoofdverdichtingen; grootboekrekeningen zijn op hun beurt weer
+      ingesprongen ten opzichte van de verdichtingen.
+  </dd>
+  <dt>Debet</dt>
+  <dd>De debet waarde van het resultaat.</dd>
+  <dt>Credit</dt>
+  <dd>De credit waarde van het resultaat.</dd>
+</dl>
 
 
     </td>
@@ -157,11 +326,11 @@ en lasten), over de hele periode van het boekjaar.<p>
 
     </td>
     <td align="center">
-      <p class="info">Copyright &copy; 2005 <a href="http://www.squirrel.nl">Squirrel Consultancy</a>. All Rights Reserved.<br />
+      <p class="info">Copyright &copy; 2005-2006 <a href="http://www.squirrel.nl">Squirrel Consultancy</a>. All Rights Reserved.<br />
 Deze site is gemaakt met de 
 <a href='http://www.squirrel.nl/people/jvromans/tt2site/'>TT2Site
 Site Builder</a>.<br />
-reports/result.html laatste aanpassing 13 december 2005, 20:17:37
+reports/result.html laatste aanpassing 10 januari 2006, 22:53:27
 </p>
 
     </td>

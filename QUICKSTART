@@ -27,11 +27,11 @@ Werken met de voorbeeldadministatie van de ivp:
 
    $ cd ivp   (indien nodig)
 
-   $ source setup.csh		-- C shells, niet-geïnstalleerde versie
-   $ . ./setup.sh		-- Bourne shells, niet-geïnstalleerde versie
+   $ source setup.csh		-- C shells
+   $ . ./setup.sh		-- Bourne shells
 
    $ sh ./newdb.sh                        -- creeer database, relaties, opening
-   $ pg_dump -c $EB_NAME > reset.sql      -- hersteldatabase aanmaken
+   $ pg_dump -c $EB_DB_NAME > reset.sql   -- hersteldatabase aanmaken
 
    Deze 2 commando's zitten gerieflijk onder de alias "rebuild"
 
@@ -39,13 +39,8 @@ Werken met de voorbeeldadministatie van de ivp:
 
    $ ebshell				  -- shell interactief
 
-   $ sh ./reset.sh                        -- herstel database
-				          -- als na 'rebuild'
-
-Let op: Deze voorbeeldadministratie heeft een kunstmatige 'huidige
-datum' van 2004-12-31. Hierdoor kunnen nieuwe rapporten eenvoudig
-worden vergeleken met de oude omdat de datum niet wijzigt. Als je dat
-niet wilt, moet je de environment variabele EB_SQL_NOW verwijderen.
+   $ sh ./reset.sh                        -- herstel database a.d.h.v
+				          -- de hersteldatabase
 
 WAARSCHUWING: DIT IS BETA SOFTWARE.
 
@@ -61,7 +56,7 @@ De shell ondersteunt readline en history.
 
 Tips:
 
-   $ ebshell --journal
+   $ ebshell --journaal
    toont na elke (relevante) aktie de betreffende journaalpost 
 
    $ ebshell --echo < file
@@ -88,10 +83,14 @@ Probeer je eigen boekingen erin uit te voeren. Wat ontbreekt er nog?
 Wat kan er handiger?
 
 Ik voer mijn eigen boekhouding, plus die van de Stichting Perl
-Promotie Nederland, geheel uit met dit programma. Hoe ver kom jij?
+Promotie Nederland, geheel uit met dit programma. Anderen voeren hun
+administratie geheel of gedeeltelijk met EekBoek. Hoe ver kom jij?
 
 HINTS
 =====
+
+ZIE OOK DE ON-LINE DOCUMENTATIE. DEZE IS WAARSCHIJNLIJK MEER ACCURAAT
+DAN DEZE 'HINTS'.
 
 Boekingen
 ---------
@@ -118,23 +117,24 @@ Voorlopig gaan we uit van het draaien vanuit de uitgepakte omgeving,
 waarin "make all test" is uitgevoerd (zie boven).
 
 Maak een directory aan onder de uitpakdirectory en kopieer daarin
-vanuit de example directory:
+vanuit de example directory de bestanden:
 
-   setup.csh of setup.sh
+   setup.csh
+   setup.sh
    newdb.sh
 
 Kopieer het schema van de voorbeeldadministratie:
 
    $ ebshell --data eekboek_sample -c dump_schema > schema.dat
 
-Pas setup.sh aan (met name de database naam (moet met eekboek_
-beginnen)) en voer deze uit.
+Pas setup.sh (of setup.csh) aan (met name de database naam (moet met
+eekboek_ beginnen)) en voer deze uit.
 
 Pas schema.dat aan naar eigen wens.
 
-Creeer "opening.eb" voor de openingsbalans (zie sample/opening.eb).
+Creeer "opening.eb" voor de openingsbalans (zie example/opening.eb).
 
-Creeer "relaties.eb" voor de relaties (zie sample/relaties.eb).
+Creeer "relaties.eb" voor de relaties (zie example/relaties.eb).
 
 Probeer voorzichtig "sh newdb.sh"...
 
