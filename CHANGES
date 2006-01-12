@@ -1,6 +1,19 @@
-0.28
+0.29
 
+	Openstaande posten ondersteunt --per en --boekjaar.
+	Debiteuren/Crediteurenboekingen ondersteunen --boekjaar.
+	Debiteuren/Crediteurenboekingen tonen openstaande
+	betalingen correct.
+	Geen waarschuwing meer als de einddatum van een periode in de
+	toekomst ligt.
+	Fix HTML generatiefout (stylesheet spec ontbrak tenzij
+	expliciet meegegeven).
+
+0.28	11-01-2006 23:03
+
+	:btw=<code> in schema.
 	Lay-out fix Balans/Resultaatrekening.
+	Fix openstaande posten rapportage bij jaareinde.
 	Documentatie-updates.
 
 0.27	09-01-2005 18:48

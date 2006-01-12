@@ -1,9 +1,9 @@
-# RCS Info        : $Id: GenBase.pm,v 1.11 2006/01/10 21:39:17 jv Exp $
+# RCS Info        : $Id: GenBase.pm,v 1.15 2006/01/12 21:18:08 jv Exp $
 # Author          : Johan Vromans
 # Created On      : Sat Oct  8 16:40:43 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Tue Jan 10 22:38:25 2006
-# Update Count    : 95
+# Last Modified On: Thu Jan 12 21:51:00 2006
+# Update Count    : 101
 # Status          : Unknown, Use with caution!
 
 package main;
@@ -95,9 +95,9 @@ sub backend {
     if ( $opts->{per} ) {
 	die(_T("--per sluit --periode uit")."\n") if $opts->{periode};
 	die(_T("--per sluit --boekjaar uit")."\n") if defined $opts->{boekjaar};
-	$be->{periode} = [$opts->{per},$opts->{per}];
+	$be->{per_begin} = $dbh->adm("begin");
 	$be->{per_end} = $opts->{per};
-	$be->{per_begin} = $opts->{per};
+	$be->{periode} = [$be->{per_begin},$be->{per_end}];
 	$be->{periodex} = 1;
     }
     elsif ( $opts->{periode} ) {
@@ -131,7 +131,8 @@ sub backend {
 
     if ( $be->{per_end} gt $be->{now} ) {
 	warn("!".__x("Datum {per} valt na de huidige datum {now}",
-		     per => $be->{per_end}, now => $be->{now})."\n");
+		     per => $be->{per_end}, now => $be->{now})."\n")
+	  if 0;
 	$be->{periode}->[1] = $be->{per_end} = $be->{now};
     }
 
@@ -153,7 +154,7 @@ sub backend {
 		    per => $be->{per_end}, begin => $opendate)."\n");
     }
 
-    $be->{_style} = $opts->{style};
+    $be->{_style} = $opts->{style} if $opts->{style};
 
     # Return instance.
     $be;
