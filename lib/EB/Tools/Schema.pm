@@ -1,11 +1,11 @@
 #!/usr/bin/perl -w
-my $RCS_Id = '$Id: Schema.pm,v 1.22 2006/01/11 21:57:55 jv Exp $ ';
+my $RCS_Id = '$Id: Schema.pm,v 1.24 2006/01/13 13:54:46 jv Exp $ ';
 
 # Author          : Johan Vromans
 # Created On      : Sun Aug 14 18:10:49 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Wed Jan 11 22:20:07 2006
-# Update Count    : 435
+# Last Modified On: Fri Jan 13 14:53:10 2006
+# Update Count    : 446
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -198,11 +198,11 @@ sub scan_btw {
 
 sub scan_balres {
     my ($balres) = shift;
-    if ( /^\s*(\d+)\s+(.+)/ && $1 <= $max_hvd ) {
+    if ( /^\s*(\d+)\s+(.+)/ && length($1) <= length($max_hvd) && $1 <= $max_hvd ) {
 	error(__x("Dubbel: hoofdverdichting {vrd}", vrd => $1)."\n") if exists($hvdi[$1]);
 	$hvdi[$chvdi = $1] = [ $2, $balres ];
     }
-    elsif ( /^\s*(\d+)\s+(.+)/ && $1 <= $max_vrd ) {
+    elsif ( /^\s*(\d+)\s+(.+)/ && length($1) <= length($max_vrd) && $1 <= $max_vrd ) {
 	error(__x("Dubbel: verdichting {vrd}", vrd => $1)."\n") if exists($vdi[$1]);
 	error(__x("Verdichting {vrd} heeft geen hoofdverdichting", vrd => $1)."\n") unless defined($chvdi);
 	$vdi[$cvdi = $1] = [ $2, $balres, $chvdi ];
@@ -337,6 +337,20 @@ sub create_schema {
     $dbh->commit;
 }
 
+sub _trim {
+    my ($t) = @_;
+    for ( $t ) {
+	s/\s+/ /g;
+	s/^\s+//;
+	s/\s+$//;
+	return $_;
+    }
+}
+
+sub _tsv {
+    join("\t", map { _trim($_) } @_) . "\n";
+}
+
 sub sql_eekboek {
     my $f = findlib("schema/eekboek.sql");
     open (my $fh, '<', $f)
@@ -368,7 +382,7 @@ ESQL
     for ( my $i = 0; $i < @hvdi; $i++ ) {
 	next unless exists $hvdi[$i];
 	my $v = $hvdi[$i];
-	$out .= join("\t", $i, $v->[0], _tf($v->[1]), "\\N", "\\N") . "\n";
+	$out .= _tsv($i, $v->[0], _tf($v->[1]), "\\N", "\\N");
     }
     $out .= "\\.\n";
 
@@ -381,7 +395,7 @@ ESQL
     for ( my $i = 0; $i < @vdi; $i++ ) {
 	next unless exists $vdi[$i];
 	my $v = $vdi[$i];
-	$out .= join("\t", $i, $v->[0], _tf($v->[1]), "\\N", $v->[2]) . "\n";
+	$out .= _tsv($i, $v->[0], _tf($v->[1]), "\\N", $v->[2]);
     }
     $out . "\\.\n";
 }
@@ -399,12 +413,12 @@ ESQL
 	my $g = $acc{$i};
 	croak(__x("Geen BTW tariefgroep voor code {code}",
 		  code => $g->[5])) unless defined $btwmap{$g->[5]};
-	$out .= join("\t", $i, $g->[0], $g->[1],
+	$out .= _tsv($i, $g->[0], $g->[1],
 		     _tf($g->[2]),
 		     _tf($g->[3]),
 		     _tf($g->[4]),
 		     $btwmap{$g->[5]},
-		     0, 0) . "\n";
+		     0, 0);
     }
     $out . "\\.\n";
 }
@@ -435,7 +449,7 @@ ESQL
 	else {
 	    $_->[4] = _tf($_->[4]);
 	}
-	$out .= join("\t", @$_) . "\n";
+	$out .= _tsv(@$_);
     }
     $out . "\\.\n";
 }
@@ -561,16 +575,26 @@ EOD
 $max_hvd = $dbh->do("SELECT MAX(vdi_id) FROM Verdichtingen WHERE vdi_struct IS NULL")->[0];
 $max_vrd = $dbh->do("SELECT MAX(vdi_id) FROM Verdichtingen WHERE NOT vdi_struct IS NULL")->[0];
 
-    if ( $max_hvd > 9 || $max_vrd > 99 ) {
-	print <<EOD;
+    print <<EOD;
 
 # Normaal lopen hoofdverdichtingen van 1 t/m 9, en verdichtingen
 # van 10 t/m 99. Indien daarvan wordt afgeweken kan dit worden opgegeven
 # met de opdracht "Verdichting". De twee getallen geven het hoogste
 # nummer voor hoofdverdichtingen resp. verdichtingen.
 EOD
+
+    if ( $max_hvd > 9 || $max_vrd > 99 ) {
 	printf("\nVerdichting %d %d\n", $max_hvd, $max_vrd);
     }
+
+    print <<EOD;
+# De nummers van de grootboekrekeningen worden geacht groter te zijn
+# dan de maximale verdichting. Daarvan kan worden afgeweken door
+# middels voorloopnullen de _lengte_ van het nummer groter te maken
+# dan de lengte van de maximale verdichting. Als bijvoorbeeld 99 de
+# maximale verdichting is, dan geeft 001 een grootboekrekening met
+# nummer 1 aan.
+EOD
 
     dump_acc(1);		# Balansrekeningen
     dump_acc(0);		# Resultaatrekeningen
@@ -664,9 +688,9 @@ sub dump_acc {
 		$extra .= " :koppeling=".$kopp{$id} if exists($kopp{$id});
 		$desc =~ s/^\s+//;
 		$desc =~ s/\s+$//;
-		my $t = sprintf("         %-4d  %-2s  %-40.40s  %s",
-				$id, $flags, $desc,
-				$extra);
+		my $t = sprintf("         %-4s  %-2s  %-40.40s  %s",
+				$id < $max_vrd ? (("0" x (length($max_vrd)-length($id)+1)) . $id) : $id,
+				$flags, $desc, $extra);
 		$t =~ s/\s+$//;
 		print($t, "\n");
 		print("# ".__x("{id} ZOU EEN BALANSREKENING MOETEN ZIJN", id => $id)."\n")

@@ -1,9 +1,19 @@
-0.29
+0.30	
+	Afronden documentatie.
+	Extra build test op database.
+	IVP: Verificatie Crediteuren/Debiteurenoverzicht.
+	IVP: Verificatie HTML en CSV generatie.
+	Issue 1404053: Grootboekrekeningen als '0005' toestaan.
+	Openstaande posten: FQbsknr voor openstaande posten vorig boekjaar.
+	Aparte style / kleurtje voor openstaande posten vorig boekjaar.
+	Fix Issue 1404051: Fout bij TABs in Schema.
 
-	Openstaande posten ondersteunt --per en --boekjaar.
+0.29	12-01-2006 22:44
+
+	Issue 1395916. Openstaande posten ondersteunt --per en --boekjaar.
 	Debiteuren/Crediteurenboekingen ondersteunen --boekjaar.
-	Debiteuren/Crediteurenboekingen tonen openstaande
-	betalingen correct.
+	Issue 1403886. Debiteuren/Crediteurenboekingen tonen
+	openstaande betalingen nu correct.
 	Geen waarschuwing meer als de einddatum van een periode in de
 	toekomst ligt.
 	Fix HTML generatiefout (stylesheet spec ontbrak tenzij

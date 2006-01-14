@@ -129,7 +129,7 @@
     <td>
       
 
-<h2>In voorbereiding</h2>
+<h2>Het Journaal</h2>
 
 <p>Het boeken van en naar grootboekrekeningen vindt plaats in
 zogenaamde journaalposten. Per regel wordt daarin aangegeven of een
@@ -137,29 +137,141 @@ bedrag van of naar een rekening gaat (debet of credit). Hierbij kan
 geen geld onderweg verdwijnen: het totaal van de geboekte regels van
 en naar is altijd nul.</p>
 
-<p>Hoewel de boekingsregels in een boekstuk altijd in balans zijn,
-kunnen er toch verschillen ontstaan tussen debet en credit. Dit
-gebeurt bijvoorbeeld als er debet van een balansrekening naar credit
-van een resultaatrekening wordt geboekt. Wel is het verschil tussen
-debet en credit in de balanskolom daardoor altijd gelijk maar
-tegengesteld aan het verschil tussen debet en credit in de
-resultaatkolom. De controle hierop noemt men de vermogensvergelijking:
-het verschil tussen debet en credit in de resultaatkolom vormt het
-ondernemingsresultaat. In de balanskolom vormt dit (identieke)
-verschil de verandering in bezittingen en schulden.</p>
-
-<p>Op ieder moment kan dus langs gescheiden wegen het
-ondernemingsresultaat worden vergeleken met de toe- of afname van het
-eigen vermogen.</p>
-
-<p>Bij aanvang van het boekjaar worden alle resultaatrekeningen op nul
-gezet. De balansrekeningen laat men ongemoeid. Het verschil tussen
-debet en credit dat was ontstaan, gaat naar een speciaal daarvoor
-aangewezen balansrekening, meestal "Winst" of "Resultaat vorige
-boekjaar" genoemd, zodat ook daar het verschil tussen debet en credit
-bij aanvang weer wegvalt.</p>
 
 
+<h2>Syntaxis</h2>
+
+<blockquote class="code">journaal <var>opties</var> <var>selectie</var></blockquote>
+
+<h3>Opties</h3>
+
+<table border="1" width="100%" cellpadding="5">
+  <tr valign="top">
+    <td><code>--periode=<var>periodeaanduiding</var></code></td>
+    <td>De <a href="../period.html">begin- en einddatum</a> voor dit rapport. Deze datums moeten liggen tussen
+	het begin van de administratie en de huidige datum.
+    </td>
+  </tr>
+  <tr valign="top">
+    <td><code>--boekjaar=<var>code</var></code></td>
+    <td>Het boekjaar waarover de rapportage moet worden aangemaakt.
+	<br>Deze optie kan niet worden gebruikt samen met <code>--per</code>.
+    </td>
+  </tr>
+  <tr valign="top">
+    <td><code>--nodetail</code></td>
+    <td>Er wordt alleen het uiteindelijke totaalbedrag getoond, en
+	niet de details van alle boekingen.</p>
+    </td>
+  </tr>
+    <tr valign="top">
+    <td><code>--output=<var>file</var></code></td>
+    <td>De uitvoer wordt naar het opgegeven bestand geschreven. De
+	extensie van de bestandsnaam bepaalt de vorm waarin de
+	rapportage plaatsvindt.</td>
+  </tr>
+  <tr valign="top">
+    <td><code>--page=<var>regels</var></code></td>
+    <td>Voor tekstuele rapportages, het aantal regels per pagina.
+	<br>(Experimenteel)
+    </td>
+  </tr>
+  <tr valign="top">
+    <td><code>--gen-<var>type</var></code></td>
+    <td>Bepaalt de vorm waarin de
+	rapportage plaatsvindt. <code>--gen-text</code>, <code>--gen-csv</code> en
+	<code>--gen-html</code> zijn vrijwel altijd
+	mogelijk, overige waarden hangen af van de voor deze
+	rapportage ondersteunde plug-ins.</td>
+  </tr>
+  <tr valign="top">
+    <td><code>--style=<var>name</var></code></td>
+    <td>Voor HTML uitvoer: specificeert de naam van de te gebruiken
+	stylesheet.
+	<br>Indien geen stylesheet wordt opgegeven wordt een
+	stylesheet genoemd naar de rapportage gebruikt. Bijvoorbeeld,
+	voor een balans rapportage wordt stylesheet
+	'<code>css/balans.css</code>' gebruikt. Met de optie
+	<code>--style=other</code> zou de gebruikte stylesheet worden:
+	'<code>css/other.css</code>'
+    </td>
+  </tr>
+
+</table>
+
+<h3>Selectie</h3>
+
+De volgende selecties zijn mogelijk:
+
+<ul>
+  <li><strong>Op dagboek</strong>: door de naam van een dagboek op te
+      geven worden alleen de boekingen van dat dagboek gerapporteerd.
+      <br>In plaats van de naam mag ook een zoekcode met SQL
+      wildcards worden
+      opgegenen. </li>
+  <li><strong>Op boekstuk</strong>: de naam van het dagboek (of
+      zoekcode) gevolgd door &lsquo;<code>:</code>&rsquo; en het
+      dagboeknummer.</li>
+</ul>
+
+<p>Zonder datum-opties en andere selecties worden alle journaalposten
+van het lopende boekjaar gerapporteerd.</p>
+
+<h2>Uitvoer</h2>
+
+<blockquote class="code">                                       Journaal
+Periode: 2004-01-01 t/m 2004-12-31
+EekBoek Demo Administratie 2004                                           EekBoek, 2004-12-31
+
+Datum       Boekstuk/Grootboek       Rek      Debet     Credit  Boekstuk/regel     Relatie
+---------------------------------------------------------------------------------------------
+2004-01-05  Inkoop:1                                            ADSL
+2004-01-05    BTW Inkoop Hoog       1520       3,64               BTW ADSL
+2004-01-05    Internetkosten        4905      19,16               ADSL
+2004-01-05    Crediteuren           1600                 22,80    ADSL
+...
+2004-12-31  Memoriaal:2                                         Afschrijving comp
+2004-12-31    Afschr. kosten comp   4340     396,82               Afschrijving
+2004-12-31    Afschrijving comput    241                396,82    Afschrijving
+---------------------------------------------------------------------------------------------
+            Totaal                         22868,94   22868,94
+</blockquote>
+
+<h3>Kopregels</h3>
+
+<p>Regel 1: De naam van dit rapport.
+<br>Regel 2: De rapportage-periode.
+<br>Regel 3: Links de naam van de administratie en rechts de
+programma-versie met de rapportagedatum.</p>
+
+<h3>Kolommen</h3>
+
+<p>Elke journaalpost bestaat uit een eigen kopregel, gevolgd door
+boekstukregels.</p>
+
+<dl>
+  <dt>Datum</dt>
+  <dd>De datum van deze boeking</dd>
+  <dt>Boekstuk/Grootboek</dt>
+  <dd>Kopregel: Het boekstuk.
+      <br>Boekstukregels: De omschrijving van de grootboekrekening.
+  <dt>Rek</dt>
+  <dd>Boekstukregels: Het rekeningnummer van de grootboekrekening.</dd>
+  <dt>Debet</dt>
+  <dd>De debet waarde.</dd>
+  <dt>Credit</dt>
+  <dd>De credet waarde.</dd>
+  <dt>Boekstuk/regel</dt>
+  <dd>Kopregel: De omschrijving van de grootboekrekening.
+      <br>Boekstukregels: De omschrijving van deze boekstukregel.
+      <br>Indien het een betaling betreft, zal de omschrijving worden
+      voorafgegaan door een sterretje
+      &lsquo;<code>*</code>&rsquo;.</dd>
+  <dt>Relatie</dt>
+  <dd>Indien het een betaling betreft, de code van de betreffende relatie.</dd>
+</dl>
+
+Merk op dat de totaalbedragen voor debet en credit altijd gelijk zijn.
 
     </td>
   </tr>
@@ -181,11 +293,11 @@ bij aanvang weer wegvalt.</p>
 
     </td>
     <td align="center">
-      <p class="info">Copyright &copy; 2005 <a href="http://www.squirrel.nl">Squirrel Consultancy</a>. All Rights Reserved.<br />
+      <p class="info">Copyright &copy; 2005-2006 <a href="http://www.squirrel.nl">Squirrel Consultancy</a>. All Rights Reserved.<br />
 Deze site is gemaakt met de 
 <a href='http://www.squirrel.nl/people/jvromans/tt2site/'>TT2Site
 Site Builder</a>.<br />
-reports/journaal.html laatste aanpassing 13 december 2005, 20:17:37
+reports/journaal.html laatste aanpassing 13 januari 2006, 16:33:29
 </p>
 
     </td>

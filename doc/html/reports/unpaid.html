@@ -129,7 +129,128 @@
     <td>
       
 
-<h2>In voorbereiding</h2>
+<h2>De Openstaande Posten</h2>
+
+<p>Openstaande posten zijn in- of verkoopboekingen waarvoor de
+betaling nog niet geheel is geschied. Het totaal van de openstaande
+posten komt op elk tijdstip overeen met de balanswaarde van de
+grootboekrekeningen Debiteuren (voor verkopen) resp. Crediteuren (voor
+inkopen).
+
+<h3>Definities</h3>
+
+<p>De <var>waarde</var> van een openstaande boeking is de waarde van
+de oorspronkelijke boeking, verminderd met alle voor deze boeking
+verwerkte betalingen tot op het tijdstip van de rapportage.</p>
+
+<p>De <var>balanswaarde</var> van een grootboekrekening is de waarde
+ingevoerd op de openingsbalans, vermeerderd met de waarde van alle op
+deze grootboekrekening uitgevoerde boekingen.</p>
+
+<h2>Syntaxis</h2>
+
+<blockquote class="code">openstaand <var>opties</var></blockquote>
+
+<h3>Opties</h3>
+
+<table border="1" width="100%" cellpadding="5">
+    <tr valign="top">
+    <td><code>--per=<var>datum</var></code></td>
+    <td>De <a href="../date.html">einddatum</a> voor dit rapport. Deze datum moet liggen tussen
+	het begin van de administratie en de huidige datum.
+    </td>
+  </tr>
+
+    <tr valign="top">
+    <td><code>--boekjaar=<var>code</var></code></td>
+    <td>Het boekjaar waarover de rapportage moet worden aangemaakt.
+	<br>Deze optie kan niet worden gebruikt samen met <code>--periode</code>.
+    </td>
+  </tr>
+
+    <tr valign="top">
+    <td><code>--output=<var>file</var></code></td>
+    <td>De uitvoer wordt naar het opgegeven bestand geschreven. De
+	extensie van de bestandsnaam bepaalt de vorm waarin de
+	rapportage plaatsvindt.</td>
+  </tr>
+  <tr valign="top">
+    <td><code>--page=<var>regels</var></code></td>
+    <td>Voor tekstuele rapportages, het aantal regels per pagina.
+	<br>(Experimenteel)
+    </td>
+  </tr>
+  <tr valign="top">
+    <td><code>--gen-<var>type</var></code></td>
+    <td>Bepaalt de vorm waarin de
+	rapportage plaatsvindt. <code>--gen-text</code>, <code>--gen-csv</code> en
+	<code>--gen-html</code> zijn vrijwel altijd
+	mogelijk, overige waarden hangen af van de voor deze
+	rapportage ondersteunde plug-ins.</td>
+  </tr>
+  <tr valign="top">
+    <td><code>--style=<var>name</var></code></td>
+    <td>Voor HTML uitvoer: specificeert de naam van de te gebruiken
+	stylesheet.
+	<br>Indien geen stylesheet wordt opgegeven wordt een
+	stylesheet genoemd naar de rapportage gebruikt. Bijvoorbeeld,
+	voor een balans rapportage wordt stylesheet
+	'<code>css/balans.css</code>' gebruikt. Met de optie
+	<code>--style=other</code> zou de gebruikte stylesheet worden:
+	'<code>css/other.css</code>'
+    </td>
+  </tr>
+
+</table>
+
+<p>Zonder datum-opties worden de openstaande posten per huidige datum
+gerapporteerd.</p>
+
+<h3>Uitvoer</h3>
+
+<blockquote class="code">                             Openstaande posten
+Periode: t/m 2004-05-16
+EekBoek Demo Administratie 2004                  EekBoek 0.30, 2006-01-14
+
+Relatie     Datum       Omschrijving             Bedrag  Boekstuk
+-------------------------------------------------------------------------
+ACME        2004-04-18  Perl Cursus rest         595,00  Verkoop:3
+ACME        2004-05-14  Consultancy              714,00  Verkoop:4
+                        Totaal ACME             1309,00
+                                              ---------
+                        Totaal Debiteuren       1309,00
+
+XS4ALL      2004-05-10  ADSL                      22,80  Inkoop:7
+                        Totaal XS4ALL             22,80
+                                              ---------
+                        Totaal Crediteuren        22,80
+-------------------------------------------------------------------------
+</blockquote>
+
+<h3>Kopregels</h3>
+
+<p>Regel 1: De naam van dit rapport.
+<br>Regel 2: De rapportage-periode.
+<br>Regel 3: Links de naam van de administratie en rechts de
+programma-versie met de rapportagedatum.</p>
+
+<h3>Kolommen</h3>
+
+<p>De openstaande posten worden gerapporteerd met één boeking per
+regel, en getotaliseerd per relatie en per debiteuren/crediteuren.</p>
+
+<dl>
+  <dt>Relatie</dt>
+  <dd>De code van de betreffende debiteur/crediteur.</dd>
+  <dt>Datum</dt>
+  <dd>De boekingsdatum.</dd>
+  <dt>Omschrijving</dt>
+  <dd>De omschrijving van de boekingsregel.</dd>
+  <dt>Bedrag</dt>
+  <dd>Het bedrag van de boeking.</dd>
+  <dt>Boekstuk</dt>
+  <dd>Het boekstuknummer.</dd>
+</dl>
 
     </td>
   </tr>
@@ -151,11 +272,11 @@
 
     </td>
     <td align="center">
-      <p class="info">Copyright &copy; 2005 <a href="http://www.squirrel.nl">Squirrel Consultancy</a>. All Rights Reserved.<br />
+      <p class="info">Copyright &copy; 2005-2006 <a href="http://www.squirrel.nl">Squirrel Consultancy</a>. All Rights Reserved.<br />
 Deze site is gemaakt met de 
 <a href='http://www.squirrel.nl/people/jvromans/tt2site/'>TT2Site
 Site Builder</a>.<br />
-reports/unpaid.html laatste aanpassing 12 december 2005, 10:09:54
+reports/unpaid.html laatste aanpassing 14 januari 2006, 22:00:49
 </p>
 
     </td>

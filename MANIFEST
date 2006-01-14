@@ -50,6 +50,8 @@ example/setup.csh
 example/setup.sh
 INSTALL
 ivp/balans.txt
+ivp/balans.html
+ivp/balans2xxx.html
 ivp/balans0.txt
 ivp/balans1.txt
 ivp/balans2.txt
@@ -57,6 +59,8 @@ ivp/balans2.html
 ivp/balans2xxx.html
 ivp/balans2.csv
 ivp/btw.txt
+ivp/crdrept.txt
+ivp/debrept.txt
 ivp/grootboek.txt
 ivp/grootboek0.txt
 ivp/grootboek1.txt
@@ -143,4 +147,5 @@ README
 script/ebshell
 t/basic.t
 t/dates.t
+t/postgresql.t
 TODO

@@ -129,7 +129,159 @@
     <td>
       
 
-<h2>In voorbereiding</h2>
+<h2>Het Grootboekoverzicht</h2>
+
+Het Grootboekoverzicht geeft evenals het <a
+href="journaal.html">Journaal</a> een overzicht van alle uitgevoerde
+boekingen. In tegenstelling tot het Journaal zijn in het geval van het
+Grootboekoverzicht de boekingen geordend op grootboeknummer.</p>
+
+<h3>Definities</h3>
+
+<p>Het <var>beginsaldo</var> van een grootboekrekening is de waarde
+ingevoerd op de openingsbalans, vermeerderd met de waarde van alle op
+deze grootboekrekening uitgevoerde boekingen tot op het moment waarop
+de rapportage aanvangt.
+<br>Voor balansrekeningen komt dit overeen met de <var>balanswaarde</var>.</p>
+
+<h2>Syntaxis</h2>
+
+<blockquote class="code">grootboek <var>opties</var> <var>selectie</var></blockquote>
+
+<h3>Opties</h3>
+
+<table border="1" width="100%" cellpadding="5">
+    <tr valign="top">
+    <td><code>--periode=<var>periodeaanduiding</var></code></td>
+    <td>De <a href="../period.html">begin- en einddatum</a> voor dit rapport. Deze datums moeten liggen tussen
+	het begin van de administratie en de huidige datum.
+    </td>
+  </tr>
+
+    <tr valign="top">
+    <td><code>--boekjaar=<var>code</var></code></td>
+    <td>Het boekjaar waarover de rapportage moet worden aangemaakt.
+	<br>Deze optie kan niet worden gebruikt samen met <code>--periode</code>.
+    </td>
+  </tr>
+
+  <tr valign="top">
+    <td><code>--detail=<var>N</var></code></td>
+    <td>Selecteert de mate van detail:
+	<br>0&nbsp;&nbsp;Geen detail, alleen totaal per grootboekrekening.
+	<br>1&nbsp;&nbsp;Geen detail, alleen beginsaldo, totaal
+	mutaties en totaal per grootboekrekening.
+	<br>2&nbsp;&nbsp;Beginsaldo, mutaties, totaal mutaties en
+	totaal per grootboekrekening.
+	<p>Zonder detailselectie wordt de meest gedetailleerde
+	rapportage aangemaakt.</p>
+    </td>
+  </tr>
+    <tr valign="top">
+    <td><code>--output=<var>file</var></code></td>
+    <td>De uitvoer wordt naar het opgegeven bestand geschreven. De
+	extensie van de bestandsnaam bepaalt de vorm waarin de
+	rapportage plaatsvindt.</td>
+  </tr>
+  <tr valign="top">
+    <td><code>--page=<var>regels</var></code></td>
+    <td>Voor tekstuele rapportages, het aantal regels per pagina.
+	<br>(Experimenteel)
+    </td>
+  </tr>
+  <tr valign="top">
+    <td><code>--gen-<var>type</var></code></td>
+    <td>Bepaalt de vorm waarin de
+	rapportage plaatsvindt. <code>--gen-text</code>, <code>--gen-csv</code> en
+	<code>--gen-html</code> zijn vrijwel altijd
+	mogelijk, overige waarden hangen af van de voor deze
+	rapportage ondersteunde plug-ins.</td>
+  </tr>
+  <tr valign="top">
+    <td><code>--style=<var>name</var></code></td>
+    <td>Voor HTML uitvoer: specificeert de naam van de te gebruiken
+	stylesheet.
+	<br>Indien geen stylesheet wordt opgegeven wordt een
+	stylesheet genoemd naar de rapportage gebruikt. Bijvoorbeeld,
+	voor een balans rapportage wordt stylesheet
+	'<code>css/balans.css</code>' gebruikt. Met de optie
+	<code>--style=other</code> zou de gebruikte stylesheet worden:
+	'<code>css/other.css</code>'
+    </td>
+  </tr>
+
+</table>
+
+<h3>Selectie</h3>
+
+<p>Voor een selectief overzicht kunt u &eacute;&eacute;n of meer
+relatiecodes opgeven. Het resulterende overzicht zal dan alleen de
+boekingen met betrekking tot deze relaties tonen.</p>
+
+<p>Zonder datum- en selectie-opties wordt een rapportage voor alle
+debiteuren aangemaakt over het lopende boekjaar.</p>
+
+<h3>Uitvoer</h3>
+
+<blockquote class="code">                                         Grootboek
+Periode: 2004-01-01 t/m 2004-12-31
+EekBoek Demo Administratie 2004                                          EekBoek, 2004-12-31
+
+ GrBk  Grootboek/Boekstuk                   Datum      Debet     Credit  BoekstukNr  Relatie
+--------------------------------------------------------------------------------------------
+  231  Afschrijving inventaris &
+       inrichting
+        Beginsaldo                                      0,00    1304,81
+         Afschrijving                  2004-12-31       0,00     411,26  Memoriaal:1
+        Totaal mutaties                                          411,26
+  231  Totaal Afschrijving inventaris                           1716,07
+
+       ...
+
+       Totaal mutaties                              10971,08   10971,08
+--------------------------------------------------------------------------------------------
+       Totaal                                       26825,85   26825,85
+</blockquote>
+
+<h3>Kopregels</h3>
+
+<p>Regel 1: De naam van dit rapport.
+<br>Regel 2: De rapportage-periode.
+<br>Regel 3: Links de naam van de administratie en rechts de
+programma-versie met de rapportagedatum.</p>
+
+<h3>Regels</h3>
+
+Voor elke grootboekrekening worden de volgende regels aangemaakt:
+
+<ul>
+  <li>Detail 1, 2: Kopregel met de omschrijving van de grootboekrekening.</li>
+  <li>Detail 1, 2: Het beginsaldo.</li>
+  <li>Detail 2: Regels met de boekingen.</li>
+  <li>Detail 1, 2: Totaalregel mutaties.</li>
+  <li>Altijd: Totaalregel voor de grootboekrekening.</li>
+</ul>
+    
+<h3>Kolommen</h3>
+
+<dl>
+  <dt>GrBk</dt>
+  <dd>Het rekeningnummer van de grootboekrekening.</dd>
+  <dt>Grootboek/Boekstuk</dt>
+  <dd>Kopregel: De omschrijving van de grootboekrekening.
+  <br>Beginsaldoregel: <code>Beginsaldo</code>.
+  <br>Boekingsregel: De omschrijving van het boekstuk.</dd>
+  <dt>Datum</dt>
+  <dd>Boekingsregel: De boekingsdatum.</dd>
+  <dt>Debet</dt>
+  <dd>De debet waarde.</dd>
+  <dt>Credit</dt>
+  <dd>De credit waarde.</dd>
+  <dt>BoekstukNr</dt>
+  <dd>Boekingsregel: Het boekstuknummer.</dd>
+  <dt>Relatie</dt>
+  <dd>Boekingsregel: Als het een betaling betreft, de relatiecode.</dd>
+</dl>
 
     </td>
   </tr>
@@ -151,11 +303,11 @@
 
     </td>
     <td align="center">
-      <p class="info">Copyright &copy; 2005 <a href="http://www.squirrel.nl">Squirrel Consultancy</a>. All Rights Reserved.<br />
+      <p class="info">Copyright &copy; 2005-2006 <a href="http://www.squirrel.nl">Squirrel Consultancy</a>. All Rights Reserved.<br />
 Deze site is gemaakt met de 
 <a href='http://www.squirrel.nl/people/jvromans/tt2site/'>TT2Site
 Site Builder</a>.<br />
-reports/grootboek.html laatste aanpassing 12 december 2005, 10:09:54
+reports/grootboek.html laatste aanpassing 14 januari 2006, 21:55:14
 </p>
 
     </td>

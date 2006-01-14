@@ -129,7 +129,128 @@
     <td>
       
 
-<h2>In voorbereiding</h2>
+<h2>De Crediteurenboekingen</h2>
+
+<p>Dit overzicht geeft alle boekingen met betrekking tot
+&eacute;&eacute;n of meer crediteuren. Hieronder vallen zowel de
+inkoopboekingen als de betalingen.</p>
+
+<h2>Syntaxis</h2>
+
+<blockquote class="code">crediteuren <var>opties</var> <var>selectie</var></blockquote>
+
+<h3>Opties</h3>
+
+<table border="1" width="100%" cellpadding="5">
+  <tr valign="top">
+    <td><code>--periode=<var>periodeaanduiding</var></code></td>
+    <td>De <a href="../period.html">begin- en einddatum</a> voor dit rapport. Deze datums moeten liggen tussen
+	het begin van de administratie en de huidige datum.
+    </td>
+  </tr>
+  <tr valign="top">
+    <td><code>--boekjaar=<var>code</var></code></td>
+    <td>Het boekjaar waarover de rapportage moet worden aangemaakt.
+	<br>Deze optie kan niet worden gebruikt samen met <code>--periode</code>.
+    </td>
+  </tr>
+    <tr valign="top">
+    <td><code>--output=<var>file</var></code></td>
+    <td>De uitvoer wordt naar het opgegeven bestand geschreven. De
+	extensie van de bestandsnaam bepaalt de vorm waarin de
+	rapportage plaatsvindt.</td>
+  </tr>
+  <tr valign="top">
+    <td><code>--page=<var>regels</var></code></td>
+    <td>Voor tekstuele rapportages, het aantal regels per pagina.
+	<br>(Experimenteel)
+    </td>
+  </tr>
+  <tr valign="top">
+    <td><code>--gen-<var>type</var></code></td>
+    <td>Bepaalt de vorm waarin de
+	rapportage plaatsvindt. <code>--gen-text</code>, <code>--gen-csv</code> en
+	<code>--gen-html</code> zijn vrijwel altijd
+	mogelijk, overige waarden hangen af van de voor deze
+	rapportage ondersteunde plug-ins.</td>
+  </tr>
+  <tr valign="top">
+    <td><code>--style=<var>name</var></code></td>
+    <td>Voor HTML uitvoer: specificeert de naam van de te gebruiken
+	stylesheet.
+	<br>Indien geen stylesheet wordt opgegeven wordt een
+	stylesheet genoemd naar de rapportage gebruikt. Bijvoorbeeld,
+	voor een balans rapportage wordt stylesheet
+	'<code>css/balans.css</code>' gebruikt. Met de optie
+	<code>--style=other</code> zou de gebruikte stylesheet worden:
+	'<code>css/other.css</code>'
+    </td>
+  </tr>
+
+</table>
+
+<h3>Selectie</h3>
+
+<p>Voor een selectief overzicht kunt u &eacute;&eacute;n of meer
+relatiecodes opgeven. Het resulterende overzicht zal dan alleen de
+boekingen met betrekking tot deze relaties tonen.</p>
+
+<p>Zonder datum- en selectie-opties wordt een rapportage voor alle
+crediteuren aangemaakt over het lopende boekjaar.</p>
+
+<h2>Uitvoer</h2>
+
+<blockquote class="code">                                 Crediteurenadministratie
+Periode: 2004-01-01 t/m 2004-12-31
+EekBoek Demo Administratie 2004                                  EekBoek 0.30, 2006-01-13
+
+Crediteur Datum       Omschrijving               Bedrag  Openstaand   Betaald  Boekstuk
+-----------------------------------------------------------------------------------------
+KPN
+          2004-01-15  ADSL + Telefoon            104,65        0,00            Inkoop:2
+          2004-01-31    *ADSL + Telefoon                               104,65  Postbank:3
+          ...
+                                             ----------  ----------
+KPN                   Totaal                     631,44        0,00
+
+XS4ALL
+          2004-01-05  ADSL                        22,80        0,00            Inkoop:1
+          2004-01-19    *ADSL                                           22,80  Postbank:2
+          ...
+                                             ----------  ----------
+XS4ALL                Totaal                     296,40        0,00
+-----------------------------------------------------------------------------------------
+Totaal                                           927,84        0,00
+</blockquote>
+
+<h3>Kopregels</h3>
+
+<p>Regel 1: De naam van dit rapport.
+<br>Regel 2: De rapportage-periode.
+<br>Regel 3: Links de naam van de administratie en rechts de
+programma-versie met de rapportagedatum.</p>
+
+<h3>Kolommen</h3>
+
+<dl>
+  <dt>Crediteur</dt>
+  <dd>De relatiecode van de crediteur.</dd>
+  <dt>Datum</dt>
+  <dd>De datum van de boeking of betaling.</dd>
+  <dt>Omschrijving</dt>
+  <dd>De omschrijving van de boeking of betaling.
+  <br>In geval van betaling zal de omschrijving beginnen met een &lsquo;<code>*</code>&rsquo;.</dd>
+  <dt>Bedrag</dt>
+  <dd>Voor boekingen: Het totale bedrag van de boeking.</dd>
+  <dt>Openstaand</dt>
+  <dd>Voor boekingen: Het bedrag dat na alle betalingen nog open staat.</dd>
+  <dt>Betaals</dt>
+  <dd>Voor betalingen: Het bedrag van de betaling.</dd>
+  <dt>Boekstuk</dt>
+  <dd>Het boekstuknummer van de boeking of betaling.</dd>
+</dl>
+
+Totalen worden getoond per crediteur en voor alle crediteuren.
 
     </td>
   </tr>
@@ -151,11 +272,11 @@
 
     </td>
     <td align="center">
-      <p class="info">Copyright &copy; 2005 <a href="http://www.squirrel.nl">Squirrel Consultancy</a>. All Rights Reserved.<br />
+      <p class="info">Copyright &copy; 2005-2006 <a href="http://www.squirrel.nl">Squirrel Consultancy</a>. All Rights Reserved.<br />
 Deze site is gemaakt met de 
 <a href='http://www.squirrel.nl/people/jvromans/tt2site/'>TT2Site
 Site Builder</a>.<br />
-reports/crediteuren.html laatste aanpassing 28 december 2005, 23:20:51
+reports/crediteuren.html laatste aanpassing 13 januari 2006, 17:48:35
 </p>
 
     </td>

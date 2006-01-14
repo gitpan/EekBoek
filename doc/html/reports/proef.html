@@ -129,7 +129,123 @@
     <td>
       
 
-<h2>In voorbereiding</h2>
+<h2>De Proef- en Saldibalans</h2>
+
+<p>De Proef- en Saldibalans is een in principe tussentijdse balans van de
+saldi van de grootboekrekeningen.</p>
+
+<p>Het overzicht bestaat uit twee dubbele kolommen, waarvan het linker
+paar de totalen van alle debet en creditboekingen laten zien. Het
+rechter paar toont het netto (debet of credit) saldo.</p>
+
+<p>Voor de balansrekeningen geldt dat de saldi-kolommen overeenkomen
+met de Debet/Credit kolommen van de <a href="balans.html">Balans</a>. Voor de
+resultatenrekeningen geldt dat deze kolommen overeenkomen met de
+Debet/Credit kolommen van de <a href="result.html">Verlies/Winst Rekening</a>.</p>
+
+<h3>Definities</h3>
+
+<h3>Syntax</h3>
+
+<blockquote class="code">proefensaldibalans <var>opties</var></blockquote>
+
+<h3>Opties</h3>
+
+<table border="1" width="100%" cellpadding="5">
+    <tr valign="top">
+    <td><code>--per=<var>datum</var></code></td>
+    <td>De <a href="../date.html">einddatum</a> voor dit rapport. Deze datum moet liggen tussen
+	het begin van de administratie en de huidige datum.
+    </td>
+  </tr>
+
+    <tr valign="top">
+    <td><code>--boekjaar=<var>code</var></code></td>
+    <td>Het boekjaar waarover de rapportage moet worden aangemaakt.
+	<br>Deze optie kan niet worden gebruikt samen met <code>--periode</code>.
+    </td>
+  </tr>
+
+  <tr valign="top">
+    <td><code>--detail=<var>N</var></code></td>
+    <td>Selecteert de verdichte vorm van rapportage, en bepaalt
+	de mate van detail:
+	<br>0&nbsp;&nbsp;Geen detail, alleen totaal per hoofdverdichting.
+	<br>1&nbsp;&nbsp;Geen detail, alleen totaal per verdichting.
+	<br>2&nbsp;&nbsp;Alle grootboekrekeningen.
+	<p>Zonder detailselectie wordt de onverdichte vorm van
+	rapportage aangemaakt.</p>
+    </td>
+  </tr>
+  <tr valign="top">
+    <td><code>--verdicht</code></td>
+    <td>Een verkorte vorm voor <code>--detail=2</code>.
+    </td>
+  </tr>
+    <tr valign="top">
+    <td><code>--output=<var>file</var></code></td>
+    <td>De uitvoer wordt naar het opgegeven bestand geschreven. De
+	extensie van de bestandsnaam bepaalt de vorm waarin de
+	rapportage plaatsvindt.</td>
+  </tr>
+  <tr valign="top">
+    <td><code>--page=<var>regels</var></code></td>
+    <td>Voor tekstuele rapportages, het aantal regels per pagina.
+	<br>(Experimenteel)
+    </td>
+  </tr>
+  <tr valign="top">
+    <td><code>--gen-<var>type</var></code></td>
+    <td>Bepaalt de vorm waarin de
+	rapportage plaatsvindt. <code>--gen-text</code>, <code>--gen-csv</code> en
+	<code>--gen-html</code> zijn vrijwel altijd
+	mogelijk, overige waarden hangen af van de voor deze
+	rapportage ondersteunde plug-ins.</td>
+  </tr>
+  <tr valign="top">
+    <td><code>--style=<var>name</var></code></td>
+    <td>Voor HTML uitvoer: specificeert de naam van de te gebruiken
+	stylesheet.
+	<br>Indien geen stylesheet wordt opgegeven wordt een
+	stylesheet genoemd naar de rapportage gebruikt. Bijvoorbeeld,
+	voor een balans rapportage wordt stylesheet
+	'<code>css/balans.css</code>' gebruikt. Met de optie
+	<code>--style=other</code> zou de gebruikte stylesheet worden:
+	'<code>css/other.css</code>'
+    </td>
+  </tr>
+
+</table>
+
+<p>Zonder datum- en detail-opties wordt een rapportage op grootboekrekening
+aangemaakt over het lopende boekjaar.</p>
+
+<h3>Uitvoer</h3>
+
+<h3>Kolommen</h3>
+
+<dl>
+  <dt>RekNr</dt>
+  <dd>Het rekeningnummer van de grootboekrekening.</dd>
+  <dt>Grootboekrekening of Verdichting/Grootboekrekening</dt>
+  <dd>De verdichting, dan wel de omschrijving van de
+      grootboekrekening.
+      <br>Verdichtingen zijn ingesprongen ten opzichte van de
+      hoofdverdichtingen; grootboekrekeningen zijn op hun beurt weer
+      ingesprongen ten opzichte van de verdichtingen.</dd>
+  <dt>Debet</dt>
+  <dd>Het totaal van alle debet-boekingen op deze rekening.</dd>
+  <dt>Credit</dt>
+  <dd>Het totaal van alle credit-boekingen op deze rekening.</dd>
+  <dt>Saldo Db</dt>
+  <dd>De uiteindelijke debet waarde van deze rekening.</dd>
+  <dt>Saldo Credit</dt>
+  <dd>De uiteindelijke credit waarde van deze rekening.</dd>
+</dl>
+
+<p>Voor verdere informatie, zie de beschrijving van de <a
+href="balans.html">Balans</a> en de <a
+href="result.html">Verlies/Winst Rekening</a>.</p>
 
     </td>
   </tr>
@@ -151,11 +267,11 @@
 
     </td>
     <td align="center">
-      <p class="info">Copyright &copy; 2005 <a href="http://www.squirrel.nl">Squirrel Consultancy</a>. All Rights Reserved.<br />
+      <p class="info">Copyright &copy; 2005-2006 <a href="http://www.squirrel.nl">Squirrel Consultancy</a>. All Rights Reserved.<br />
 Deze site is gemaakt met de 
 <a href='http://www.squirrel.nl/people/jvromans/tt2site/'>TT2Site
 Site Builder</a>.<br />
-reports/proef.html laatste aanpassing 12 december 2005, 10:09:54
+reports/proef.html laatste aanpassing 14 januari 2006, 22:23:46
 </p>
 
     </td>
