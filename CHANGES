@@ -1,4 +1,11 @@
-0.30	
+0.31	17-01-2006
+
+	Export functionaliteit.
+	Tegenrekening voor Memoriaal.
+	Verbetering PostgreSQL tests.
+
+0.30	14-01-2006 22:37
+
 	Afronden documentatie.
 	Extra build test op database.
 	IVP: Verificatie Crediteuren/Debiteurenoverzicht.

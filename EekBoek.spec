@@ -1,5 +1,5 @@
 %define modname EekBoek
-%define modversion 0.30
+%define modversion 0.31
 
 Name: %modname
 Version: %modversion
@@ -28,7 +28,8 @@ appreciated).
 
 %build
 perl Makefile.PL
-make all test
+make all
+env EB_SKIPDBTESTS=1 make test
 
 %install
 rm -rf $RPM_BUILD_ROOT

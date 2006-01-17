@@ -103,6 +103,7 @@ lib/EB/css/openstaand.css
 lib/EB/css/proef.css
 lib/EB/css/result.css
 lib/EB/DB.pm
+lib/EB/Export.pm
 lib/EB/Expression.pm
 lib/EB/Finance.pm
 lib/EB/Globals.pm
