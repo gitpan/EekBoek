@@ -112,6 +112,7 @@ lib/EB/migrate/001000000001000001.sql
 lib/EB/migrate/001000001001000002.pl
 lib/EB/migrate/001000002001000003.sql
 lib/EB/migrate/001000003001000004.sql
+lib/EB/migrate/001000005001000006.sql
 lib/EB/Relation.pm
 lib/EB/Report.pm
 lib/EB/Report/Balres.pm
@@ -128,6 +129,7 @@ lib/EB/Report/Reporter/Csv.pm
 lib/EB/Report/Reporter/Html.pm
 lib/EB/Report/Reporter/Text.pm
 lib/EB/schema/bvnv.dat
+lib/EB/schema/cleanup.sql
 lib/EB/schema/eekboek.sql
 lib/EB/schema/eenmanszaak.dat
 lib/EB/schema/sample.dat

@@ -1,4 +1,19 @@
-0.31	17-01-2006
+0.32	
+
+	INCOMPATIBELE WIJZIGING
+	=======================
+	Openstaande posten ingevoerd bij het openen van het boekjaar
+	door middel van de vorm "adm_relatie <boekstuknummer> ..."
+	hebben de omschrijving en relatiecode omgewisseld.
+
+	Dat betekent dat de opdracht ter invoering van de openstaande
+	boeking nu identiek is aan de oorspronkelijke
+	boekingsopdracht, voorafgegaan door het woord "adm_relatie".
+	=======================
+
+	Database structuur is gewijzigd, auto-migratie is beschikbaar.
+
+0.31	17-01-2006 22:19
 
 	Export functionaliteit.
 	Tegenrekening voor Memoriaal.
