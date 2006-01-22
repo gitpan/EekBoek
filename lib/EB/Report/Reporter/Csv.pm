@@ -1,12 +1,15 @@
 # Csv.pm -- 
-# RCS Info        : $Id: Csv.pm,v 1.2 2006/01/09 14:18:35 jv Exp $
+# RCS Info        : $Id: Csv.pm,v 1.4 2006/01/22 17:12:36 jv Exp $
 # Author          : Johan Vromans
 # Created On      : Thu Jan  5 18:47:37 2006
 # Last Modified By: Johan Vromans
-# Last Modified On: Mon Jan  9 15:17:58 2006
-# Update Count    : 8
+# Last Modified On: Sun Jan 22 18:12:30 2006
+# Update Count    : 12
 # Status          : Unknown, Use with caution!
-#!/usr/bin/perl -w
+
+package main;
+
+our $cfg;
 
 package EB::Report::Reporter::Csv;
 
@@ -40,7 +43,7 @@ sub add {
 
     return unless %$data;
 
-    $sep = $self->{_sep} ||= $ENV{EB_CSV_SEPARATOR} || ",";
+    $sep = $self->{_sep} ||= $cfg->val(qw(csv separator), ",");
 
     $self->_checkhdr;
 

@@ -93,10 +93,10 @@
 <br />
 &nbsp;-&nbsp;<a href="../ebshell/clo.html" class="menuselect">Opties</a>
 <br />
-&nbsp;-&nbsp;<a href="../ebshell/env.html" class="menu">Environment</a>
-<br />
 &nbsp;-&nbsp;<a href="../ebshell/files.html" class="menu">Bestanden</a>
 <br />
+<br />
+<a href="../config.html" class="menu">Configuratie</a>
 <br />
 <a href="../setup/index.html" class="menu">Opzetten administratie</a>
 <br />
@@ -121,6 +121,11 @@
 
 <table border="1" width="100%" cellpadding="5">
   <tr valign="top">
+    <td><code>-f <var>cfg</var><br>--config=<var>cfg</var></code></td>
+    <td>Specificeert een extra configuratiebestand. Zie <a href="../config.html">Configuratiebestanden</a>.
+    </td>
+  </tr>
+  <tr valign="top">
     <td><code>-c<br>--command</code></td>
     <td>De rest van de opdrachtregel wordt als een ebshell opdracht
 	ge&iuml;nterpreteerd.
@@ -136,7 +141,8 @@
     <td><code>--dataset=<var>name</var></code></td>
     <td>De opgegeven database wordt gebruikt in plaats van de
 	standaard database. Zie <a
-	href="env.html#EB_DB_NAME"><code>Environment, EB_DB_NAME</code></a>.
+	href="../config.html#database">Configuratiebestanden,
+	sectie Database</a>.
     </td>
   </tr>
   <tr valign="top">
@@ -149,6 +155,15 @@
     <td><code>--boekjaar=<var>code</var></code></td>
     <td>Selecteer een boekjaar uit een administratie die meerdere
 	boekjaren omvat.
+    </td>
+  </tr>
+  <tr valign="top">
+    <td><code>--createdb</code></td>
+    <td>Cre&euml;er een lege database. Indien de database al bestaat
+	wordt deze geheel leeggemaakt, anders wordt een nieuwe, lege
+	database aangemaakt.
+	<br>Deze opdracht is alleen zinvol in combinatie met de
+	opdracht <code>--schema</code>, zie hieronder.
     </td>
   </tr>
   <tr valign="top">
@@ -187,11 +202,11 @@
 
     </td>
     <td align="center">
-      <p class="info">Copyright &copy; 2005 <a href="http://www.squirrel.nl">Squirrel Consultancy</a>. All Rights Reserved.<br />
+      <p class="info">Copyright &copy; 2005-2006 <a href="http://www.squirrel.nl">Squirrel Consultancy</a>. All Rights Reserved.<br />
 Deze site is gemaakt met de 
 <a href='http://www.squirrel.nl/people/jvromans/tt2site/'>TT2Site
 Site Builder</a>.<br />
-ebshell/clo.html laatste aanpassing 13 december 2005, 21:14:42
+ebshell/clo.html laatste aanpassing 22 januari 2006, 18:29:04
 </p>
 
     </td>

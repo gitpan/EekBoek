@@ -1,4 +1,15 @@
-0.32	
+0.34
+
+	Config files.
+	Uitfasering environment variabelen.
+	Fix .eb generatie door jaareinde.
+	Kleine fixes.
+
+0.33	20-01-2006 09:38
+
+	Emergency fix. Please do not use 0.32.
+
+0.32	18-01-2006 22:47
 
 	INCOMPATIBELE WIJZIGING
 	=======================

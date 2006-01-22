@@ -1,8 +1,9 @@
 #!/usr/bin/perl -w
-my $RCS_Id = '$Id: BKM.pm,v 1.32 2006/01/18 20:46:00 jv Exp $ ';
+my $RCS_Id = '$Id: BKM.pm,v 1.34 2006/01/22 16:39:15 jv Exp $ ';
 
 package main;
 
+our $cfg;
 our $dbh;
 our $app;
 our $config;
@@ -12,8 +13,8 @@ package EB::Booking::BKM;
 # Author          : Johan Vromans
 # Created On      : Thu Jul  7 14:50:41 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Wed Jan 18 20:42:18 2006
-# Update Count    : 285
+# Last Modified On: Sun Jan 22 17:38:30 2006
+# Update Count    : 291
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -31,7 +32,7 @@ use EB::Finance;
 use EB::Report::Journal;
 use base qw(EB::Booking);
 
-my $trace_updates = $ENV{EB_TRACE_UPDATES};		# for debugging
+my $trace_updates = $cfg->val(__PACKAGE__, "trace_updates", 0);	# for debugging
 
 sub perform {
     my ($self, $args, $opts) = @_;
@@ -383,7 +384,10 @@ sub perform {
 
     if ( $opts->{journal} ) {
 	warn("?"._T("Dit overicht is ter referentie, de boeking is niet uitgevoerd!")."\n") if $fail;
-	EB::Report::Journal->new->journal({select => $bsk_id, detail => 1});
+	EB::Report::Journal->new->journal
+	    ({select => $bsk_id,
+	      d_boekjaar => $bky,
+	      detail => 1});
     }
 
     if ( $fail ) {
