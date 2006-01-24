@@ -43,6 +43,7 @@ doc/html/setup/schema.html
 doc/html/stdacc.html
 doc/html/yearend.html
 EekBoek.spec
+example/eekboek.conf
 example/mutaties.eb
 example/newdb.sh
 example/opening.eb
@@ -106,6 +107,7 @@ lib/EB/css/openstaand.css
 lib/EB/css/proef.css
 lib/EB/css/result.css
 lib/EB/DB.pm
+lib/EB/DB/Postgres.pm
 lib/EB/Export.pm
 lib/EB/Expression.pm
 lib/EB/Finance.pm
