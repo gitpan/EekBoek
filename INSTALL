@@ -1,8 +1,15 @@
 Installatie Eekboek Boekhoudpakket (command line versie)
 ========================================================
 
-Nodig: Perl5.8.x met DBI (zit standaard in Perl)
-       PostgreSQL
+Let op: Dit document gebruikt de ISO-8859.1 (Latin1) tekenset.
+Niet-ASCII tekens worden alleen juist getoond indien je programma op
+deze tekenset is ingesteld.
+
+Benodigdheden
+-------------
+
+Perl5.8.x met DBI (zit standaard in Perl)
+PostgreSQL (zit standaard in de meeste Linux systemen)
 
 Perl modules (zelf te installeren):
        DBD::Pg 1.41 of later
@@ -10,13 +17,57 @@ Perl modules (zelf te installeren):
        Config::IniFiles
        (Text::CSV_XS voor de Exact importprogramma's)
 
-Bouwen:
+Bouwen en verifiëren
+--------------------
 
    $ perl Makefile.PL
-   $ make all test
+   $ make all
+   $ make test
+
+De laatste vereist generieke toegang tot een draaiende PostgreSQL
+database server. Indien nodig kunnen de environment variabelen PGHOST
+PGPORT en PGUSER worden toegepast; zie de PostgreSQL documentatie.
+Als het niet mogelijk is de database server te benaderen, gebruik dan
+
+   $ env EB_SKIPDBTESTS=1 make test
+
+Als je wel toegang hebt tot een draaiende database server, en je hebt
+permissie om databases aan te maken (zie verderop 'Aantekeningen'),
+dan kun je de uitgebreide installatie-verificatieprocedure uitvoeren:
+
+   $ make ivp
+
+De te verwachten uitvoer van de installatie-verificatieprocedure is:
+
+   Using blib version
+   === IVP === aanmaken database ===
+   === IVP === relaties ===
+   === IVP === openen administratie ===
+   === IVP === mutaties ===
+   === IVP === verificatie ===
+   EekBoek x.xx -- Copyright 2005-2006 Squirrel Consultancy
+   (Deze banner wordt een keer of 25 getoond. ELKE ANDERE UITVOER
+   DUIDT OP PROBLEMEN.)
+   === IVP === gereed ===
+
+Zonder een succesvolle afronding van de installatie-verificatie-
+procedure heeft het GEEN ZIN om verder te gaan. Raadpleeg in dat geval
+de .log files en eventueel de mailing list (zie verderop).
+
+Gebruiksklaar maken
+-------------------
 
 Het is niet nodig om EekBoek te installeren om het te kunnen
-gebruiken. Wil je toch installeren:
+gebruiken. Het is dan wel noodzakelijk om de environment variabelen
+PERL5LIB en PATH op de juiste wijze op te zetten:
+
+   $ PERL5LIB=<eekboekdir>/blib/lib:$PERL5LIB; export PERL5LIB
+   $ PATH=<eekboekdir>/blib/script:$PATH; export PATH
+
+Hierin is <eekboekdir> de plaats waar eerder de make all en make test
+is uitgevoerd.
+
+Wil je installeren:
 
    $ su
    # make install
@@ -27,10 +78,29 @@ Installatie verwijderen:
    De gehele directory EB kun je weghalen, evenals EekBoek.pm, EB.pm
    en het programma /usr/bin/ebshell.
 
-Liefhebbers van RPM kunnen de meeegeleverde EekBoek.spec file gebruiken.
+Aantekeningen
+-------------
 
-Voor het uitwisselen van ervaringen, vragen om ondersteuning en zo:
-gebruik de mailing list http://lists.sourceforge.net/lists/listinfo/eekboek-users.
+* Liefhebbers van RPM kunnen de meeegeleverde EekBoek.spec file
+  gebruiken, of een .src.rpm downloaden van de SourceForge site,
+  http://sourceforge.net/project/showfiles.php?group_id=154512 .
+
+* Je moet de mogelijkheid hebben om PostgreSQL databases aan te maken.
+  Dat kun je bereiken met (veronderstel dat je user 'piet' bent):
+
+   $ su 
+   # su - postgres
+   # createuser -d piet
+   # exit
+   $ exit
+
+  Raadpleeg anders je systeembeheerder.
+
+* Voor het uitwisselen van ervaringen, vragen om ondersteuning en zo:
+  gebruik de mailing list
+  http://lists.sourceforge.net/lists/listinfo/eekboek-users .
+
+ZIE OOK DE ON-LINE DOCUMENTATIE http://www.squirrel.nl/eekboek/docs/ . 
 
 ----------------------------------------------------------------------------
 Johan Vromans                                           jvromans@squirrel.nl

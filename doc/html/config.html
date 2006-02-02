@@ -145,7 +145,23 @@ meer generieke bestanden.<p>
 <p>De EekBoek shell <code>ebshell</code> kan bovendien op de command
 line een <a href="ebshell/clo.html#config">configuratie-optie</a>
 worden meegegeven. Met deze optie wordt een extra configuratiebestand
-aangewezen dat weer voorrang heeft boven alle andere.</p>
+aangewezen dat weer voorrang heeft boven alle andere. Ook is het
+mogelijk om met de command line optie <code>-X</code> de EekBoek shell
+te instrueren alle standaard-configuratiebestanden over te slaan. Dit
+is uiteraard alleen zinvol in combinatie met <code>--config</code>.</p>
+
+<p>De waarde van configuratie-variabelen kan worden opgevraagd met de
+EekBoek shell. Als de <em>eerste</em> optie op de command line
+<code>--printcfg</code> is, of de verkorte vorm <code>-P</code>, dan
+worden alle volgende argumenten gezien als configuratie-variabelen en
+wordt de waarde ervan afgedrukt. Dit is met name zinvol in shell
+scripts, bijvoorbeeld om de actuele naam van de database op te vragen.
+<em>Na het afdrukken van de variabelen stopt de EekBoek shell, er wordt
+dus geen normale verwerking opgestart.</em>
+<br>Configuratie-variabelen kunnen worden opgegeven in de vorm
+<var>sectie</var><code>:</code><var>variabele</var>. Ook is het
+mogelijk een sectie te selecteren voor een reeks van variabelen met de
+optie <code>--section=<var>sectie</var></code>.
 
 <p>De configuratiebestanden zijn verdeeld in secties, die elk een of
 meer variabelen kunnen bevatten. Bijvoorbeeld</p>
@@ -199,12 +215,23 @@ toekomstige versie komen te vervallen.</p>
     <td><a name="database_name"></a><code>name</code></td>
     <td>De naam van de te gebruiken database.<br>
 	De command line optie <code>--dataset</code> (zie hierboven)
-	prevaleert over het
-	zetten van deze configuratievariabele.
+	prevaleert over het zetten van deze configuratievariabele.
 	Let op! De werkelijke naam wordt, indien nodig, voorzien van
 	het voorvoegsel	<code>eekboek_</code>. Dit om de EekBoek
 	databases te kunnen onderscheiden van de overige databases.
+	Deze configuratievariabele, indien opgevraagd, zal altijd de
+	naam weergeven <em>zonder</em> voorvoegsel. Zie ook
+	<code>fullname</code> hieronder.
 	<br>Fallback: <code>EB_DB_NAME</code>.
+    </td>
+  </tr>
+  <tr valign="top">
+    <td><a name="database_fullname"></a><code>fullname</code></td>
+    <td>De volledige naam van de database, dus inclusief het
+	<code>eekboek_</code> voorvoegsel.<br>
+	Deze veriabele kan niet worden opgegeven in de
+	configuratiebestanden maar wordt automatisch afgeleid van de
+	database naam.
     </td>
   </tr>
   <tr valign="top">
@@ -294,7 +321,7 @@ ongewenste problemen leiden.</em></p>
 Deze site is gemaakt met de 
 <a href='http://www.squirrel.nl/people/jvromans/tt2site/'>TT2Site
 Site Builder</a>.<br />
-config.html laatste aanpassing 22 januari 2006, 17:46:32
+config.html laatste aanpassing 29 januari 2006, 12:02:21
 </p>
 
     </td>

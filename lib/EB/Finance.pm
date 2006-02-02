@@ -105,12 +105,28 @@ sub numfmtv {
 }
 
 sub numround {
+    # This somethimes does odd things.
+    # E.g. 892,5 -> 892 and 891,5 -> 892.
     0 + sprintf("%.0f", $_[0]);
 }
 
-sub numdebcrd {
-    $_[0] >= 0 ? ($_[0], undef) : (undef, -$_[0]);
+=begin alternative
+
+# Is this a beteer alternative?
+
+use POSIX qw(floor ceil);
+
+sub numround {
+    my ($val) = @_;
+    if ( $val < 0 ) {
+	ceil($val - 0.5);
+    }
+    else {
+	floor($val + 0.5);
+    }
 }
+
+=cut
 
 sub btwfmt {
     my $v = sprintf($btwfmt0, 100*$_[0]/BTWSCALE);
@@ -129,7 +145,7 @@ sub norm_btw {
 			      " WHERE btw_id = ?", $bsr_btw_id);
 	    my $group;
 	    ($btw_perc, $btw_incl, $group) = @$rr;
-	    if ( $group == BTWTYPE_HOOG ) {
+	    if ( $group == BTWTARIEF_HOOG ) {
 		$btw_acc_inkoop = $dbh->std_acc("btw_ih");
 		$btw_acc_verkoop = $dbh->std_acc("btw_vh");
 	    }

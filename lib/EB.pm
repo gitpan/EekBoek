@@ -1,10 +1,10 @@
 # EB.pm -- 
-# RCS Info        : $Id: EB.pm,v 1.38 2006/01/23 10:39:58 jv Exp $
+# RCS Info        : $Id: EB.pm,v 1.40 2006/02/01 12:58:30 jv Exp $
 # Author          : Johan Vromans
 # Created On      : Fri Sep 16 18:38:45 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Mon Jan 23 11:39:53 2006
-# Update Count    : 110
+# Last Modified On: Wed Feb  1 12:31:19 2006
+# Update Count    : 112
 # Status          : Unknown, Use with caution!
 
 our $app;
@@ -15,7 +15,7 @@ use strict;
 use base qw(Exporter);
 
 our $VERSION;
-$VERSION = "0.36";
+$VERSION = "0.37";
 
 our @EXPORT;
 our @EXPORT_OK;
@@ -77,7 +77,7 @@ INIT {
 		 ident   => $ident,
 		 extra   => ($app ? "Wx " : ""),
 		 locale  => (LOCALISER ? "("._T("Nederlands").") " : ""),
-		 year    => $year)."\n");
+		 year    => $year)."\n") unless @ARGV && $ARGV[0] =~ /-(P|-?printconf)$/;
     @months =
       split(" ", _T("Jan Feb Mrt Apr Mei Jun Jul Aug Sep Okt Nov Dec"));
     @month_names =

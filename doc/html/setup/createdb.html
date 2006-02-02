@@ -121,26 +121,26 @@
 
 <p>Elke administratie wordt opgeslagen in een eigen database. De
 eerste stap in het opzetten van een administratie is daarom het
-aanmaken van de database. Deze handeling moet buiten EekBoek worden
-uitgevoerd, omdat er geen database-onafhankelijke manier is om
-databases aan te maken.</p>
+aanmaken van de database.</p>
 
-<p>EekBoek databases dragen namen die alle beginnen met het
-voorvoegsel '<code>eekboek_</code>', dit om ze te kunnen onderscheiden
-van andere, niet-EekBoek databases die op het systeem aanwezig kunnen
-zijn.</p>
+<p>Het aanmaken van een database met bijvoorbeeld de naam
+'<code>test</code>' kan met de volgende EekBoek shell opdracht:</p>
 
-<p>Het aanmaken van een '<code>test</code>' database in PostgreSQL
-kan met de volgende systeemopdracht:</p>
+<blockquote class="code">ebshell --createdb --db=test -c</blockquote>
 
-<blockquote class="code">createdb eekboek_test</blockquote>
+<p>Deze opdracht zal een nieuwe database aanmaken. Indien de database al
+bestaat wordt deze geheel leeggemaakt en hergebruikt.</p>
 
-<p>PostgreSQL werkt standaard met UNICODE data. Indien de
-administratiegegevens zijn gesteld in de ISO Latin1 tekenset dient bij
-het aanmaken van de database de command line optie '<code>-E</code>'
-te worden meegegeven:</p>
+<p>Zie de beschrijving van de <a
+href="../config.html">Configuratiefiles</a> voor het vastleggen van de
+naam van de database en andere instellingen.</p>
 
-<blockquote class="code">createdb -E latin1 eekboek_test</blockquote>
+<p>EekBoek databases dragen namen die in werkelijkheid alle beginnen
+met het voorvoegsel '<code>eekboek_</code>', dit om ze te kunnen
+onderscheiden van andere, niet-EekBoek databases die op het systeem
+aanwezig kunnen zijn. De software draagt zelf zorg voor het aanbrengen
+van het voorvoegsel.</p>
+
 
     </td>
   </tr>
@@ -166,7 +166,7 @@ te worden meegegeven:</p>
 Deze site is gemaakt met de 
 <a href='http://www.squirrel.nl/people/jvromans/tt2site/'>TT2Site
 Site Builder</a>.<br />
-setup/createdb.html laatste aanpassing 08 december 2005, 09:52:22
+setup/createdb.html laatste aanpassing 31 januari 2006, 18:27:23
 </p>
 
     </td>

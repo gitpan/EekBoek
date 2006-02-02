@@ -1,5 +1,5 @@
 -- EekBoek Database Schema
--- $Id: eekboek.sql,v 1.22 2006/01/18 20:46:58 jv Exp $
+-- $Id: eekboek.sql,v 1.25 2006/01/31 17:38:54 jv Exp $
 
 -- Constanten. Deze worden gegenereerd door de EB::Globals module.
 CREATE TABLE Constants (
@@ -28,7 +28,7 @@ CREATE TABLE Accounts (
     acc_balres  boolean,       -- t:balans f:resultaten
     acc_debcrd  boolean,       -- t:debet  f:credit
     acc_kstomz  boolean,       -- t:kosten f:omzet
-    acc_btw     smallint,
+    acc_btw     smallint,      -- references BTWTabel (constraint postponed)
     acc_ibalance int,          -- openingsbalanswaarde
     acc_balance int
 );
@@ -89,7 +89,7 @@ CREATE TABLE Relaties (
     rel_code      char(10) not null primary key,
     rel_desc 	  text not null,
     rel_debcrd    boolean,		     -- t: debiteur f: crediteur
-    rel_btw_status smallint default 0, 	     -- BTW_NORMAAL, BTW_VERLEGD, BTW_INTRA, BTW_EXTRA.
+    rel_btw_status smallint default 0, 	     -- BTWTYPE NORMAAL, VERLEGD, INTRA, EXTRA.
     rel_ledger    varchar(4) references Dagboeken,  -- verkoop/inkoopdagboek
     rel_acc_id    int references Accounts,   -- standaard grootboekrekening
     CONSTRAINT "rel_btw_status"
@@ -139,6 +139,7 @@ CREATE TABLE Boekstukregels (
     bsr_amount   int,
     bsr_btw_id   smallint references BTWTabel,
     bsr_btw_acc  int references Accounts,
+    bsr_btw_class  int, -- see BTWKLASSE definities
 --
     bsr_type      smallint,
                   -- I: Standaard, [- Artikel (levering van) -], ...,
@@ -193,6 +194,6 @@ CREATE TABLE Metadata (
 
 -- Harde waarden, moeten overeenkomen met de code.
 INSERT INTO metadata (adm_scm_majversion, adm_scm_minversion, adm_scm_revision)
-  VALUES (1, 0, 6);
+  VALUES (1, 0, 7);
 
 UPDATE Metadata SET adm_bky = '<<<<'; -- Voorgaand boekjaar

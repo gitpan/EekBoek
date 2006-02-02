@@ -1,5 +1,5 @@
 %define modname EekBoek
-%define modversion 0.36
+%define modversion 0.37
 
 Name: %modname
 Version: %modversion
@@ -9,6 +9,7 @@ BuildArch: noarch
 URL: http://www.squirrel.nl/eekboek/
 BuildRoot: %{_tmppath}/rpm-buildroot-%{name}-%{version}-%{release}
 Prefix: %{_prefix}
+BuildRequires: perl(Config::IniFiles);
 
 Summary: Bookkeeping software for small and medium-size businesses
 License: Artistic
@@ -57,6 +58,8 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man3/*
 
 %changelog
+* Mon Jan 30 2006 Johan Vromans <jvromans@squirrel.nl> 0.37
+- Add build dep perl(Config::IniFiles).
 * Fri Dec 23 2005 Wytze van der Raay <wytze@nlnet.nl> 0.23
 - Fixes for x86_64 building problems.
 * Wed Dec 12 2005 Johan Vromans <jvromans@squirrel.nl> 0.22

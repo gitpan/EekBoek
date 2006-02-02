@@ -1,11 +1,10 @@
-#!/usr/bin/perl -w
-my $RCS_Id = '$Id: Schema.pm,v 1.26 2006/01/22 16:47:53 jv Exp $ ';
+my $RCS_Id = '$Id: Schema.pm,v 1.29 2006/02/02 12:00:15 jv Exp $ ';
 
 # Author          : Johan Vromans
 # Created On      : Sun Aug 14 18:10:49 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Fri Jan 20 21:53:37 2006
-# Update Count    : 454
+# Last Modified On: Thu Feb  2 12:58:53 2006
+# Update Count    : 474
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -84,7 +83,6 @@ my %dbk;			# dagboeken
 my @dbk;			# dagboeken
 my @btw;			# btw tarieven
 my %btwmap;			# btw type/incl -> code
-
 my $fail;			# any errors
 
 sub error { warn('?', @_); $fail++; }
@@ -127,7 +125,7 @@ sub scan_dagboeken {
     error(__x("Dagboek {id}: het :rekening nummer ontbreekt", id => $id)."\n")
       if ( $type == DBKTYPE_KAS || $type == DBKTYPE_BANK ) and !$type;
     error(__x("Dagboek {id}: rekeningnummer enkel toegestaan voor Kas en Bankboeken", id => $id)."\n")
-      if $rek && !($type == DBKTYPE_KAS || $type == DBKTYPE_BANK);
+      if $rek && !($type == DBKTYPE_KAS || $type == DBKTYPE_BANK || $type == DBKTYPE_MEMORIAAL);
 
     $dbk{$id} = $dbkid;
     $dbk[$dbkid] = [ $id, $desc, $type, $rek||undef ];
@@ -156,13 +154,13 @@ sub scan_btw {
 	    }
 	}
 	elsif ( $extra =~ m/^tariefgroep=hoog$/i ) {
-	    $groep = BTWTYPE_HOOG;
+	    $groep = BTWTARIEF_HOOG;
 	}
 	elsif ( $extra =~ m/^tariefgroep=laag$/i ) {
-	    $groep = BTWTYPE_LAAG;
+	    $groep = BTWTARIEF_LAAG;
 	}
 	elsif ( $extra =~ m/^tariefgroep=geen$/i ) {
-	    $groep = BTWTYPE_GEEN;
+	    $groep = BTWTARIEF_GEEN;
 	}
 	elsif ( $extra =~ m/^incl(?:usief)?$/i ) {
 	    $incl = 1;
@@ -178,18 +176,18 @@ sub scan_btw {
 
     error(__x("BTW tarief {id}: geen percentage en de tariefgroep is niet \"{none}\"",
 	      id => $id, none => _T("geen"))."\n")
-      unless defined($perc) || $groep == BTWTYPE_GEEN;
+      unless defined($perc) || $groep == BTWTARIEF_GEEN;
 
     $btw[$id] = [ $id, $desc, $groep, $perc, $incl ];
 
-    if ( $groep == BTWTYPE_GEEN && !defined($btwmap{g}) ) {
+    if ( $groep == BTWTARIEF_GEEN && !defined($btwmap{g}) ) {
 	$btwmap{g} = $id;
     }
     elsif ( $incl ) {
-	if ( $groep == BTWTYPE_HOOG && !defined($btwmap{h}) ) {
+	if ( $groep == BTWTARIEF_HOOG && !defined($btwmap{h}) ) {
 	    $btwmap{h} = $id;
 	}
-	elsif ( $groep == BTWTYPE_LAAG && !defined($btwmap{l}) ) {
+	elsif ( $groep == BTWTARIEF_LAAG && !defined($btwmap{l}) ) {
 	    $btwmap{l} = $id;
 	}
     }
@@ -213,7 +211,7 @@ sub scan_balres {
 	error(__x("Dubbel: rekening {acct}", acct => $1)."\n") if exists($acc{$id});
 	error(__x("Rekening {id} heeft geen verdichting", id => $id)."\n") unless defined($cvdi);
 	my $debcrd;
-	my $kstomz;
+	my $kstomz = 1;
 	if ( ($balres ? $flags =~ /^[dc]$/i : $flags =~ /^[ko]$/i)
 	     ||
 	     $flags =~ /^[dc][ko]$/i ) {
@@ -276,6 +274,7 @@ sub load_schema {
 	next if /^\s*#/;
 	next unless /\S/;
 
+	# Scanner selectie.
 	if ( /^balans/i ) {
 	    $scanner = \&scan_balans;
 	    next;
@@ -292,11 +291,15 @@ sub load_schema {
 	    $scanner = \&scan_btw;
 	    next;
 	}
+
+	# Overige settings.
 	if ( /^verdichting\s+(\d+)\s+(\d+)/i && $1 < $2 ) {
 	    $max_hvd = $1;
 	    $max_vrd = $2;
 	    next;
 	}
+
+	# Anders: Scan.
 	if ( $scanner ) {
 	    chomp;
 	    $scanner->() or
@@ -443,7 +446,7 @@ ESQL
 
     foreach ( @btw ) {
 	next unless defined;
-	if ( $_->[2] == BTWTYPE_GEEN ) {
+	if ( $_->[2] == BTWTARIEF_GEEN ) {
 	    $_->[3] = 0;
 	    $_->[4] = "\\N";
 	}
@@ -492,6 +495,10 @@ sub gen_schema {
 
 sub _tf {
     qw(f t)[shift];
+}
+
+sub _tfn {
+    defined($_[0]) ? qw(f t)[$_[0]] : "\\N";
 }
 
 ################ Subroutines ################
@@ -572,7 +579,23 @@ print {$fh}  <<EOD;
 #   winst	rekening waarop de winst wordt geboekt
 #
 # Al deze koppelingen moeten éénmaal in het rekeningschema voorkomen.
+
 EOD
+
+=begin not_now
+
+# De classificatie Kosten/Omzet voor resultaatrekeningen wordt onder
+# meer gebruikt om te bepalen hoe BTW moet worden geboekt. Als om
+# welke reden dan ook de classificatie niet betrouwbaar moet worden
+# geacht, kan de aanduiding "Kosten-Omzet NOK" worden gebruikt om aan
+# te geven dat EekBoek deze niet mag gebruiken. Dit kan echter leiden
+# tot problemen met BTW boekingen!
+
+EOD
+
+    print {$fh} ($dbh->adm_ko ? "# " : "", "Kosten-Omzet NOK\n");
+
+=cut
 
 $max_hvd = $dbh->do("SELECT MAX(vdi_id) FROM Verdichtingen WHERE vdi_struct IS NULL")->[0];
 $max_vrd = $dbh->do("SELECT MAX(vdi_id) FROM Verdichtingen WHERE NOT vdi_struct IS NULL")->[0];
@@ -680,16 +703,20 @@ sub dump_acc {
 	    while ( my $rr = $sth->fetchrow_arrayref ) {
 		my ($id, $desc, $acc_balres, $acc_debcrd, $acc_kstomz, $btw_id, $btw, $btwincl) = @$rr;
 		my $flags = "";
-		$flags .= $acc_debcrd ? "D" : "C" if $balres;
-		$flags .= $acc_kstomz ? "K" : "O" unless $balres;
+		if ( $balres ) {
+		    $flags .= $acc_debcrd ? "D" : "C";
+		}
+		else {
+		    $flags .= $acc_kstomz ? "K" : "O";
+		}
 		my $extra = "";
-		if ( $btw == BTWTYPE_HOOG && $btwincl ) {
+		if ( $btw == BTWTARIEF_HOOG && $btwincl ) {
 		    $extra .= " :btw=hoog";
 		}
-		elsif ( $btw == BTWTYPE_LAAG && $btwincl ) {
+		elsif ( $btw == BTWTARIEF_LAAG && $btwincl ) {
 		    $extra .= " :btw=laag";
 		}
-		elsif ( $btw != BTWTYPE_GEEN ) {
+		elsif ( $btw != BTWTARIEF_GEEN ) {
 		    $extra .= " :btw=$btw_id";
 		}
 		$extra .= " :koppeling=".$kopp{$id} if exists($kopp{$id});
@@ -718,8 +745,8 @@ sub dump_btw {
     while ( my $rr = $sth->fetchrow_arrayref ) {
 	my ($id, $desc, $perc, $btg, $incl) = @$rr;
 	my $extra = "";
-	$extra .= " :tariefgroep=" . lc(BTWTYPES->[$btg]);
-	if ( $btg != BTWTYPE_GEEN ) {
+	$extra .= " :tariefgroep=" . lc(BTWTARIEVEN->[$btg]);
+	if ( $btg != BTWTARIEF_GEEN ) {
 	    $extra .= " :perc=".btwfmt($perc);
 	    $extra .= " :" . qw(exclusief inclusief)[$incl] unless $incl;
 	}

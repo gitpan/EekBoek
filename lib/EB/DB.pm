@@ -1,11 +1,11 @@
 #!/usr/bin/perl -w
-my $RCS_Id = '$Id: DB.pm,v 1.33 2006/01/24 17:15:15 jv Exp $ ';
+my $RCS_Id = '$Id: DB.pm,v 1.36 2006/02/02 11:43:58 jv Exp $ ';
 
 # Author          : Johan Vromans
 # Created On      : Sat May  7 09:18:15 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Tue Jan 24 18:13:07 2006
-# Update Count    : 297
+# Last Modified On: Thu Feb  2 12:43:09 2006
+# Update Count    : 306
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -416,10 +416,16 @@ sub createdb {
     $dbpkg->create($dbname);
 }
 
-sub typedb {
+sub driverdb {
     my ($self) = shift;
     $dbpkg ||= $self->_loaddbbackend;
     $dbpkg->type;
+}
+
+sub isql {
+    my ($self) = shift;
+    $dbpkg ||= $self->_loaddbbackend;
+    $dbpkg->isql(@_);
 }
 
 sub get_sequence {
@@ -437,7 +443,7 @@ sub set_sequence {
 
 sub _loaddbbackend {
     my ($self) = @_;
-    my $dbtype = $cfg->val(qw(database type), "postgres");
+    my $dbtype = $cfg->val(qw(database driver), "postgres");
     my $pkg = __PACKAGE__ . "::" . ucfirst(lc($dbtype));
     my $pkgfile = __PACKAGE__ . "::" . ucfirst(lc($dbtype)) . ".pm";
     $pkgfile =~ s/::/\//g;

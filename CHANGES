@@ -1,4 +1,9 @@
-0.36
+0.37
+
+	In batch mode wordt backslash-continuering ook beëindigd door
+	een lege regel.
+
+0.36	24-01-2006 18:16
 
 	Wijzigen rapportopmaak d.m.v. de configuratiefiles (Experimenteel).
 	Fix periode-einde balans/resultaat.

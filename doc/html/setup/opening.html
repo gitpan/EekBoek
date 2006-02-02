@@ -133,7 +133,7 @@ gebruiksklaar maken.</p>
 </ul>
 
 <p>De EekBoek shell opdrachten die te maken hebben met het openen van
-de administratie beginnen alle met het voorvoegsel '<code>adm_</code>'.</p>
+de administratie beginnen alle met het voorvoegsel &lsquo;<code>adm_</code>&rsquo;.</p>
 
 <a name="#amdgg"></a><h3>Het invoeren van administratie-specifieke gegevens</h3>
 
@@ -166,8 +166,8 @@ wordt het jaartal gebruikt.</p>
 <a name="opbal"></a><h3>Het invoeren van de openingsbalans</h3>
 
 <p>De openingsbalans wordt ingevoerd met de opdracht
-'<code>adm_balanstotaal</code>', indien nodig gevolgd door twee of
-meermaal '<code>adm_balans</code>'.</p>
+&lsquo;<code>adm_balanstotaal</code>&rsquo;, indien nodig gevolgd door twee of
+meermaal &lsquo;<code>adm_balans</code>&rsquo;.</p>
 
 <blockquote class="code">adm_balanstotaal 15854,77</blockquote>
 
@@ -186,15 +186,15 @@ en tevens gelijk aan het eerder opgegeven balanstotaal.</p>
 
 <p>Indien er nog onbetaalde fakturen uit het voorgaande boekjaar
 staan, dan moeten die nu worden ingevoerd met een of meer
-'<code>adm_relatie</code>' opdrachten.</p>
+&lsquo;<code>adm_relatie</code>&rsquo; opdrachten.</p>
 
-<blockquote class="code">adm_relatie inkoop:2003:67 2003-12-31 "Printwerk" KESTER 48.79</blockquote>
+<blockquote class="code">adm_relatie inkoop:2003:67 2003-12-31 KESTER "Printwerk" 48.79</blockquote>
 
-<p>De '<code>adm_relatie</code>' opdracht kent de volgende
+<p>De &lsquo;<code>adm_relatie</code>&rsquo; opdracht kent de volgende
 onderdelen:</p>
 <ul>
   <li>Het boekstuknummer, in volledige vorm:
-      '<code><var>Dagboek</var>:<var>Boekjaar</var>:<var>Volgnummer</var></code>'.
+      &lsquo;<code><var>Dagboek</var>:<var>Boekjaar</var>:<var>Volgnummer</var></code>&rsquo;.
       <br>Hier kan dus hetzelfde nummer worden opgegeven als in het
       oorpronkelijke, voorafgaande boekjaar is gebruikt.
       <br><strong>Belangrijk:</strong> Indien het oorspronkelijke dagboek
@@ -208,10 +208,13 @@ onderdelen:</p>
   <li>De relatie-code voor de betreffende debiteur/crediteur.
       <br><strong>Belangrijk:</strong> Deze code moet bekend zijn,
       zodat het nodig kan zijn eerst de opdracht
-      '<a href="../debcrd.html"><code>relatie</code></a>' te gebruiken om de relatie te
+      &lsquo;<a href="../debcrd.html"><code>relatie</code></a>&rsquo; te gebruiken om de relatie te
       defini&euml;ren.</li>
   <li>Het bedrag van de openstaande post.</li>
 </ul>
+
+<p>Merk op dat alles na <code>adm_relatie</code> precies overeenkomt
+met een &lsquo;normale&rsquo; in- of verkoopboeking.</p>
 
 <a name="open"></a><h3>Het eigenlijke openen.</h3>
 
@@ -247,7 +250,7 @@ administratie geopend met volgende opdracht:</p>
 Deze site is gemaakt met de 
 <a href='http://www.squirrel.nl/people/jvromans/tt2site/'>TT2Site
 Site Builder</a>.<br />
-setup/opening.html laatste aanpassing 13 december 2005, 20:17:37
+setup/opening.html laatste aanpassing 31 januari 2006, 12:29:55
 </p>
 
     </td>

@@ -1,66 +1,43 @@
 WAARSCHUWING: DIT IS BETA SOFTWARE.
 
+Let op: Dit document gebruikt de ISO-8859.1 (Latin1) tekenset.
+Niet-ASCII tekens worden alleen juist getoond indien je programma op
+deze tekenset is ingesteld.
+
 Eekboek Boekhoudpakket (command line versie)
 ============================================
 
-Je moet de mogelijkheid hebben om PostgreSQL databases aan te maken.
-Dat kun je bereiken met (veronderstel dat je user 'piet' bent):
-
-   $ su 
-   # su - postgres
-   # createuser -d piet
-   # exit
-   $ exit
-
-Verificatie installatie. Dit vereist de mogelijkheid om bestanden te
-kunnen aanmaken in de ivp directory.
-
-   $ cd ivp
-   $ sh ./verify.sh
-
-Er mogen geen fouten of verschillen optreden -- inspecteer na afloop
-ook newdb.log en mutaties.log
-
-Zie verderop hoe een eigen administratie op te zetten.
+Dit document gaat ervan uit dat alle stappen uit de INSTALL
+documentatie met goed gevolg zijn uitgevoerd.
 
 Werken met de voorbeeldadministatie van de ivp:
 
-   $ cd ivp   (indien nodig)
-
-   $ source setup.csh		-- C shells
-   $ . ./setup.sh		-- Bourne shells
-
-   $ sh ./newdb.sh                        -- creeer database, relaties, opening
-   $ pg_dump -c $EB_DB_NAME > reset.sql   -- hersteldatabase aanmaken
-
-   Deze 2 commando's zitten gerieflijk onder de alias "rebuild"
-
-   $ ebshell < mutaties.eb                -- importeren mutaties
-
+   $ cd ivp
    $ ebshell				  -- shell interactief
-
-   $ sh ./reset.sh                        -- herstel database a.d.h.v
-				          -- de hersteldatabase
-
-WAARSCHUWING: DIT IS BETA SOFTWARE.
 
 De EekBoek shell werkt als volgt:
 
    $ ebshell             -- interactief
-   $ ebshell < file      -- batch
+   $ ebshell < file      -- batch, leest opdrachten uit file
    $ ebshell -c command  -- single command
 
 Voor commando's -> gebruik "help".
 
 De shell ondersteunt readline en history.
 
+ZIE OOK DE ON-LINE DOCUMENTATIE http://www.squirrel.nl/eekboek/docs/ . 
+
 Tips:
 
+ZIE OOK DE ON-LINE DOCUMENTATIE http://www.squirrel.nl/eekboek/docs/ . 
+
    $ ebshell --journaal
-   toont na elke (relevante) aktie de betreffende journaalpost 
+   toont na elke boekingsaktie automatisch de betreffende journaalpost 
 
    $ ebshell --echo < file
    toont tijdens de verwerking de commando's uit de file
+
+De shell ondersteunt readline en history.
 
 De opdrachten 'toon' en 'verwijder' plaatsen het getoonde resp,
 verwijderde boekstuk in de shell historie, zodat het met een pijltje
@@ -74,6 +51,8 @@ gewijzigd, b.v.
    <<wijzig Juli -> Juni>>
    eb> postbank:24 2005-07-14 "KPN" crd "KPN Juni 2005" 344.61 [Enter]
 
+ZIE OOK DE ON-LINE DOCUMENTATIE http://www.squirrel.nl/eekboek/docs/ . 
+
 WAT WIL IK VAN JE HOREN
 =======================
 
@@ -86,57 +65,7 @@ Ik voer mijn eigen boekhouding, plus die van de Stichting Perl
 Promotie Nederland, geheel uit met dit programma. Anderen voeren hun
 administratie geheel of gedeeltelijk met EekBoek. Hoe ver kom jij?
 
-HINTS
-=====
-
-ZIE OOK DE ON-LINE DOCUMENTATIE. DEZE IS WAARSCHIJNLIJK MEER ACCURAAT
-DAN DEZE 'HINTS'.
-
-Boekingen
----------
-De opdracht om een boeking uit te voeren in een dagboek is hetzelfde
-als de naam van het dagboek in onderkast letters. Dus voor dagboek
-"Postbank" is de opdracht "postbank".
-
-Boekstuknummering
------------------
-Boekstukken kunnen automatisch worden genummerd. Experts raden dat
-echter af, omdat er officieel wordt geëist dat boekstuknummers altijd
-opeenvolgend zijn. Boekstukken worden aangegeven in de vorm
-Dagboek:Volgnummer (b.v. postbank:24).
-
-Voor met name bank- en giroboekingen is het handig om het volgnummer
-van de afschrijving als volgnummer op te geven. Tevens kan voor bank-,
-kas- en giroboekingen het eindsaldo na elke boeking worden geverifiëerd. 
-De opdracht wordt dan: de postbank:24 --saldo 10357,48 ...
-
-OPZETTEN EIGEN ADMINISTRATIE
-============================
-
-Voorlopig gaan we uit van het draaien vanuit de uitgepakte omgeving,
-waarin "make all test" is uitgevoerd (zie boven).
-
-Maak een directory aan onder de uitpakdirectory en kopieer daarin
-vanuit de example directory de bestanden:
-
-   setup.csh
-   setup.sh
-   newdb.sh
-
-Kopieer het schema van de voorbeeldadministratie:
-
-   $ ebshell --data eekboek_sample -c dump_schema > schema.dat
-
-Pas setup.sh (of setup.csh) aan (met name de database naam (moet met
-eekboek_ beginnen)) en voer deze uit.
-
-Pas schema.dat aan naar eigen wens.
-
-Creeer "opening.eb" voor de openingsbalans (zie example/opening.eb).
-
-Creeer "relaties.eb" voor de relaties (zie example/relaties.eb).
-
-Probeer voorzichtig "sh newdb.sh"...
+ZIE OOK DE ON-LINE DOCUMENTATIE http://www.squirrel.nl/eekboek/docs/ . 
 
 Voor het uitwisselen van ervaringen, vragen om ondersteuning en zo:
 gebruik de mailing list http://lists.sourceforge.net/lists/listinfo/eekboek-users.
