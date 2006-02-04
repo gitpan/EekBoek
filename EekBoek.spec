@@ -1,5 +1,5 @@
 %define modname EekBoek
-%define modversion 0.37
+%define modversion 0.38
 
 Name: %modname
 Version: %modversion
@@ -9,7 +9,7 @@ BuildArch: noarch
 URL: http://www.squirrel.nl/eekboek/
 BuildRoot: %{_tmppath}/rpm-buildroot-%{name}-%{version}-%{release}
 Prefix: %{_prefix}
-BuildRequires: perl(Config::IniFiles);
+BuildRequires: perl(Config::IniFiles)
 
 Summary: Bookkeeping software for small and medium-size businesses
 License: Artistic

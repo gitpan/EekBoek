@@ -1,11 +1,11 @@
 #!/usr/bin/perl -w
-my $RCS_Id = '$Id: BTWAangifte.pm,v 1.25 2006/02/02 12:01:12 jv Exp $ ';
+my $RCS_Id = '$Id: BTWAangifte.pm,v 1.27 2006/02/03 14:00:24 jv Exp $ ';
 
 # Author          : Johan Vromans
 # Created On      : Tue Jul 19 19:01:33 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Wed Feb  1 20:45:21 2006
-# Update Count    : 438
+# Last Modified On: Fri Feb  3 14:33:01 2006
+# Update Count    : 457
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -280,7 +280,9 @@ sub collect {
     my $deb_x = 0;
     my $deb_btw_x = 0;
 
-    # 1d. Belast met 0%/verlegd
+    # 1d. Eigen gebruikt.
+
+    # 1e. Belast met 0%/verlegd
 
     my $deb_0 = 0;
     my $verlegd = 0;
@@ -429,7 +431,9 @@ sub collect {
     $data{deb_x} = $v;
     $tot += $v;
 
-    # 1d. Belast met 0%/verlegd
+    # 1d. Eigen gebruik
+
+    # 1e. Belast met 0%/verlegd
     $data{deb_0} = rounddown($deb_0 + $verlegd);
     #$data{deb_0} = roundtozero($deb_0 + $verlegd);
 
@@ -469,9 +473,16 @@ sub collect {
     $data{vb} = $vb;
     $tot -= $vb;
 
-    # 5c Subtotaal
-    $data{sub1} = $tot;
+    # 5c Subtotaal / 5g Totaal
+    $data{sub1} = $data{tot} = $tot;
     $data{onbekend} = $xx if $xx;
+
+    # 5d Kleine Ondernemers
+    if ( $self->{compat_periode} =~ /^\d\d\d\d$/ ) { # aangifte per jaar
+	if ( $data{ko} = kleine_ondernemers($self->{compat_periode}, $data{sub1}) ) {
+	    $data{tot} -= $data{ko};
+	}
+    }
 
     $data{btw_delta} = $btw_delta if $btw_delta;
 
@@ -503,8 +514,10 @@ sub report {
     # 1c. Belast met ander, niet-nul tarief
     $rep->outline('', "1c", "Belast met ander tarief", $data->{deb_x}, $data->{deb_btw_x});
 
-    # 1d. Belast met 0%/verlegd
-    $rep->outline('', "1d", "Belast met 0% / verlegd", $data->{deb_0}, undef);
+    # 1d. Eigen gebruik
+
+    # 1e. Belast met 0%/verlegd
+    $rep->outline('', "1e", "Belast met 0% / verlegd", $data->{deb_0}, undef);
 
     # Buitenland
     $rep->outline('H1', "Buitenland");
@@ -541,6 +554,23 @@ sub report {
     # 5c Subtotaal
     $rep->outline('', "5c", "Subtotaal", undef, $data->{sub1});
 
+    if ( $self->{compat_periode} =~ /^\d\d\d\d$/ ) { # aangifte per jaar
+	if ( defined($data->{ko}) ) {
+	    # 5d Subtotaal
+	    $rep->outline('', "5d", "Vermindering kleineondernemersregeling", undef, $data->{ko});
+	}
+	else {
+	    $rep->outline('', "5d", "Geen gegevens voor kleineondernemersregeling", undef, undef);
+	}
+    }
+
+    # 5g Subtotaal
+    if ( $data->{tot} >= 0 ) {
+	$rep->outline('', "5g", "Totaal te betalen", undef, $data->{tot});
+    }
+    else {
+	$rep->outline('', "5g", "Totaal terug te vragen", undef, 0-$data->{tot});
+    }
     $rep->outline('X', "xx", "Onbekend", undef, numfmt($data->{onbekend})) if $data->{onbekend};
 
     my @msg;
@@ -551,11 +581,7 @@ sub report {
 		 " Voor de aangifte is de werkelijk ingehouden BTW gebruikt.",
 		 amount => numfmt($data->{btw_delta})));
     }
-    if ( $self->{compat_periode} =~ /^\d\d\d\d$/ ) { # aangifte per jaar
-	if ( my $msg = kleine_ondernemers($self->{compat_periode}, $data->{sub1}) ) {
-	    push(@msg, $msg);
-	}
-    }
+
     $rep->finish(@msg);
 
 }
@@ -604,23 +630,21 @@ sub roundtozero {
 sub kleine_ondernemers {
     my ($year, $amount) = @_;
 
-    return if $amount < 0;
+    return 0 if $amount < 0;
 
     # Formule lijkt linds 1995 ongwijzigd, alleen de bedragen veranderen.
     my %mmtab = ( 2005 => [ 1345, 1883 ] );
 
-    return "" unless exists $mmtab{$year};
+    return unless exists $mmtab{$year};
 
     my ($min, $max) = @{$mmtab{$year}};
     if ( $amount <= $min ) {
-	return __x("Het te betalen bedrag is minder dan {ko} en hoeft niet te worden betaald (Regeling Kleine Ondernemers).", ko => $min)."\n";
+	return $amount;
     }
     elsif ( $amount > $min && $amount <= $max ) {
-	return __x("Het te betalen bedrag is minder dan {ko}. U hoeft slechts {amt} te betalen (Regeling Kleine Ondernemers).",
-		   ko => $max,
-		   amt => $amount - (2.5 * ($max - $amount)))."\n";
+	return roundup(250 * ($max - $amount));
     }
-    return "";
+    return 0;
 }
 
 package EB::Report::BTWAangifte::Text;
