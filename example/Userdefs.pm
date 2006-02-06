@@ -15,15 +15,6 @@ use EB;
 
 sub pp_kasverkoop {
     my ($self, $cmd, @args) = @_;
-    _kas_iv($self, 0, $cmd, @args);
-}
-sub pp_kasinkoop {
-    my ($self, $cmd, @args) = @_;
-    _kas_iv($self, 1, $cmd, @args);
-}
-
-sub _kas_iv {
-    my ($self, $iv, $cmd, @args) = @_;
 
     # Kontroleer argumenten. "--nr=.." is een intern doorgegeven
     # argument wanneer de vorm "kasverkoop:boekstuknummer" wordt
@@ -45,12 +36,7 @@ sub _kas_iv {
     }
     my $amt = shift(@args);
     my $desc = @args ? "@args" : "Diversen";
-    if ( $iv ) {
-	push(@a, "Inkoop", "std", $desc, $amt.'@0', "4799");
-    }
-    else {
-	push(@a, "Verkoop", "std", $desc, $amt.'@1', "8600");
-    }
+    push(@a, "Verkoop", "std", $desc, $amt.'@1', "8600");
 
     # Toon...
     warn("+ $cmd @a\n");
@@ -59,7 +45,7 @@ sub _kas_iv {
     ($cmd, @a);
 }
 
-# En uiteraard, de help boodschappen.
+# En uiteraard, de hulpboodschap.
 
 sub help_kasverkoop {
     return <<EOD;
@@ -74,22 +60,6 @@ Bijvoorbeeld:
 Dit wordt omgezet in de opdracht:
 
   kas 28-01 Verkopen std Diversen 20,00\@1 8600
-EOD
-}
-
-sub help_kasinkoop {
-    return <<EOD;
-Eenvoudige manier om een kasinkoop te boeken.
-
-  kasinkoop <datum> <bedrag> [ <omschrijving> ... ]
-
-Bijvoorbeeld:
-
-  kasinkoop 28-01 25,00
-
-Dit wordt omgezet in de opdracht:
-
-  kas 28-01 Inkopen std Diversen 20,00\@0 799
 EOD
 }
 
