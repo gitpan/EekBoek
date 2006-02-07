@@ -1,10 +1,10 @@
-my $RCS_Id = '$Id: Schema.pm,v 1.29 2006/02/02 12:00:15 jv Exp $ ';
+my $RCS_Id = '$Id: Schema.pm,v 1.31 2006/02/07 11:44:05 jv Exp $ ';
 
 # Author          : Johan Vromans
 # Created On      : Sun Aug 14 18:10:49 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Thu Feb  2 12:58:53 2006
-# Update Count    : 474
+# Last Modified On: Tue Feb  7 12:20:08 2006
+# Update Count    : 478
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -55,14 +55,20 @@ sub create {
     shift;			# singleton class method
     my ($name) = @_;
     my $file;
-    foreach my $dir ( ".", "schema" ) {
-	foreach my $ext ( ".dat" ) {
-	    next unless -s "$dir/$name$ext";
-	    $file = "$dir/$name$ext";
-	    last;
-	}
+    if ( $name !~ /^\w+$/) {
+	$file = $name;
     }
-    $file = findlib("schema/$name.dat") unless $file;
+    else {
+	foreach my $dir ( ".", "schema" ) {
+	    foreach my $ext ( ".dat" ) {
+		next unless -s "$dir/$name$ext";
+		$file = "$dir/$name$ext";
+		last;
+	    }
+	}
+	$file = findlib("schema/$name.dat") unless $file;
+    }
+
     die("?".__x("Onbekend schema: {schema}", schema => $name)."\n") unless $file;
     open($fh, "<$file") or die("?".__x("Toegangsfout schema data: {err}", err => $!)."\n");
     $schema = $name;
@@ -84,6 +90,22 @@ my @dbk;			# dagboeken
 my @btw;			# btw tarieven
 my %btwmap;			# btw type/incl -> code
 my $fail;			# any errors
+
+sub init_vars {
+    @hvdi = ();			# hoofdverdichtingen
+    @vdi = ();			# verdichtingen
+    undef $max_hvd;		# hoogste waarde voor hoofdverdichting
+    undef $max_vrd;		# hoogste waarde voor verdichting
+    %acc = ();			# grootboekrekeningen
+    undef $chvdi;		# huidige hoofdverdichting
+    undef $cvdi;		# huidige verdichting
+    %std = ();			# standaardrekeningen
+    %dbk = ();			# dagboeken
+    @dbk = ();			# dagboeken
+    @btw = ();			# btw tarieven
+    %btwmap = ();		# btw type/incl -> code
+    undef $fail;		# any errors
+}
 
 sub error { warn('?', @_); $fail++; }
 
@@ -264,6 +286,7 @@ sub scan_result {
 
 sub load_schema {
 
+    init_vars();
     my $scanner;		# current scanner
     $max_hvd = 9;
     $max_vrd = 99;
@@ -361,7 +384,7 @@ sub sql_eekboek {
       or die("?"._T("Installatiefout -- geen schema")."\n");
 
     local $/;
-    $sql = <$fh>;
+    my $sql = <$fh>;
     close($fh);
     $sql;
 }

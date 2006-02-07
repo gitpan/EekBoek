@@ -113,6 +113,7 @@ lib/EB/Export.pm
 lib/EB/Expression.pm
 lib/EB/Finance.pm
 lib/EB/Globals.pm
+lib/EB/Import.pm
 lib/EB/Locale.pm
 lib/EB/migrate/001000000001000001.sql
 lib/EB/migrate/001000001001000002.pl
