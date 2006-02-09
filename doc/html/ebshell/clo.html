@@ -139,6 +139,14 @@
 	ge&iuml;nterpreteerd als namen van configuratie-variabelen
 	en de bijbehorenden waardes worden uitgeprint. Zie <a
 	href="../config.html">Configuratiebestanden</a>.
+	<br><em>Deze optie moet als eerste op de commandoregel voorkomen.</em>
+    </td>
+  </tr>
+  <tr valign="top">
+    <td><code>-D
+	<var>var</var><code>=</code><var>waarde</var><br>--define&nbsp;<var>var</var><code>=</code><var>waarde</var></code></td>
+    <td>Definieer configuratievariabelen. &lsquo;<var>var</var>&rsquo;
+	is van de vorm &lsquo;<var>sectie</var><code>:</code><var>naam</var>&rsquo;
     </td>
   </tr>
   <tr valign="top">
@@ -187,13 +195,16 @@
     <td>Initialiseer de administratie met het opgegeven schema. Dit
 	kan uitsluitend indien de te gebruiken database nog helemaal
 	leeg is.
-	<br>Het opgegeven schema wordt gezocht in de volgende
+	<br>Als de opgegeven schemanaam alleen letters,
+	cijfers en onderstrepingen bevat wordt het schema gezocht in de volgende
 	plaatsen:
 	<br><code>./<var>naam</var>.dat</code>
 	<br><code>schema/<var>naam</var>.dat</code>
 	<br><code><var>EBLIB</var>/schema/<var>naam</var>.dat</code>
 	<br>In het laatste geval staat <var>EBLIB</var> voor de
 	locatie waar EekBoek is ge&iuml;nstalleerd.
+	<br>Als de opgegeven schemanaam andere tekens bevat  wordt het als een
+	bestandsnaam beschouwd en wordt het schema vanuit dat bestand geladen.
     </td>
   </tr>
 </table>
@@ -222,7 +233,7 @@
 Deze site is gemaakt met de 
 <a href='http://www.squirrel.nl/people/jvromans/tt2site/'>TT2Site
 Site Builder</a>.<br />
-ebshell/clo.html laatste aanpassing 27 januari 2006, 16:46:21
+ebshell/clo.html laatste aanpassing 09 februari 2006, 12:37:19
 </p>
 
     </td>
