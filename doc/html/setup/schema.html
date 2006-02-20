@@ -185,36 +185,7 @@ de omschrijving. Bijvoorbeeld:</p>
 <p>Het rekeningschema beslaat twee onderdelen uit het schema-bestand:
 <dfn>balansrekeningen</dfn> en <dfn>resultaatrekeningen</dfn>. Beide
 onderdelen verschillen slechts in één aspect, alle gemeenschappelijke
-informatie wordt besproken bij de balansrekeningen.</p>
-
-<p><strong>Balansrekeningen</strong></p>
-
-<p>Elke balansrekening wordt als volgt opgegeven in het
-schema-bestand:</p>
-
-<blockquote class="code">   110   D   Aanloopkosten
-   111   C   Afschrijving aanloopkosten</blockquote>
-
-<p>Tussen het rekeningnummer en de omschrijving wordt door middel van
-de code '<code>D</code>' of '<code>C</code>' aangegeven of dit een
-debet- dan wel credit-rekening betreft.</p>
-
-<p>Achter de omschrijving kan extra informatie worden opgegeven in de
-vorm '<code>:trefwoord=<var>waarde</var></code>'. Hiermee kan voor
-resultaatrekeningen worden opgegeven of een BTW tarief van
-toepassing is (trefwoord '<code>btw</code>'). Ook kunnen op deze
-wijze grootboekrekeningen worden aangegeven als rekeningen met een
-speciale betekenis, de zogenaamde <dfn>koppelingen</dfn> (trefwoord
-'<code>koppeling</code>').</p>
-
-<p>Koppelingen worden op dezelfde wijze aangeduid. Bijvoorbeeld, de
-standaardrekening voor inkoopboekingen:</p>
-
-<blockquote class="code">  1600  C   Crediteuren                    :koppeling=crd</blockquote>
-
-<p>Voor een volledig overzicht van alle mogelijke koppelingen, zie <a
-href="../stdacc.html">Koppelingen</a>. Elke koppeling moet exact
-&eacute;&eacute;n maal in het schema voorkomen.</p>
+informatie wordt besproken bij de resultaatrekeningen.</p>
 
 <p><strong>Resultaatrekeningen</strong></p>
 
@@ -225,12 +196,18 @@ het onderdeel "resultaatrekeningen" in het schema-bestand.</p>
   5  Bedrijfsopbrengsten
      53  Overige bedrijfsopbrengst</blockquote>
 
-<p>In plaats van de debet/credit-aanduiding zoals bij de
-balansrekeningen wordt bij de resultaatrekeningen de aanduidingen
-'<code>K</code>', '<code>O</code>' en '<code>N</code>' gebruikt om aan
-te geven dat dit een kosten-, omzet- dan wel neutrale
-resultaatrekening betreft. Dit is van belang voor het toepassen van
-BTW tarieven.</p>
+<p>Tussen het rekeningnummer en de omschrijving wordt door middel van
+de code '<code>K</code>', '<code>O</code>' of '<code>N</code>'
+aangegeven of dit een kosten-, omzet, dan wel neutrale rekening
+betreft. Dit is van belang voor de omzetbelasting.</p>
+
+<p>Achter de omschrijving kan extra informatie worden opgegeven in de
+vorm '<code>:trefwoord=<var>waarde</var></code>'. Hiermee kan voor
+resultaatrekeningen worden opgegeven of een BTW tarief van
+toepassing is (trefwoord '<code>btw</code>'). Ook kunnen op deze
+wijze grootboekrekeningen worden aangegeven als rekeningen met een
+speciale betekenis, de zogenaamde <dfn>koppelingen</dfn> (trefwoord
+'<code>koppeling</code>').</p>
 
 <blockquote class="code">  8680  O   Omzet naar kosten BTW hoog     :btw=hoog
   8690  K   Doorbelaste omzet naar kosten</blockquote>
@@ -242,8 +219,48 @@ BTW tarieven.</p>
 :btw=laag</blockquote>
 
 <p>Wanneer geen van bovenstaande aanduidingen is opgegeven, wordt
-standaard geen BTW toegepast bij boekingen op deze
+het BTW 0% tarief toegepast bij boekingen op deze
 resultaatrekening.</p>
+
+<p>Naast het BTW tarief kan ook worden aangegeven of bij boekingen op
+deze rekening het bedrag standaard inclusief of exclusief wordt
+opgegeven:</p>
+
+<blockquote class="code">:btw=hoog,excl
+:btw=laag,incl</blockquote>
+
+<p>Zonder nadere aanduiding wordt opgave exclusief verondersteld.</p>
+
+<p><strong>Balansrekeningen</strong></p>
+
+<p>Elke balansrekening wordt als volgt opgegeven in het
+schema-bestand:</p>
+
+<blockquote class="code">   110   D   Aanloopkosten
+   111   C   Afschrijving aanloopkosten</blockquote>
+
+<p>In plaats van de kostem/omzet/neutraal-aanduiding zoals bij de
+resultaatrekeningen wordt bij de balansrekeningen de aanduidingen
+'<code>D</code>' en '<code>C</code>' gebruikt om aan te geven dat dit
+een debte- dan wel credit-rekening betreft.</p>
+
+<p>Wanneer bij boekingen op een balansrekening standaard BTW moet worden
+toegepast dan kan dit worden opgegeven zoals bij de
+resultaatrekeningen. In het geval van balansrekeningen moet echter ook
+worden aangegeven of de boeking als kosten dan wel omzetboeking moet
+worden beschouwd:</p>
+
+<blockquote class="code">:btw=hoog,kosten
+:btw=laag,omzet</blockquote>
+
+<p>Koppelingen worden op dezelfde wijze aangeduid. Bijvoorbeeld, de
+standaardrekening voor inkoopboekingen:</p>
+
+<blockquote class="code">  1600  C   Crediteuren                    :koppeling=crd</blockquote>
+
+<p>Voor een volledig overzicht van alle mogelijke koppelingen, zie <a
+href="../stdacc.html">Koppelingen</a>. Elke koppeling moet exact
+&eacute;&eacute;n maal in het schema voorkomen.</p>
 
 <a name="dbk"></a><h3>De dagboeken</h3>
 
@@ -316,7 +333,7 @@ in een vorm die later weer kan worden gebruikt om in te voeren.</p>
 Deze site is gemaakt met de 
 <a href='http://www.squirrel.nl/people/jvromans/tt2site/'>TT2Site
 Site Builder</a>.<br />
-setup/schema.html laatste aanpassing 09 februari 2006, 18:25:11
+setup/schema.html laatste aanpassing 20 februari 2006, 21:32:12
 </p>
 
     </td>

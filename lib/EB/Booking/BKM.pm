@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-my $RCS_Id = '$Id: BKM.pm,v 1.42 2006/02/09 16:51:33 jv Exp $ ';
+my $RCS_Id = '$Id: BKM.pm,v 1.44 2006/02/20 20:07:02 jv Exp $ ';
 
 package main;
 
@@ -13,8 +13,8 @@ package EB::Booking::BKM;
 # Author          : Johan Vromans
 # Created On      : Thu Jul  7 14:50:41 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Thu Feb  9 10:55:17 2006
-# Update Count    : 338
+# Last Modified On: Mon Feb 20 16:32:48 2006
+# Update Count    : 351
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -129,11 +129,7 @@ sub perform {
 		warn(" "._T("boekstuk").": std $t $amt $acct\n");
 	    }
 
-	    my $dc = "acc_debcrd";
-	    my $explicit_dc;
 	    if ( $acct =~ /^(\d+)([cd])/i ) {
-#		$acct = $1;
-#		$explicit_dc = $dc = lc($2) eq 'd' ? 1 : 0;
 		warn("?"._T("De \"D\" of \"C\" toevoeging aan het rekeningnummer is hier niet toegestaan")."\n");
 		$fail++;
 		next;
@@ -143,8 +139,8 @@ sub perform {
 		$fail++;
 		next;
 	    }
-	    $dc = 1;		# ####
-	    my $rr = $dbh->do("SELECT acc_desc,acc_balres,$dc,acc_kstomz,acc_btw".
+
+	    my $rr = $dbh->do("SELECT acc_desc,acc_balres,acc_kstomz,acc_btw".
 			      " FROM Accounts".
 			      " WHERE acc_id = ?", $acct);
 	    unless ( $rr ) {
@@ -153,18 +149,16 @@ sub perform {
 		$fail++;
 		next;
 	    }
-	    my ($adesc, $balres, $debcrd, $kstomz, $btw_id) = @$rr;
+	    my ($adesc, $balres, $kstomz, $btw_id) = @$rr;
 
 	    if ( $balres && $dagboek_type != DBKTYPE_MEMORIAAL ) {
 		warn("!".__x("Grootboekrekening {acct} ({desc}) is een balansrekening",
 			     acct => $acct, desc => $adesc)."\n") if 0;
-		#$dbh->rollback;
-		#return;
 	    }
 
 	    my $bid;
 	    my $oamt = $amt;
-	    ($amt, $bid) = amount($amt, undef);
+	    ($amt, $bid) = amount_with_btw($amt, undef);
 	    unless ( defined($amt) ) {
 		warn("?".__x("Ongeldig bedrag: {amt}", amt => $oamt)."\n");
 		$fail++;
@@ -172,59 +166,30 @@ sub perform {
 	    }
 	    $btw_id = 0, undef($bid) if defined($bid) && !$bid; # override: @0
 
-	    # If there's BTW associated, it must be explicitly confirmed.
+	    # For memorials, if there's BTW associated, it must be explicitly confirmed.
 	    if ( $btw_id && !defined($bid) && $dagboek_type == DBKTYPE_MEMORIAAL ) {
-		warn("?".__x("Boekingen met BTW zijn niet mogelijk in een {dbk}.".
-			     " De BTW is op nul gesteld.",
-			     dbk => $dagboek_type == DBKTYPE_BANK ? "bankboek" :
-			     $dagboek_type == DBKTYPE_KAS ? "kasboek" :
-			     "memoriaal")."\n");
+		warn("?"._T("Boekingen met BTW zijn niet mogelijk in een memoriaal.".
+			    " De BTW is op nul gesteld.")."\n");
 		$btw_id = 0;
 	    }
+
 	    my $btw_acc;
 	    if ( defined($bid) ) {
-		if ( $bid =~ /^[hl]|[hl][iv]|[iv][hl]$/i ) {
-		    $bid = lc($bid);
-		    my $t = $bid =~ /h/ ? "h" : "l";
-		    if ( $bid =~ /([iv])/ ) {
-			$t = $1.$t;
-		    }
-		    else {
-			$t = $amt < 0 ? "i$t" : "v$t";
-		    }
-		    $btw_acc = $dbh->std_acc("btw_$t");
-		    $btw_id = $dbh->do("SELECT btw_id".
-				       " FROM BTWTabel".
-				       " WHERE btw_tariefgroep = ?".
-				       " AND btw_incl",
-				       $bid =~ /h/ ? BTWTARIEF_HOOG : BTWTARIEF_LAAG)->[0];
+
+		($btw_id, $kstomz) = parse_btw_spec($bid, $btw_id, $kstomz);
+		unless ( defined($btw_id) ) {
+		    warn("?".__x("Ongeldige BTW-specificatie: {spec}", spec => $bid)."\n");
+		    $fail++;
+		    next;
 		}
-		elsif ( $bid =~ /^\d+|\d+[iv]|[iv]\d+$/i ) {
-		    my $t = $btw_id = $1 if $bid =~ /(\d+)/;
-		    my $group = $dbh->lookup($t, qw(BTWTabel btw_id btw_tariefgroep));
-		    unless ( defined $group ) {
-			warn("?".__x("Ongeldige BTW codering: {cod}",
-				     cod => '@'.$bid)."\n");
-			$fail++;
-			next;
-		    }
-		    if ( $bid =~ /([iv])/ ) {
-			$t = $1;
-		    }
-		    else {
-			$t = $kstomz ? "i" : "v";
-		    }
-		    $t .= $group == BTWTARIEF_HOOG ? "h" : "l";
-		    $btw_acc = $dbh->std_acc("btw_$t");
-		}
-		else {
-		    warn("?".__x("Ongeldige BTW codering: {cod}",
-				 cod => '@'.$bid)."\n");
+
+		if ( !defined($kstomz) && $btw_id ) {
+		    warn("?"._T("BTW toepassen is niet mogelijk op een neutrale rekening")."\n");
 		    $fail++;
 		    next;
 		}
 	    }
-	    elsif ( $btw_id ) {
+	    if ( $btw_id ) {
 		my $tg = $dbh->lookup($btw_id, qw(BTWTabel btw_id btw_tariefgroep));
 		croak("INTERNAL ERROR: btw code $btw_id heeft tariefgroep $tg")
 		  unless $tg;
@@ -241,7 +206,7 @@ sub perform {
 		  @{EB::Finance::norm_btw($bsr_amount, $btw_id)};
 		$amt = $bsr_amount - $btw;
 	    }
-	    $orig_amount = -$orig_amount;# unless $debcrd;
+	    $orig_amount = -$orig_amount;
 
 	    $dbh->sql_insert("Boekstukregels",
 			     [qw(bsr_nr bsr_date bsr_bsk_id bsr_desc bsr_amount
@@ -282,7 +247,7 @@ sub perform {
 	    else {
 		return "?".__x("Onherkenbare datum: {date}",
 			       date => $args->[0])."\n"
-		  if ($args->[0]||"") =~ /^[[:digit:]]+=/;
+		  if ($args->[0]||"") =~ /^[[:digit:]]+-/;
 		$dd = $date;
 	    }
 	    return "?"._T("Deze opdracht is onvolledig. Gebruik de \"help\" opdracht voor meer aanwijzingen.")."\n"
@@ -319,8 +284,6 @@ sub perform {
 		$rr = $dbh->do($sql, @sql_args);
 		unless ( defined($rr) ) {
 		    warn("?"._T("Geen bijbehorende open post gevonden")."\n");
-		    #warn("DEBUG: SQL: $sql\n");
-		    #warn("DEBUG: args: @sql_args\n");
 		    $fail++;
 		    next;
 		}
@@ -357,8 +320,6 @@ sub perform {
 		$rr = $dbh->do($sql, @sql_args);
 		unless ( defined($rr) ) {
 		    warn("?"._T("Geen bijbehorende open post gevonden")."\n");
-		    #warn("DEBUG: SQL: $sql\n");
-		    #warn("DEBUG: args: @sql_args\n");
 		    $fail++;
 		    next;
 		}

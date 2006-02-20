@@ -1,6 +1,7 @@
 build_common.inc
 CHANGES
 doc/html/bookings/bank.html
+doc/html/bookings/btw.html
 doc/html/bookings/cash.html
 doc/html/bookings/index.html
 doc/html/bookings/memorial.html

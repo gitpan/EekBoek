@@ -185,6 +185,7 @@ de <dfn>boekstukkop</dfn> en een of meer <dfn>boekstukregels</dfn>.</p>
     <td>Het bedrag.
 	<br>Een te betalen bedrag wordt als positief bedrag opgegeven,
 	een credit-faktuur als negatief bedrag.
+	<br>Achter het bedrag mag een <a href="btw.html">BTW-specificatie</a> worden opgegeven.
     </td>
   </tr>
   <tr valign="top">
@@ -207,21 +208,6 @@ href="../ebshell/index.html">batch mode</a>, waarbij opdrachten over
 meerdere regels mogen worden ingegeven.</p>
 
 
-
-
-<p>Indien aan de grootboekrekening een BTW-tarief is gekoppeld, zal
-dit voor deze boeking worden doorberekend. Het opgegeven bedrag is dan
-het te boeken bedrag inclusief BTW. Het is mogelijk hiervan af te
-wijken door expliciet een BTW-code toe te voegen aan het bedrag in de
-vorm '<code>@<var>X</var></code>', waarbij <var>X</var> de gewenste
-BTW-code is. BTW-code '<code>0</code>' betekent altijd 'geen BTW',
-zodat de toevoeging '<code>@0</code>' aangeeft dat er geen BTW van
-toepassing is op deze boeking. Met de symbolische codes
-'<code>H</code>' en '<code>L</code>' kan worden gekozen voor het hoge
-resp. lage BTW tarief. Voor de overige codes hangt het resultaat af
-van de definitie van de BTW-codes.</p>
-
-
 <p>Tot slot is het mogelijk het boekstuktotaal te verifiëren door aan
 de boekingsopdracht de optie '<code>--totaal=<var>bedrag</var></code>'
 toe te voegen.</p>
@@ -242,13 +228,13 @@ opgegeven door middel van de toevoeging '<code>@L</code>'.</p>
 BTW-vrij. Dit resulteert in de volgende boeking:</p>
 
 <blockquote class="code">Inkopen:22 31-08-2005 KPN --totaal=131,68 \
-  "Telefoon BTW hoog" 110,73-0,48@2 4900 \
+  "Telefoon BTW hoog" 110,73-0,48@H- 4900 \
   "Telefoon BTW vrij" 0,48@0 4900</blockquote>
 
 <p>In de eerste boekstukregel wordt de 0,48 afgetrokken van 110,73, en
-<em>dat geheel</em> wordt geboekt tegen BTW tariefcode 2. Dit is in deze
-administratie hoog tarief waarbij het bedrag <em>exclusief</em> de BTW
-wordt opgegeven.</p>
+<em>dat geheel</em> wordt geboekt tegen BTW tariefcode H-, dit is hoog
+tarief waarbij het bedrag <em>exclusief</em> de BTW wordt
+opgegeven.</p>
 
 <p>In de tweede boekstukregel wordt de 0,48 opgevoerd zonder BTW
 (toevoeging '<code>@0</code>').</p>
@@ -277,7 +263,7 @@ wordt opgegeven.</p>
 Deze site is gemaakt met de 
 <a href='http://www.squirrel.nl/people/jvromans/tt2site/'>TT2Site
 Site Builder</a>.<br />
-bookings/payable.html laatste aanpassing 22 januari 2006, 13:17:51
+bookings/payable.html laatste aanpassing 13 februari 2006, 21:54:51
 </p>
 
     </td>

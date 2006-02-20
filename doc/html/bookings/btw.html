@@ -42,10 +42,6 @@
     <td class="info"></td>
     <td><a href="../bookings/index.html" class="menu">Boekingen</a>
 </td>
-	<td> &#xbb; </td>
-    <td class="info"></td>
-    <td><a href="../bookings/receivable.html" class="menu">Verkoopfakturen</a>
-</td>
 	
   </tr>
 </table>
@@ -99,7 +95,7 @@
 <br />
 &nbsp;-&nbsp;<a href="../bookings/payable.html" class="menu">Inkoopfakturen</a>
 <br />
-&nbsp;-&nbsp;<a href="../bookings/receivable.html" class="menuselect">Verkoopfakturen</a>
+&nbsp;-&nbsp;<a href="../bookings/receivable.html" class="menu">Verkoopfakturen</a>
 <br />
 &nbsp;-&nbsp;<a href="../bookings/bank.html" class="menu">Bankafschriften</a>
 <br />
@@ -119,99 +115,86 @@
 
     </td>
     <td>
-      <h2>Verkoopfakturen</h2>
+      <h2>BTW (Omzetbelasting)</h2>
 
-<p>Verkoopfakturen worden geboekt in een dagboek van het type Verkoop.
-Zo'n dagboek heet typisch 'Verkoop' of 'Verkopen'. De keuze van de
-naam is vrij, en er mogen meerdere verkoopdagboeken tegelijk zijn.</p>
+<p>Indien wordt geboekt op een grootboekrekening waaraan een
+BTW-tarief is gekoppeld, dan zal dit voor deze boeking worden
+doorberekend. Het opgegeven bedrag is dan het te boeken bedrag
+inclusief BTW. Het is mogelijk hiervan af te wijken door een
+expliciete BTW-specifcatie op te geven, zie verderop.</p>
 
-<p>De naam van de boekingsopdracht is gelijk aan die van het dagboek.
-We nemen hier als voorbeeld het dagboek 'Verkopen'.</p>
+<p>Er zijn drie factoren die een rol spelen bij het bepalen van de
+omzetbelasting.</p>
+<ol>
+  <li>Het BTW tarief: Hoog, Laag, of Geen.
+      <br>Dit bepaalt de hoogte van de in rekening te brengen BTW.</p></li>
+  <li>Voor inkoop- en verkoopboekingen, de BTW-status van de relatie.
+      <br>Bepalend is of de relatie binnen of buiten de EU is
+      gevestigd, of dat BTW is verlegd.</p></li>
+  <li>Of de boeking betrekking heeft op <em>Kosten</em>, 
+      <em>Omzet</em>, of <em>Neutraal</em>.
+      <br>BTW berekend op kostenboekingen wordt bij de uiteindelijke
+      BTW aangifte verrekend als voorheffing. De BTW berekend op omzet
+      moet bij de aangifte worden afgedragen. Daarnaast bepaalt deze
+      indeling of een boeking zonder BTW, dus met tarief
+      &lsquo;Geen&rsquo;, moet worden opgevoerd op de aangifte. Enkel
+      boekingen op neutrale grootboekrekeningen worden niet
+      meegenomen in de BTW aangifte.</p></li>
+</ol>
 
-<p>Zoals alle boekingen bestaat ook de verkoopboeking uit twee delen: de
-<dfn>boekstukkop</dfn> en een of meer <dfn>boekstukregels</dfn>.</p>
+<h2>BTW-specificatie in boekstukken</h2>
 
-<p>Syntaxvoorbeeld van een boekstukkop:</p>
+<p>Met een expliciete BTW-specificatie kan worden bepaald of op een
+boeking BTW moet worden toegepast, en kan worden gekozen voor het hoge
+of lage tarief. Tevens kan worden opgegeven of het te boekden bedrag
+inclusief of exclusief BTW is. Tot slot kan worden bepaald of de
+boeking betrekking heeft op kosten of omzet. Elk van deze onderdelen
+mag ontbreken, en EekBoek zal dan de instellingen van de betreffende
+grootboekrekening gebruiken.</p>
 
-<blockquote class="code">verkopen:12 11-09-2005 Consultancy ACME</blockquote>
+<p>Een BTW-specificatie wordt toegevoegd aan het te boeken bedrag in de
+vorm &lsquo;<code>@<var>XX</var></code>&rsquo;.
+<code><var>XX</var></code> bestaat uit drie tekens, die elk mogen
+ontbreken.</p>
 
-<p>De onderdelen:</p>
-
-<table border="1" width="100%" cellpadding="5">
+<table border="1" cellpadding="5">
   <tr valign="top">
-    <td><code>verkopen:12</code></td>
-    <td>Het boekstuknummer. Dit bestaat uit de naam van het dagboek
-	en het (vrij te kiezen) boekstuknummer, gescheiden door een
-	dubbele punt '<code>:</code>'.
-	<br>Het volgnummer mag worden weggelaten, in welk geval
-	EekBoek zelf een volgnummer toekent. Het verdient echter
-	aanbeveling om altijd expliciet een volgnummer op te geven.
+    <td><code>H</code><br><code>L</code><br><code>0</code><br><code><var>n</var></code></td>
+    <td>Pas het hoge BTW tarief toe.
+	<br>Pas het lage BTW tarief toe.
+	<br>(Het cijfer nul) Geen BTW toepassen.
+	<br>Pas de BTW toe volgens de BTW code
+	<code><var>n</var></code>.
+	<hr>Standaard wordt het BTW-tarief toegepast dat aan de
+	betreffende grootboekrekening is toegekend.
     </td>
   </tr>
   <tr valign="top">
-    <td><code>11-09-2005</code></td>
-    <td>De boekingsdatum in <a href="../date.html">een van de ondersteunde vormen</a>.</td>
-  </tr>
-  <tr valign="top">
-    <td><code>Consultancy</code></td>
-    <td>De omschrijving van dit boekstuk.
-	<br>Indien deze spaties bevat moeten er aanhalingstekens
-	omheen worden geplaatst.
+    <td><code>-</code><br><code>+</code></td>
+    <td>Het opgegeven bedrag is <em>exclusief</em> BTW.
+    <br>Het opgegeven bedrag is <em>inclusief</em> BTW.
+	<hr>Het standaardgedrag wordt afgeleid van het BTW-type van de
+	betreffende grootboekrekening.
+	<br>Deze aanduiding kan niet worden gebruikt indien
+	voorafgaand een BTW code is opgegeven.
     </td>
   </tr>
   <tr valign="top">
-    <td><code>ACME</code></td>
-    <td>De code van de debiteur. Conventioneel wordt deze in
-	hoofdletters gegeven, maar dit is niet vereist.</td>
+    <td><code>K</code><br><code>O</code></td>
+    <td>De boeking betreft <em>Kosten</em>.
+    <br>(De letter O) De boeking betreft <em>Omzet</em>.
+	<hr>Standaard wordt de kosten/omzet indeling van de betreffende
+	grootboekrekening gebruikt. Deze aanduiding <em>moet</em> worden opgegeven indien BTW moet
+	worden toegepast bij boeking op een balansrekening, of op een
+	neutrale resultaatrekening.
+    </td>
   </tr>
 </table>
 
-<p>Syntaxvoorbeeld van een boekingsregel:</p>
+<h2>Zie ook ...</h2>
 
-<blockquote class="code">Werkzaamheden 369,82 8104</blockquote>
-
-<p>De onderdelen:</p>
-
-<table border="1" width="100%" cellpadding="5">
-  <tr valign="top">
-    <td><code>Werkzaamheden</code></td>
-    <td>De omschrijving van deze boekstukregel.
-	<br>Indien deze spaties bevat moeten er aanhalingstekens
-	omheen worden geplaatst.
-    </td>
-  </tr>
-  <tr valign="top">
-    <td><code>369,82</code></td>
-    <td>Het bedrag.
-	<br>Een te ontvangen bedrag wordt als positief bedrag opgegeven,
-	een debitering als negatief bedrag.
-	<br>Achter het bedrag mag een <a href="btw.html">BTW-specificatie</a> worden opgegeven.
-    </td>
-  </tr>
-  <tr valign="top">
-    <td><code>8104</code></td>
-    <td>De grootboekrekening waarop dit bedrag moet worden
-	geboekt.</td>
-  </tr>
-</table>
-
-<p>Zoals gezegd kan een boekstuk meerdere regels bevatten. Dit wordt
-voornamelijk bepaald door de aard van de faktuur. De som van alle
-bedragen is het boekstuktotaal. Dit wordt geboekt op de vaste
-tegenrekening voor verkoopboekingen (zie <a
-href="../stdacc.html">Koppelingen</a>).</p>
-
-<p>Let op: Als u opdrachten direct ingeeft in de EekBoek shell, moet
-de gehele opdracht op &eacute;&eacute;n enkele regel worden ingegeven! Dit
-in tegenstelling tot de zogenaamde <a
-href="../ebshell/index.html">batch mode</a>, waarbij opdrachten over
-meerdere regels mogen worden ingegeven.</p>
-
-
-<p>Tot slot is het mogelijk het boekstuktotaal te verifiëren door aan
-de boekingsopdracht de optie '<code>--totaal=<var>bedrag</var></code>'
-toe te voegen.</p>
-
+<p><a href="../setup/schema.html">BTW codering in het schema.</a></p>
+<p><a href="../reports/btw.html">De BTW aangifte.</a></p>
 
     </td>
   </tr>
@@ -237,7 +220,7 @@ toe te voegen.</p>
 Deze site is gemaakt met de 
 <a href='http://www.squirrel.nl/people/jvromans/tt2site/'>TT2Site
 Site Builder</a>.<br />
-bookings/receivable.html laatste aanpassing 13 februari 2006, 22:02:50
+bookings/btw.html laatste aanpassing 20 februari 2006, 21:47:23
 </p>
 
     </td>

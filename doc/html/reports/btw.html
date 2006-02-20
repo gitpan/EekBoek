@@ -231,8 +231,8 @@ worden gedaan, voor zover deze valt binnen het huidige boekjaar.</p>
 <h2>Uitvoer</h2>
 
 <blockquote class="code">BTW Aangifte
-Periode: 2004
-EekBoek Demo Administratie 2004
+Periode: 2005
+EekBoek Demo Administratie
 
 Binnenland
 
@@ -278,22 +278,24 @@ Berekening
 <table>
   <tr valign="top">
     <td>1a</td>
-    <td>Het totaal aan boekingen waarover het hoge BTW tarief is
+    <td>Het totaal aan omzetboekingen waarover het hoge BTW tarief is
 	verschuldigd, en de berekende omzetbelasting.</td>
   </tr>
   <tr valign="top">
     <td>1b</td>
-    <td>Het totaal aan boekingen waarover het lage BTW tarief is
+    <td>Het totaal aan omzetboekingen waarover het lage BTW tarief is
 	verschuldigd, en de berekende omzetbelasting.</td>
   </tr>
   <tr valign="top">
     <td>1c</td>
-    <td>Het totaal aan boekingen waarover een ander tarief van
-	toepassing is, en geen omzetbelasting is verschuldigd.</td>
+    <td>Het totaal aan omzetboekingen waarover een ander tarief van
+	toepassing is, en geen omzetbelasting is verschuldigd.
+	<br><em>Dit wordt nog niet ondersteund.</em>
+    </td>
   </tr>
   <tr valign="top">
     <td>1e</td>
-    <td>Het totaal aan boekingen waarover het nul-tarief van
+    <td>Het totaal aan omzetboekingen waarover het nul-tarief van
 	toepassing is, dan wel de BTW is verlegd.</td>
   </tr>
 </table>
@@ -302,11 +304,18 @@ Berekening
 <table>
   <tr valign="top">
     <td>3a</td>
-    <td>Het totaal aan boekingen inzake leveringen aan EU landen.</td>
+    <td>Het totaal aan boekingen inzake leveringen aan EU landen.
+    <br>Dit betreft omzetboekingen waarbij de debiteur de btw-code
+	'<code>intra</code>' (intra-communautair) heeft.
+	<br><em>Dit wordt nog niet volledig ondersteund.</em>
+    </td>
   </tr>
   <tr valign="top">
     <td>3b</td>
-    <td>Het totaal aan boekingen inzake leveringen aan niet-EU landen.</td>
+    <td>Het totaal aan boekingen inzake leveringen aan niet-EU landen.
+    <br>Dit betreft omzetboekingen waarbij de debiteur de btw-code
+	'<code>extra</code>' (extra-communautair) heeft.
+    </td>
   </tr>
 </table>
 
@@ -315,12 +324,18 @@ Berekening
   <tr valign="top">
     <td>4a</td>
     <td>Het totaal aan boekingen inzake leveringen vanuit niet-EU landen,
-	en de daarover verschuldigde omzetbelasting.</td>
+	en de daarover verschuldigde omzetbelasting.
+	<br>Dit betreft kostenboekingen waarbij de crediteur de btw-code
+	'<code>intra</code>' (intra-communautair) heeft.
+	<br><em>Dit wordt nog niet volledig ondersteund.</em>
+    </td>
   </tr>
   <tr valign="top">
     <td>4b</td>
     <td>Het totaal aan boekingen inzake leveringen vanuit EU landen,
-	en de daarover verschuldigde omzetbelasting.</td>
+	en de daarover verschuldigde omzetbelasting.
+	<br>Dit betreft kostenboekingen waarbij de crediteur de btw-code
+	'<code>extra</code>' (extra-communautair) heeft.</td>
   </tr>
 </table>
 
@@ -333,7 +348,8 @@ Berekening
   </tr>
   <tr valign="top">
     <td>5b</td>
-    <td>Het totaal van alle reeds betaalde omzetbelasting.</td>
+    <td>Het totaal van alle reeds betaalde omzetbelasting.
+	<br>Dit is de op de kostenboekingen toegepaste BTW.</td>
   </tr>
   <tr valign="top">
     <td>5c</td>
@@ -341,7 +357,14 @@ Berekening
   </tr>
   <tr valign="top">
     <td>5d</td>
-    <td>Toepassing regeling Kleine Ondernemers.</td>
+    <td>Toepassing regeling Kleine Ondernemers.
+	<br>Indien de omzetbelasting minder is dan een bepaald bedrag,
+	kan het bedrag in veel gevallen geheel of gedeeltelijk worden
+	kwijtgescholden: de regeling &lsquo;Kleine Ondernemers&rsquo;.
+	EekBoek zal, indien het een jaaropgave betreft en de details
+	van de regeling voor dat jaar bekend zijn, de eventuele
+	korting  vermelden.
+    </td>
   </tr>
   <tr valign="top">
     <td>5g</td>
@@ -363,13 +386,6 @@ goederen. EekBoek zal in dit geval de volgende boodschap tonen:
 berekende en werkelijk ingehouden BTW. Voor de aangifte is de
 werkelijk ingehouden BTW gebruikt.</blockquote>
 
-<h3>Regeling Kleine Ondernemers</h3>
-
-<p>Indien de omzetbelasting minder is dan een bepaald bedrag, kan het
-bedrag geheel of gedeeltelijk worden kwijtgescholden: de regeling
-&lsquo;Kleine Ondernemers&rsquo;. EekBoek zal, indien de details van
-de regeling bekend zijn, een daartoe ge&euml;igende boodschap
-afdrukken.</p>
 
     </td>
   </tr>
@@ -395,7 +411,7 @@ afdrukken.</p>
 Deze site is gemaakt met de 
 <a href='http://www.squirrel.nl/people/jvromans/tt2site/'>TT2Site
 Site Builder</a>.<br />
-reports/btw.html laatste aanpassing 31 januari 2006, 19:51:47
+reports/btw.html laatste aanpassing 20 februari 2006, 21:44:24
 </p>
 
     </td>
