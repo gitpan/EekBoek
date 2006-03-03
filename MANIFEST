@@ -122,6 +122,7 @@ lib/EB/migrate/001000002001000003.sql
 lib/EB/migrate/001000003001000004.sql
 lib/EB/migrate/001000005001000006.sql
 lib/EB/migrate/001000006001000007.sql
+lib/EB/migrate/001000007001000008.sql
 lib/EB/Relation.pm
 lib/EB/Report.pm
 lib/EB/Report/Balres.pm

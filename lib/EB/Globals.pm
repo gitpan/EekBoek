@@ -21,7 +21,7 @@ sub N__($) { $_[0] }
 BEGIN {
     _newconst("SCM_MAJVERSION", 1);
     _newconst("SCM_MINVERSION", 0);
-    _newconst("SCM_REVISION",   7);
+    _newconst("SCM_REVISION",   8);
 
     _newconst("AMTPRECISION",   2);
     _newconst("AMTWIDTH",       9);
@@ -39,8 +39,8 @@ BEGIN {
 	      "[qw(".N__("-- Inkoop Verkoop Bank Kas Memoriaal").")]");
     $i = 0;
     map { _newconst("BTWTARIEF_$_", $i++) }
-      qw(GEEN HOOG LAAG);
-    _newconst("BTWTARIEVEN", "[qw(".N__("Geen Hoog Laag").")]");
+      qw(NUL HOOG LAAG);
+    _newconst("BTWTARIEVEN", "[qw(".N__("Nul Hoog Laag").")]");
     _newconst("BTWPER_GEEN", 0);
     _newconst("BTWPER_JAAR", 1);
     _newconst("BTWPER_KWARTAAL", 4);
@@ -52,7 +52,7 @@ BEGIN {
     _newconst("BTWTYPES", "[qw(".N__("Normaal Verlegd Intra Extra").")]");
 
     _newconst("BTWKLASSE_BTW_BIT",   0x200);
-    _newconst("BTWKLASSE_IV_BIT",    0x100);
+    _newconst("BTWKLASSE_KO_BIT",    0x100);
     _newconst("BTWKLASSE_TYPE_BITS", 0x0ff);
 
 }
@@ -61,7 +61,7 @@ sub BTWKLASSE($$;$) {
     unshift(@_, 1) if @_ == 2;
     ($_[0] ? BTWKLASSE_BTW_BIT : 0)
       | ($_[1] & BTWKLASSE_TYPE_BITS)
-	| ($_[2] ? BTWKLASSE_IV_BIT : 0);
+	| ($_[2] ? BTWKLASSE_KO_BIT : 0);
 }
 
 BEGIN { push(@EXPORT, qw(BTWKLASSE)) }

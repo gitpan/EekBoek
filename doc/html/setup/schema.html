@@ -212,15 +212,23 @@ speciale betekenis, de zogenaamde <dfn>koppelingen</dfn> (trefwoord
 <blockquote class="code">  8680  O   Omzet naar kosten BTW hoog     :btw=hoog
   8690  K   Doorbelaste omzet naar kosten</blockquote>
 
+<a name="btwcodes"></a>
 <p>Er zijn drie BTW tariefgroepen die kunnen worden opgegeven:</p>
 
-<blockquote class="code">:btw=geen
+<blockquote class="code">:btw=nul
 :btw=hoog
 :btw=laag</blockquote>
 
-<p>Wanneer geen van bovenstaande aanduidingen is opgegeven, wordt
-het BTW 0% tarief toegepast bij boekingen op deze
-resultaatrekening.</p>
+<p>Wanneer geen van bovenstaande aanduidingen is opgegeven, wordt het
+BTW 0% tarief toegepast bij boekingen op deze resultaatrekening.</p>
+
+<p>Let op: Er is een significant verschil tussen &lsquo;BTW 0%&rsquo;
+en &lsquo;geen BTW&rsquo;. Hoewel in beide gevallen het BTW bedrag nul
+is, telt een boeking met &lsquo;BTW 0%&rsquo; mee voor de BTW aangifte
+(omzetboekingen met 0% BTW worden opgegeven bij onderdeel &ldquo;<a
+href="../reports/btw.html#btw1e">Belast met 0% / verlegd</a>&rdquo;),
+terwijl een boeking met &lsquo;geen BTW&rsquo; niet meetelt voor de
+BTW aangifte..</p>
 
 <p>Naast het BTW tarief kan ook worden aangegeven of bij boekingen op
 deze rekening het bedrag standaard inclusief of exclusief wordt
@@ -333,7 +341,7 @@ in een vorm die later weer kan worden gebruikt om in te voeren.</p>
 Deze site is gemaakt met de 
 <a href='http://www.squirrel.nl/people/jvromans/tt2site/'>TT2Site
 Site Builder</a>.<br />
-setup/schema.html laatste aanpassing 20 februari 2006, 21:32:12
+setup/schema.html laatste aanpassing 03 maart 2006, 11:56:17
 </p>
 
     </td>

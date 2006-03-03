@@ -1,12 +1,12 @@
 #!/usr/bin/perl
 
-my $RCS_Id = '$Id: Shell.pm,v 1.62 2006/02/20 20:06:42 jv Exp $ ';
+my $RCS_Id = '$Id: Shell.pm,v 1.65 2006/03/03 21:28:35 jv Exp $ ';
 
 # Author          : Johan Vromans
 # Created On      : Thu Jul  7 15:53:48 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Mon Feb 13 15:48:50 2006
-# Update Count    : 746
+# Last Modified On: Fri Feb 24 13:47:22 2006
+# Update Count    : 753
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -387,6 +387,7 @@ sub do_journaal {
 	       };
 
     require EB::Report::Journal;
+    require EB::Report::GenBase;
 
     return unless
     parse_args(\@args,
@@ -427,9 +428,11 @@ EOS
 
 sub do_balans {
     my ($self, @args) = @_;
-    require EB::Report::Balres;
     my $opts = { d_boekjaar   => $bky || $dbh->adm("bky"),
 	       };
+
+    require EB::Report::Balres;
+    require EB::Report::GenBase;
 
     return unless
     parse_args(\@args,
@@ -463,9 +466,11 @@ EOS
 
 sub do_result {
     my ($self, @args) = @_;
-    require EB::Report::Balres;
     my $opts = { d_boekjaar   => $bky || $dbh->adm("bky"),
 	       };
+
+    require EB::Report::Balres;
+    require EB::Report::GenBase;
 
     return unless
     parse_args(\@args,
@@ -499,10 +504,12 @@ EOS
 
 sub do_proefensaldibalans {
     my ($self, @args) = @_;
-    require EB::Report::Proof;
 
     my $opts = { d_boekjaar   => $bky || $dbh->adm("bky"),
 	       };
+
+    require EB::Report::Proof;
+    require EB::Report::GenBase;
 
     return unless
     parse_args(\@args,
@@ -535,11 +542,13 @@ EOS
 
 sub do_grootboek {
     my ($self, @args) = @_;
-    require EB::Report::Grootboek;
 
     my $opts = { detail       => 2,
 		 d_boekjaar   => $bky || $dbh->adm("bky"),
 	       };
+
+    require EB::Report::Grootboek;
+    require EB::Report::GenBase;
 
     return unless
     parse_args(\@args,
@@ -615,7 +624,8 @@ sub do_btwaangifte {
 		 close	      => 0,
 	       };
 
-    use EB::Report::BTWAangifte;
+    require EB::Report::BTWAangifte;
+    require EB::Report::GenBase;
 
     return unless
     parse_args(\@args,
@@ -623,6 +633,7 @@ sub do_btwaangifte {
 		 'periode=s'  => sub { periode_arg($opts, @_) },
 		 "definitief" => sub { $opts->{close} = 1 },
 		 EB::Report::GenBase->backend_options(EB::Report::BTWAangifte::, $opts),
+		 "noreport",
 	       ], $opts)
       or goto &help_btwaangifte;
 
@@ -662,6 +673,9 @@ Opties:
                               met --boekjaar, en evenmin met de bovenvermelde
                               methode van periode-specificatie.
   --boekjaar=<code>           Selecteer boekjaar
+  --noreport                  Geen rapportage. Dit is enkel zinvol samen
+                              met --definitief om de afgesloten BTW periode
+                              aan te passen.
 
 Zie verder "help rapporten" voor algemene informatie over aan te maken
 rapporten.
@@ -674,6 +688,7 @@ sub do_debiteuren {
 	       };
 
     require EB::Report::Debcrd;
+    require EB::Report::GenBase;
 
     return unless
     parse_args(\@args,
@@ -707,6 +722,7 @@ sub do_crediteuren {
 	       };
 
     require EB::Report::Debcrd;
+    require EB::Report::GenBase;
 
     return unless
     parse_args(\@args,
@@ -740,6 +756,7 @@ sub do_openstaand {
 	       };
 
     require EB::Report::Open;
+    require EB::Report::GenBase;
 
     return unless
     parse_args(\@args,
@@ -858,7 +875,9 @@ EOS
 sub do_export {
     my ($self, @args) = @_;
 
-    my $opts = {
+    my $opts = { single   => 0,
+		 explicit => 0,
+		 totals   => 1,
 	       };
 
     return unless
@@ -866,6 +885,9 @@ sub do_export {
 	       [ 'dir=s',
 		 'output=s',
 		 'boekjaar=s',
+		 'single',
+		 'explicit',
+		 'totals!',
 	       ], $opts)
       or goto &help_export;
 

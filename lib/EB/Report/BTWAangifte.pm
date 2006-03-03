@@ -1,11 +1,11 @@
 #!/usr/bin/perl -w
-my $RCS_Id = '$Id: BTWAangifte.pm,v 1.27 2006/02/03 14:00:24 jv Exp $ ';
+my $RCS_Id = '$Id: BTWAangifte.pm,v 1.31 2006/02/23 12:27:08 jv Exp $ ';
 
 # Author          : Johan Vromans
 # Created On      : Tue Jul 19 19:01:33 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Fri Feb  3 14:33:01 2006
-# Update Count    : 457
+# Last Modified On: Thu Feb 23 13:25:00 2006
+# Update Count    : 461
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -173,9 +173,10 @@ sub perform {
 	$opts->{close} ? die("?$msg\n") : warn("!$msg\n");
     }
 
-    my $data = $self->collect($rep->{per_begin}, $rep->{per_end});
-
-    $self->report($rep, $data);
+    unless ( $opts->{noreport} ) {
+	my $data = $self->collect($rep->{per_begin}, $rep->{per_end});
+	$self->report($rep, $data);
+    }
 
     if ( $opts->{close} ) {
 	$dbh->adm("btwbegin", scalar parse_date($rep->{per_end}, undef, 1));	# implied commit
@@ -349,7 +350,7 @@ sub collect {
 	}
 
 	unless ( defined $debcrd ) {
-	    $debcrd = !($btwclass & BTWKLASSE_IV_BIT);
+	    $debcrd = !($btwclass & BTWKLASSE_KO_BIT);
 	}
 	if ( $btw_status == BTWTYPE_NORMAAL ) {
 	    if ( $debcrd ) {
@@ -363,7 +364,7 @@ sub collect {
 		    $deb_l += $amt;
 		    $deb_btw_l += $btw;
 		}
-		elsif ( $btg_id == BTWTARIEF_GEEN ) {
+		elsif ( $btg_id == BTWTARIEF_NUL ) {
 		    $tr->("0%");
 		    $deb_0 += $amt;
 		}
