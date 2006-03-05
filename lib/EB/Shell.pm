@@ -1,12 +1,12 @@
 #!/usr/bin/perl
 
-my $RCS_Id = '$Id: Shell.pm,v 1.65 2006/03/03 21:28:35 jv Exp $ ';
+my $RCS_Id = '$Id: Shell.pm,v 1.68 2006/03/05 20:07:53 jv Exp $ ';
 
 # Author          : Johan Vromans
 # Created On      : Thu Jul  7 15:53:48 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Fri Feb 24 13:47:22 2006
-# Update Count    : 753
+# Last Modified On: Sun Mar  5 21:07:06 2006
+# Update Count    : 770
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -32,8 +32,17 @@ sub new {
     _plug_cmds();
 
     # User defined stuff.
-    eval { require EB::Shell::Userdefs };
-    warn($@) if $@ && $@ !~ /can't locate eb.shell.userdefs\.pm in \@inc/i;
+    my $pkg = $cfg->val(qw(shell userdefs), undef);
+    if ( $pkg ) {
+	$pkg =~ s/::/\//g;
+	$pkg .= ".pm";
+	eval { require $pkg };
+	die($@) if $@;
+    }
+    else {
+	eval { require EB::Shell::Userdefs };
+	die($@) if $@ && $@ !~ /can't locate eb.shell.userdefs\.pm in \@inc/i;
+    }
 
     my $self = $class->SUPER::new($opts);
 
@@ -169,6 +178,7 @@ INIT { @outopts = qw(html csv text output=s page=i) }
 
 # Plug in some commands dynamically.
 sub _plug_cmds {
+    my $does_btw = $dbh->does_btw;
     my $sth = $dbh->sql_exec("SELECT dbk_id,dbk_desc,dbk_type FROM Dagboeken");
     my $rr;
     while ( $rr = $sth->fetchrow_arrayref ) {
@@ -198,6 +208,7 @@ sub _plug_cmds {
     foreach my $adm ( @{EB::Tools::Opening->commands} ) {
 	my $cmd = $adm;
 	$cmd =~ s/^set_//;
+	next if $cmd =~ /^btw/ && !$does_btw;
 	no strict 'refs';
 	*{"do_adm_$cmd"} = sub {
 	    (shift->{o} ||= EB::Tools::Opening->new)->$adm(@_);
@@ -208,6 +219,13 @@ sub _plug_cmds {
 	    ($self->{o} ||= EB::Tools::Opening->new)->can($help)
 	      ? $self->{o}->$help() : $self->{o}->shellhelp($cmd);
 	};
+    }
+
+    # BTW aangifte.
+    if ( $does_btw ) {
+	no strict 'refs';
+	*{"do_btwaangifte"}   = \&_do_btwaangifte;
+	*{"help_btwaangifte"} = \&_help_btwaangifte;
     }
 
     $dbk_pat = $dbk_i_pat.$dbk_v_pat.$dbk_bkm_pat;
@@ -618,7 +636,8 @@ Toont een lijstje van beschikbare dagboeken.
 EOS
 }
 
-sub do_btwaangifte {
+# do_btwaangifte and help_btwaangifte are dynamically plugged in (or not).
+sub _do_btwaangifte {
     my ($self, @args) = @_;
     my $opts = { d_boekjaar   => $bky || $dbh->adm("bky"),
 		 close	      => 0,
@@ -635,7 +654,7 @@ sub do_btwaangifte {
 		 EB::Report::GenBase->backend_options(EB::Report::BTWAangifte::, $opts),
 		 "noreport",
 	       ], $opts)
-      or goto &help_btwaangifte;
+      or goto &_help_btwaangifte;
 
     if ( lc($args[-1]) eq "definitief" ) {
 	$opts->{close} = 1;
@@ -648,7 +667,7 @@ sub do_btwaangifte {
     undef;
 }
 
-sub help_btwaangifte {
+sub _help_btwaangifte {
     <<EOS;
 Toont de BTW aangifte.
 
@@ -839,7 +858,7 @@ sub do_relatie {
     return unless
     parse_args(\@args,
 	       [ 'dagboek=s',
-		 'btw=s',
+		 $dbh->does_btw ? 'btw=s' : (),
 	       ], $opts)
       or goto &help_relatie;
 
@@ -855,7 +874,7 @@ sub do_relatie {
 }
 
 sub help_relatie {
-    <<EOS;
+    my $ret = <<EOS;
 Aanmaken een of meer nieuwe relaties.
 
   relatie [ <opties> ] { <code> <omschrijving> <rekening> } ...
@@ -863,11 +882,15 @@ Aanmaken een of meer nieuwe relaties.
 Opties:
 
   --dagboek=<dagboek>         Selecteer dagboek voor deze relatie
+EOS
+
+    $ret .= <<EOS if $dbh->does_btw;
   --btw=<type>                BTW type: normaal, verlegd, intra, extra
 
 *** BTW type 'verlegd' wordt nog niet ondersteund ***
 *** BTW type 'intra' wordt nog niet geheel ondersteund ***
 EOS
+    $ret;
 }
 
 ################ Im/export ################

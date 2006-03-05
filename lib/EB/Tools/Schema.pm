@@ -1,10 +1,10 @@
-my $RCS_Id = '$Id: Schema.pm,v 1.36 2006/03/03 21:48:35 jv Exp $ ';
+my $RCS_Id = '$Id: Schema.pm,v 1.39 2006/03/05 20:58:08 jv Exp $ ';
 
 # Author          : Johan Vromans
 # Created On      : Sun Aug 14 18:10:49 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Fri Mar  3 21:34:07 2006
-# Update Count    : 548
+# Last Modified On: Sun Mar  5 21:05:03 2006
+# Update Count    : 570
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -146,8 +146,8 @@ sub scan_dagboeken {
     error(__x("Dagboek {id}: het :type ontbreekt", id => $id)."\n") unless defined($type);
     error(__x("Dagboek {id}: het :rekening nummer ontbreekt", id => $id)."\n")
       if ( $type == DBKTYPE_KAS || $type == DBKTYPE_BANK ) and !$type;
-    error(__x("Dagboek {id}: rekeningnummer enkel toegestaan voor Kas en Bankboeken", id => $id)."\n")
-      if $rek && !($type == DBKTYPE_KAS || $type == DBKTYPE_BANK || $type == DBKTYPE_MEMORIAAL);
+#    error(__x("Dagboek {id}: rekeningnummer enkel toegestaan voor Kas en Bankboeken", id => $id)."\n")
+#      if $rek && !($type == DBKTYPE_KAS || $type == DBKTYPE_BANK || $type == DBKTYPE_MEMORIAAL);
 
     $dbk{$id} = $dbkid;
     $dbk[$dbkid] = [ $id, $desc, $type, $rek||undef ];
@@ -385,13 +385,10 @@ sub load_schema {
 		     " \"Dagboeken\" of \"BTW Tarieven\"")."\n");
     }
 
-=begin maybelater
-
     # Bekijk alle dagboeken om te zien of er inkoop/verkoop dagboeken
     # zijn die een tegenrekening nodig hebben. In dat geval moet de
     # betreffende koppeling in het schema gemaakt zijn.
     my ($need_deb, $need_crd) = (0,0);
-    use Data::Dumper; warn Dumper(\@dbk);
     foreach ( @dbk ) {
 	next unless defined($_); # sparse
 	my ($id, $desc, $type, $rek) = @$_;
@@ -415,19 +412,26 @@ sub load_schema {
     delete($std{crd}) unless $need_crd;
     delete($std{deb}) unless $need_deb;
 
-=cut
-
+    my %mapbtw = ( n => "Nul", h => "Hoog", "l" => "Laag" );
+    if ( @btw ) {
+	foreach ( keys(%mapbtw) ) {
+	    next if defined($btwmap{$_});
+	    error(__x("Geen BTW tarief gevonden met tariefgroep {gr}, inclusief",
+		      gr => $mapbtw{$_})."\n");
+	}
+    }
+    else {
+	for ( qw(ih il vh vl ok) ) {
+	    delete($std{"btw_$_"}) unless $std{"btw_$_"};
+	}
+	$btwmap{n} = undef;
+	$btw[0] = [ 0, "BTW Nul", BTWTARIEF_NUL, 0, 0 ];
+    }
     while ( my($k,$v) = each(%std) ) {
 	next if $v;
 	error(__x("Geen koppeling gevonden voor \"{std}\"", std => $k)."\n");
     }
 
-    my %mapbtw = ( n => "Nul", h => "Hoog", "l" => "Laag" );
-    foreach ( keys(%mapbtw) ) {
-	next if defined($btwmap{$_});
-	error(__x("Geen BTW tarief gevonden met tariefgroep {gr}, inclusief",
-		  gr => $mapbtw{$_})."\n");
-    }
     die("?"._T("FOUTEN GEVONDEN, VERWERKING AFGEBROKEN")."\n") if $fail;
 
     if ( $sql ) {
@@ -521,12 +525,12 @@ ESQL
     for my $i ( sort { $a <=> $b } keys(%acc) ) {
 	my $g = $acc{$i};
 	croak(__x("Geen BTW tariefgroep voor code {code}",
-		  code => $g->[5])) unless defined $btwmap{$g->[5]};
+		  code => $g->[5])) unless exists $btwmap{$g->[5]};
 	$out .= _tsv($i, $g->[0], $g->[1],
 		     _tf($g->[2]),
 		     _tf($g->[3]),
 		     _tfn($g->[4]),
-		     $btwmap{$g->[5]},
+		     defined($btwmap{$g->[5]}) ? $btwmap{$g->[5]} : "\\N",
 		     0, 0);
     }
     $out . "\\.\n";
@@ -571,8 +575,8 @@ ESQL
 
     foreach ( @dbk ) {
 	next unless defined;
-	$_->[3] = $std{deb} if $_->[2] == DBKTYPE_VERKOOP;
-	$_->[3] = $std{crd} if $_->[2] == DBKTYPE_INKOOP;
+	$_->[3] ||= $std{deb} if $_->[2] == DBKTYPE_VERKOOP;
+	$_->[3] ||= $std{crd} if $_->[2] == DBKTYPE_INKOOP;
 	$out .= join("\t",
 		     map { defined($_) ? $_ : "\\N" } @$_).
 		       "\n";
@@ -667,6 +671,7 @@ print {$fh}  <<EOD;
 # tariefstelling worden aangegeven die op deze rekening van toepassing
 # is:
 #
+#   :btw=nul
 #   :btw=hoog
 #   :btw=laag
 #
@@ -674,8 +679,8 @@ print {$fh}  <<EOD;
 # (speciale betekenis) heeft met :koppeling=xxx. De volgende koppelingen
 # zijn mogelijk:
 #
-#   crd		de tegenrekening (Crediteuren) voor inkoopboekingen
-#   deb		de tegenrekening (Debiteuren) voor verkoopboekingen
+#   crd		de standaard tegenrekening (Crediteuren) voor inkoopboekingen
+#   deb		de standaard tegenrekening (Debiteuren) voor verkoopboekingen
 #   btw_ih	de rekening voor BTW boekingen voor inkopen, hoog tarief
 #   btw_il	idem, laag tarief
 #   btw_vh	idem, verkopen, hoog tarief
@@ -683,8 +688,14 @@ print {$fh}  <<EOD;
 #   btw_ok	rekening voor de betaalde BTW
 #   winst	rekening waarop de winst wordt geboekt
 #
-# Al deze koppelingen moeten éénmaal in het rekeningschema voorkomen.
-
+# De koppeling winst is verplicht en moet altijd in een administratie
+# voorkomen in verband met de jaarafsluiting.
+# De koppelingen voor BTW moeten worden opgegeven indien BTW
+# van toepassing is op de administratie.
+# De koppelingen voor Crediteuren en Debiteuren moeten worden
+# opgegeven indien er inkoop dan wel verkoopdagboeken zijn die gebruik
+# maken van de standaardwaarden (dus zelf geen tegenrekening hebben
+# opgegeven).
 EOD
 
 $max_hvd = $dbh->do("SELECT MAX(vdi_id) FROM Verdichtingen WHERE vdi_struct IS NULL")->[0];
@@ -723,24 +734,26 @@ print {$fh}  <<EOD;
 # dagboeken worden aangemaakt.
 # In de eerste kolom wordt de korte naam (code) voor het dagboek
 # opgegeven. Verder moet voor elk dagboek worden opgegeven van welk
-# type het is. Voor rekeningen van het type Kas en Bank moet bovendien
-# een tegenrekening worden opgegeven.
+# type het is. Voor dagboeken van het type Kas en Bank moet een
+# tegenrekening worden opgegeven, voor de overige dagboeken mag een
+# tegenrekening worden opgegeven.
 EOD
 
     dump_dbk($fh);			# Dagboeken
 
-print {$fh}  <<EOD;
+    if ( $dbh->does_btw ) {
+	print {$fh}  <<EOD;
 
 # BTW TARIEVEN
 #
-# Er zijn drie tariefgroepen: "hoog", "laag" en "geen". De tariefgroep
+# Er zijn drie tariefgroepen: "hoog", "laag" en "nul". De tariefgroep
 # bepaalt het rekeningnummer waarop de betreffende boeking plaatsvindt.
 # Binnen elke tariefgroep zijn meerdere tarieven mogelijk, hoewel dit
 # in de praktijk niet snel zal voorkomen.
 # In de eerste kolom wordt de (numerieke) code voor dit tarief
 # opgegeven. Deze kan o.m. worden gebruikt om expliciet een BTW tarief
 # op te geven bij het boeken. Voor elk tarief (behalve die van groep
-# "geen") moet het percentage worden opgegeven. Met de aanduiding
+# "nul") moet het percentage worden opgegeven. Met de aanduiding
 # :exclusief kan worden opgegeven dat boekingen op rekeningen met deze
 # tariefgroep standaard het bedrag exclusief BTW aangeven.
 #
@@ -750,8 +763,8 @@ print {$fh}  <<EOD;
 # hebben voor de reeds in scripts vastgelegde boekingen.
 EOD
 
-    dump_btw($fh);			# BTW tarieven
-
+	dump_btw($fh);			# BTW tarieven
+    }
 print {$fh}  <<EOD;
 
 # Einde EekBoek schema
@@ -788,7 +801,8 @@ sub dump_acc {
 				     " acc_btw, btw_tariefgroep, btw_incl".
 				     " FROM Accounts, BTWTabel ".
 				     " WHERE acc_struct = ?".
-				     " AND btw_id = acc_btw".
+				     " AND (btw_id = acc_btw".
+				     " OR btw_id = 0 AND acc_btw IS NULL)".
 				     " ORDER BY acc_id", $id);
 	    while ( my $rr = $sth->fetchrow_arrayref ) {
 		my ($id, $desc, $acc_balres, $acc_debcrd, $acc_kstomz, $btw_id, $btw, $btwincl) = @$rr;
@@ -873,7 +887,8 @@ sub dump_dbk {
 			     " ORDER BY dbk_id");
     while ( my $rr = $sth->fetchrow_arrayref ) {
 	my ($id, $desc, $type, $acc_id) = @$rr;
-	$acc_id = 0 if $type == DBKTYPE_INKOOP || $type == DBKTYPE_VERKOOP;
+	$acc_id = 0 if $type == DBKTYPE_INKOOP  && $dbh->std_acc("crd", 0) == $acc_id;
+	$acc_id = 0 if $type == DBKTYPE_VERKOOP && $dbh->std_acc("deb", 0) == $acc_id;
 	my $t = sprintf("  %-4s  %-20s  :type=%-10s %s",
 			$id, $desc, lc(DBKTYPES->[$type]),
 			($acc_id ? ":rekening=$acc_id" : ""));

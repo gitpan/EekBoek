@@ -93,6 +93,8 @@
 <br />
 <a href="../setup/index.html" class="menuselect">Opzetten administratie</a>
 <br />
+&nbsp;-&nbsp;<a href="../setup/config.html" class="menu">Opzetten werkomgeving</a>
+<br />
 &nbsp;-&nbsp;<a href="../setup/createdb.html" class="menu">Aanmaken database</a>
 <br />
 &nbsp;-&nbsp;<a href="../setup/schema.html" class="menuselect">Administratiegegevens</a>
@@ -267,8 +269,7 @@ standaardrekening voor inkoopboekingen:</p>
 <blockquote class="code">  1600  C   Crediteuren                    :koppeling=crd</blockquote>
 
 <p>Voor een volledig overzicht van alle mogelijke koppelingen, zie <a
-href="../stdacc.html">Koppelingen</a>. Elke koppeling moet exact
-&eacute;&eacute;n maal in het schema voorkomen.</p>
+href="../stdacc.html">Koppelingen</a>.
 
 <a name="dbk"></a><h3>De dagboeken</h3>
 
@@ -277,8 +278,14 @@ ondersteunt vijf soorten dagboeken: Kas, Bank, Inkoop, Verkoop en
 Memoriaal. Elk dagboek heeft een unieke, alfanumerieke code (max. 4
 tekens). Deze wordt in een toekomstige versie gebruikt om
 boekstuknummers te produceren. Verder moet voor elk dagboek worden
-opgegeven van welke soort het is. Voor rekeningen van de soort Kas en
-Bank moet bovendien een tegenrekening worden opgegeven. </p>
+opgegeven van welke soort het is.</p>
+<p>Bij dagboeken van het soort Kas en Bank moet altijd een
+tegenrekening worden opgegeven.
+<br>Bij dagboeken van het soort Inkoop en Verkoop mag een
+tegenrekening worden opgegeven. Indien deze ontbreekt wordt de
+betreffende standaardrekening genomen, zie <a href="../stdacc.html">Koppelingen</a>.
+<br>Bij dagboeken van het soort Memoriaal mag een tegenrekening worden
+opgegeven.</p>
 
 <p>Een illustratief voorbeeld:</p>
 
@@ -289,27 +296,36 @@ Bank moet bovendien een tegenrekening worden opgegeven. </p>
    V  Verkoop               :type=verkoop
    M  Memoriaal             :type=memoriaal</blockquote>
 
-<a name="btw"></a><h3>De BTW tariefgroepen</h3>
 
-<p>Er zijn drie tariefgroepen: "hoog", "laag" en "geen". De
+<a name="btw"></a><h3>De BTW tarieven</h3>
+
+<p>De BTW tarieven worden gespecificeerd in het onderdeel "btw
+tarieven". Dit onderdeel hoeft niet te worden opgegeven wanneer geen
+BTW administratie wordt gevoerd.</p>
+
+<p>Er zijn drie tariefgroepen: "hoog", "laag" en "nul". De
 tariefgroep bepaalt het rekeningnummer waarop de betreffende boeking
 plaatsvindt. Binnen elke tariefgroep zijn meerdere tarieven mogelijk,
-hoewel dit in de praktijk niet snel zal voorkomen.</p> <p>Elke tarief
-heeft een unieke, numerieke code. Deze kan o.m. worden gebruikt om
-expliciet een BTW tarief op te geven bij het boeken. Voor elk tarief
-(behalve die van groep "geen") moet verder het percentage worden
-opgegeven. Met de aanduiding '<code>:exclusief</code>' kan worden
-opgegeven dat boekingen op rekeningen met deze tariefgroep standaard
-het bedrag exclusief BTW aangeven.</p>
+hoewel dit in de praktijk niet snel zal voorkomen.</p>
+
+<p>Elke tarief heeft een unieke, numerieke code. Deze kan o.m. worden
+gebruikt om expliciet een BTW tarief op te geven bij het boeken. Voor
+elk tarief (behalve die van groep "nul") moet verder het percentage
+worden opgegeven. Met de aanduiding '<code>:exclusief</code>' kan
+worden opgegeven dat boekingen op rekeningen met deze tariefgroep
+standaard het bedrag exclusief BTW aangeven.</p>
 
 <p>Een illustratief voorbeeld:</p>
 
 <blockquote class="code">BTW Tarieven
-   0  BTW Geen          :tariefgroep=geen
+   0  BTW 0%            :tariefgroep=nul
    1  BTW 19% incl.     :tariefgroep=hoog :perc=19,00
    2  BTW 19% excl.     :tariefgroep=hoog :perc=19,00 :exclusief
    3  BTW 6,0% incl.    :tariefgroep=laag :perc=6,00
-   4  BTW 6,0% excl.    :tariefgroep=laag :perc=6,00 :exclusief</blockquote>
+   4  BTW 6,0% excl.    :tariefgroep=laag :perc=6,00  :exclusief</blockquote>
+
+<p>De rekeningen waarop de BTW moet worden geboekt worden
+gespecifieerd met <a href="../stdacc.html">koppelingen</a>.
 
 <h3>Opnieuw aanmaken schema-gegevens</h3>
 
@@ -341,7 +357,7 @@ in een vorm die later weer kan worden gebruikt om in te voeren.</p>
 Deze site is gemaakt met de 
 <a href='http://www.squirrel.nl/people/jvromans/tt2site/'>TT2Site
 Site Builder</a>.<br />
-setup/schema.html laatste aanpassing 03 maart 2006, 11:56:17
+setup/schema.html laatste aanpassing 05 maart 2006, 22:14:33
 </p>
 
     </td>

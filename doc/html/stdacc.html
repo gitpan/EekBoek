@@ -104,12 +104,12 @@
 
 <h2>Koppelingen</h2>
 
-<p>Door middel van zogenaamde 'koppelingen' kunnen speciale
-betekenissen worden toegekend aan grootboekrekeningen.</p>
+<p>Door middel van zogenaamde 'koppelingen' kan een speciale
+betekenis worden toegekend aan grootboekrekeningen.</p>
 
-<p>Bijvoorbeeld, de vaste tegenrekening voor inkoopboekingen heet
+<p>Bijvoorbeeld, de standaard tegenrekening voor inkoopboekingen heet
 conventioneel 'Crediteuren'. In het <a
-href="setup/schema.html#acc">schema</a> kan de koppeling worden
+href="setup/schema.html#acc">schema</a> kan deze koppeling worden
 aangegeven als volgt:</p>
 
 <blockquote class="code">  1600  C  Crediteuren    :koppeling=crd</blockquote>
@@ -118,41 +118,58 @@ aangegeven als volgt:</p>
 
 <table border="1" width="100%" cellpadding="5">
   <tr valign="top">
-    <td>crd</td>
-    <td>de tegenrekening (Crediteuren) voor inkoopboekingen</td>
+    <td><code>crd</code></td>
+    <td>De standaard tegenrekening voor inkoopboekingen.
+    <br>Deze koppeling moet in het schema voorkomen indien de
+	adminstratie inkoopdagboeken heeft waaraan niet expliciet een
+	rekeningnummer is verbonden.</td>
   </tr>
   <tr valign="top">
-    <td>deb</td>
-    <td>de tegenrekening (Debiteuren) voor verkoopboekingen</td>
+    <td><code>deb</code></td>
+    <td>De standaard tegenrekening voor verkoopboekingen.
+    <br>Deze koppeling moet in het schema voorkomen indien de
+	adminstratie verkoopdagboeken heeft waaraan niet expliciet een
+	rekeningnummer is verbonden.</td>
   </tr>
   <tr valign="top">
-    <td>btw_ih</td>
-    <td>de rekening voor BTW boekingen voor inkopen, hoog tarief</td>
+    <td><code>btw_ih</code></td>
+    <td>De rekening voor BTW boekingen voor inkopen, hoog tarief.
+    <br>Deze koppeling moet in het schema voorkomen als de
+	administratie BTW-plichtig is.</td>
   </tr>
   <tr valign="top">
-    <td>btw_il</td>
-    <td>idem, laag tarief</td>
+    <td><code>btw_il</code></td>
+    <td>Idem, laag tarief.
+    <br>Deze koppeling moet in het schema voorkomen als de
+	administratie BTW-plichtig is.</td>
   </tr>
   <tr valign="top">
-    <td>btw_vh</td>
-    <td>idem, verkopen, hoog tarief</td>
+    <td><code>btw_vh</code></td>
+    <td>Idem, verkopen, hoog tarief.
+    <br>Deze koppeling moet in het schema voorkomen als de
+	administratie BTW-plichtig is.</td>
   </tr>
   <tr valign="top">
-    <td>btw_vl</td>
-    <td>idem, laag tarief</td>
+    <td><code>btw_vl</code></td>
+    <td>Idem, laag tarief.
+    <br>Deze koppeling moet in het schema voorkomen als de
+	administratie BTW-plichtig is.</td>
   </tr>
   <tr valign="top">
-    <td>btw_ok</td>
-    <td>rekening voor de betaalde BTW</td>
+    <td><code>btw_ok</code></td>
+    <td>Rekening voor de betaalde BTW.
+    <br>Deze koppeling moet in het schema voorkomen als de
+	administratie BTW-plichtig is.</td>
   </tr>
   <tr valign="top">
-    <td>winst</td>
-    <td>rekening waarop het bedrijfsresultaat wordt geboekt</td>
+    <td><code>winst</code></td>
+    <td>Rekening waarop het bedrijfsresultaat wordt geboekt.
+    <br>Deze koppeling moet in het schema voorkomen.</td>
   </tr>
 </table>
 
-<p><strong>Let op!</strong> Elk van deze koppelingen moet precies
-&eacute;&eacute;nmaal in het schema voorkomen.</p>
+<p>Elke koppelingen mag ten hoogste &eacute;&eacute;nmaal in het
+schema voorkomen.</p>
 
     </td>
   </tr>
@@ -178,7 +195,7 @@ aangegeven als volgt:</p>
 Deze site is gemaakt met de 
 <a href='http://www.squirrel.nl/people/jvromans/tt2site/'>TT2Site
 Site Builder</a>.<br />
-stdacc.html laatste aanpassing 09 december 2005, 17:17:47
+stdacc.html laatste aanpassing 05 maart 2006, 22:16:51
 </p>
 
     </td>
