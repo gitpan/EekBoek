@@ -210,6 +210,15 @@ toekomstige versie komen te vervallen.</p>
 	gebruiken decimaalpunt te wijzigen.
     </td>
   </tr>
+  <tr valign="top">
+    <td><a name="locale_tsp"></a><code>thousandsep</code></td>
+    <td>Deze variable kan worden gebruikt om EekBoek duizendpuntjes te
+	laten zetten in bedragen. De waarde van de variabele is het
+	&lsquo;puntje&rsquo;. De breedte van de kolommen in de
+	rapportages wordt automatisch aangepast om ruimte te bieden
+	aan de duizendpuntjes.
+    </td>
+  </tr>
 </table>
 
 <p><a name="database"></a><b>Sectie "Database"</b></p>
@@ -270,7 +279,7 @@ toekomstige versie komen te vervallen.</p>
   </tr>
 </table>
 
-<p><a name="internal"></a><b>Sectie "Shell"</b></p>
+<p><a name="shell"></a><b>Sectie "Shell"</b></p>
 
 <table border="1" width="100%" cellpadding="5">
   <tr valign="top">
@@ -286,7 +295,28 @@ toekomstige versie komen te vervallen.</p>
   </tr>
 </table>
 
-<p><a name="internal"></a><b>Sectie "CSV"</b></p>
+<p><a name="text"></a><b>Sectie "Text"</b></p>
+
+<table border="1" width="100%" cellpadding="5">
+  <tr valign="top">
+    <td><a name="text_numwidth"></a><code>numwidth</code></td>
+    <td>De standaardbreedte voor de kolommen met bedragen in 
+	tekstuele rapportages. Deze is standaard 9 posities, voldoende
+	voor bedragen onder het miljoen (zes cijfers voor de komma, komma
+	plus twee achter de komma). Heeft u een miljoenenadministratie
+	dan kan de breedte hiermee worden aangepast.
+	<br><code>numwidth</code> kan een waarde worden toegekend,
+	maar ook &lsquo;<code>+<var>n</var></code>&rsquo;,
+	&lsquo;<code>-<var>n</var></code>&rsquo; of
+	&lsquo;<code><var>nnn</var>%</code>&rsquo; om de breedte te
+	vergroten of te verkleinen.
+	<br>Merk op dat bij gebruik van duizendpuntjes de kolombreedte
+	automatisch wordt aangepast om de plaats te bieden aan de puntjes.
+    </td>
+  </tr>
+</table>
+
+<p><a name="csv"></a><b>Sectie "CSV"</b></p>
 
 <table border="1" width="100%" cellpadding="5">
   <tr valign="top">
@@ -341,7 +371,7 @@ ongewenste problemen leiden.</em></p>
 Deze site is gemaakt met de 
 <a href='http://www.squirrel.nl/people/jvromans/tt2site/'>TT2Site
 Site Builder</a>.<br />
-config.html laatste aanpassing 05 maart 2006, 12:37:17
+config.html laatste aanpassing 06 maart 2006, 16:37:15
 </p>
 
     </td>

@@ -3,8 +3,8 @@
 # Author          : Johan Vromans
 # Created On      : Mon Jan 16 20:47:38 2006
 # Last Modified By: Johan Vromans
-# Last Modified On: Sun Mar  5 18:31:12 2006
-# Update Count    : 132
+# Last Modified On: Mon Mar  6 17:02:47 2006
+# Update Count    : 133
 # Status          : Unknown, Use with caution!
 
 package main;
@@ -105,6 +105,8 @@ sub _relaties {
 
 sub _opening {
     my ($self) = @_;
+
+    require EB::Booking::Decode;
 
     my $sth;
 

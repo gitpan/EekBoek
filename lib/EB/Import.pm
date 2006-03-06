@@ -3,8 +3,8 @@
 # Author          : Johan Vromans
 # Created On      : Tue Feb  7 11:56:50 2006
 # Last Modified By: Johan Vromans
-# Last Modified On: Tue Feb  7 12:28:29 2006
-# Update Count    : 15
+# Last Modified On: Mon Mar  6 17:03:22 2006
+# Update Count    : 16
 # Status          : Unknown, Use with caution!
 
 package main;
@@ -23,6 +23,8 @@ my $ident;
 
 sub do_import {
     my ($self, $cmdobj, $opts) = @_;
+
+    require EB::Tools::Schema;
 
     my $dir = $opts->{dir};
     if ( $dir ) {

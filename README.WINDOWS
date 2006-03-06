@@ -1,0 +1,44 @@
+Systeemeisen
+============
+
+  * ActivePerl 5.8
+
+Installatie
+===========
+
+Installeer als eerste ActivePerl (http://www.activestate.com).
+
+Gebruik dan de Perl Package Manager (ppm):
+
+  ppm> install http://www.blingforyourring.com/DBD-Pg.ppd
+  ppm> install http://theoryx5.uwinnipeg.ca/ppms/Crypt-SSLeay.ppd
+
+  --> volg de aanwijzingen omtrent ssleay32.dll en libeay32.dll.
+
+  ppm> install http://www.squirrel.nl/eekboek/dl/ppms/EekBoek.ppd
+  ppm> exit
+
+(Fallback versies van de externe modules vind je op
+ http://www.squirrel.nl/eekboek/dl/ppms/DBD-Pg.ppd
+ http://www.squirrel.nl/eekboek/dl/ppms/Crypt-SSLeay.ppd
+)
+
+Creëer ergens een nieuwe directory, cd erin, en maak een .eekboek.conf
+aan (met de juiste aanpassingen, uiteraard):
+
+    [locale]
+    lang = nl_NL
+    decimalpt = ,
+
+    [database]
+    name = sample
+    host = dbhost.mydomain.com
+    user = dbuser
+
+De command opdracht "ebshell" zou dan moeten werken.
+
+Known Bugs
+==========
+
+"ebshell --createdb" detecteert niet een bestaande database en werkt
+dus alleen op echt nieuwe databases.

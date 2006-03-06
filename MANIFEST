@@ -157,6 +157,7 @@ MANIFEST
 META.yml
 QUICKSTART
 README
+README.WINDOWS
 script/ebshell
 t/basic.t
 t/dates.t
