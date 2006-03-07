@@ -1,10 +1,10 @@
 # Export.pm -- Export EekBoek administratie
-# RCS Info        : $Id: Export.pm,v 1.9 2006/03/05 20:55:53 jv Exp $
+# RCS Info        : $Id: Export.pm,v 1.10 2006/03/07 08:55:06 jv Exp $
 # Author          : Johan Vromans
 # Created On      : Mon Jan 16 20:47:38 2006
 # Last Modified By: Johan Vromans
-# Last Modified On: Mon Mar  6 17:02:47 2006
-# Update Count    : 133
+# Last Modified On: Mon Mar  6 18:34:51 2006
+# Update Count    : 134
 # Status          : Unknown, Use with caution!
 
 package main;
@@ -154,16 +154,16 @@ sub _opening {
 	    $out .= "\n# " . ($acc_debcrd ? _T("Debet") : _T("Credit")) . "\n";
 	}
 	$out .= sprintf("adm_balans %-5s %10s   # %s\n",
-			$acc_id, numfmt($acc_balance),
+			$acc_id, numfmt_plain($acc_balance),
 			$acc_desc);
 	$debcrd = $acc_debcrd;
     }
 
     die("?".__x("Internal error -- unbalance {arg1} <> {arg2}",
-		arg1 => numfmt($dt),
-		arg2 => numfmt($ct))."\n")
+		arg1 => numfmt_plain($dt),
+		arg2 => numfmt_plain($ct))."\n")
       unless $dt == $ct;
-    $out .= "\n# " .  _T("Totaal") . "\n" . "adm_balanstotaal " . numfmt($dt) . "\n";
+    $out .= "\n# " .  _T("Totaal") . "\n" . "adm_balanstotaal " . numfmt_plain($dt) . "\n";
 
 =begin wrong
 
@@ -188,7 +188,7 @@ sub _opening {
 		     "adm_relatie",
 		     $dbk_desc . ":" . $bsk_nr,
 		     $bsk_date, _quote($bsk_desc), _quote($bsr_rel_code),
-		     numfmt($bsk_amount)). "\n";
+		     numfmt_plain($bsk_amount)). "\n";
     }
 
 =cut

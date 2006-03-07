@@ -1,4 +1,132 @@
-0.37
+0.46	07-03-2006
+
+	* Duizendpuntjes worden niet worden toegepast in geëporteerde gegevens
+	  omdat die anders niet meer kunnen worden ingelezen.
+
+0.45	06-03-2006 17:23
+
+	* Kolombreedte van bedragen in tekstuele rapportages is instelbaar.
+
+	  Configuratievariabele 'numwidth' in sectie 'text' kan hiervoor
+	  worden gebruikt:
+
+	      [text]
+	      numwidth = 10
+	      numwidth = +1
+	      numwidth = 111%
+
+	  Elk van deze settings vergroot de standaardwaarde van 9 naar 10.
+
+	* Duizendpuntjes.
+
+	  Configuratievariabele 'thousandsep' in sectie 'locale' kan hiervoor
+	  worden gebruikt:
+
+	      [locale]
+	      decimalpt = ,
+	      thousandsep = .
+
+	  De kolombreedte in tekstuele rapportages wordt automatisch vergroot
+	  bij het gebruik van duizendpuntjes.
+
+	* Windows install kit voor de ActiveState Perl Package Manager.
+	  Zie README.WINDOWS.
+
+0.44	05-03-2006 22:26
+
+	* Inkoop/Verkoopdagboeken mogen ook een :rekening specificatie krijgen
+	  in het schema. Indien deze ontbreekt wordt de koppeling "crd" resp
+	  "deb" gebruikt.
+
+	* Koppelingen voor "deb" en "crd" mogen ontbreken in het schema mits
+	  er geen dagboeken zijn die er gebruik van maken.
+
+	* De BTW tabel mag ontbreken in het schema. Er wordt dan geen BTW
+	  toegepast. Bijvoorbeeld voor organisaties die niet BTW-plichtig
+	  zijn. (Experimenteel)
+
+	* Alle koppelingen voor BTW (btw_ih, btw_vl, etc...) mogen ontbreken
+	  in een BTW-vrije administratie.
+
+	* Configuratie-setting "userdefs" in sectie "shell" om een userdefs
+	  module te selecteren. Pas op: als de module niet succesvol laadt is
+	  dit een fatale fout.
+
+0.43	03-03-2006 23:01
+
+	* Nieuw aangemaakte administraties (aangemaakt met 0.43 of later)
+	  kunnen bedragen groter dan 21.474.836,47 aan. De huidige limiet ligt
+	  op 92.233.720.368.547.758,07.
+	  Bestaande databases worden ge-automigreerd.
+
+	* Diverse aanpassingen in de toepassing van BTW voor minder-triviale
+	  boekingen.
+
+	* Export/import verbeteringen, waarondr behoud van BTW aangifteperiode.
+
+	* Mogelijkheid tot draaien zonder Term::ReadLine::Gnu. Niet dat je het
+	  leuk zult vinden...
+
+0.42	20-02-2006 22:59
+
+	* Toepassen van BTW is nu volledig gedreven door de kosten/omzet
+	  classificatie van de grootboekrekeningen.
+
+	* Meer flexibele BTW codering in schema: naast hoog/laag kan ook
+	  kosten/omzet en incl/excl worden opgegeven.
+
+	* BTW koppeling met balansrekening in schema is weer mogelijk, daarbij
+	  moet dan een kosten/omzet classificatie worden opgegeven.
+
+	* Naast kosten (code K) en omzet (code O) kan een grootboekrekening in
+	  het schema ook als neutraal (code N) worden opgegeven. Op een
+	  neutrale rekening kan nooit BTW worden geboekt.
+
+	* Meer flexibele BTW codering in boekingsbedragen: naast H/L is ook
+	  K/O mogelijk (en soms verplicht). BTW exclusief kan worden opgegeven
+	  met een "-".
+
+	* Herziene en aanvullende documentatie inzake het toepassen van BTW.
+
+0.41	09-02-2006 18:47
+
+	* BTW koppeling met balansrekening in schema niet langer toegestaan.
+
+	* Config variabelen op command line:
+
+	  --define database:name=foo
+
+0.40	07-02-2006 12:55
+
+	* Opdrachten "import" en "include" (experimenteel).
+
+	  Met "import" kan een eerder geëxporteerde administratie in één klap
+	  weer worden gereconstrueerd. De huidige inhoud van de database wordt
+	  daarbij volledig overschreven.
+
+	  Opdracht "include" neemt een bestandsnaam en voert alle opdrachten
+	  uit dit bestand uit.
+
+	* Schema-naam (ebshell --schema=naam) mag nu ook een bestand zijn in
+	  plaats van een naam (alleen letters, cijfers en _). In het geval van
+	  een bestand wordt geen zoekstrategie toegepast.
+
+0.39	06-02-2006 19:22
+
+	* Kleine bugfixjes.
+
+0.38	04-02-2006 20:41
+
+	* BTW Aangifteformulier aangepast aan de moderne tijd.
+	  Kleineondernemenrsregeling verwerkt in formulier.
+
+	* Betere foutdetectie op verkeerde commando-invoer.
+
+	* Herziening alle hulpteksten.
+
+	* Bug fix: RPM bouwprobleem met Config::IniFiles.
+
+0.37	02-02-2006 15:08
 
 	In batch mode wordt backslash-continuering ook beëindigd door
 	een lege regel.

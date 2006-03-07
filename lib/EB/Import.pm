@@ -1,5 +1,5 @@
 # Import.pm -- Import EekBoek administratie
-# RCS Info        : $Id: Import.pm,v 1.1 2006/02/07 11:45:43 jv Exp $
+# RCS Info        : $Id: Import.pm,v 1.2 2006/03/07 08:55:06 jv Exp $
 # Author          : Johan Vromans
 # Created On      : Tue Feb  7 11:56:50 2006
 # Last Modified By: Johan Vromans
