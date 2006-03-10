@@ -1,4 +1,10 @@
-0.46	07-03-2006
+0.47	10-03-2006
+
+	* Additionele fixes voor duizendpuntjes in jaarafsluiting.
+
+	* Fix BTW afsluiting na export/import indien BTW periode != jaar.
+
+0.46	07-03-2006 10:06
 
 	* Duizendpuntjes worden niet worden toegepast in geëporteerde gegevens
 	  omdat die anders niet meer kunnen worden ingelezen.
