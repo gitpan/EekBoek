@@ -1,3 +1,33 @@
+0.48
+
+	* Negatieve getallen in de openingsbalans blijven gehandhaafd.
+          In vorige versies werd (foutief!) de D/C status gewisseld.
+
+	  B.v., oude situatie:
+
+		adm_balans <debetrek>  100
+		adm_balans <debetrek>  -10
+
+		adm_balans <creditrek>  90
+
+		adm_balanstotaal       100
+
+	  Nieuwe situatie:
+
+		adm_balans <debetrek>  100
+		adm_balans <debetrek>  -10
+
+		adm_balans <creditrek>  90
+
+		adm_balanstotaal        90
+
+	Dit is een incompatibele wijziging, doch enkel indien er
+	negatieve bedragen in de openingsbalans voorkomen (wat
+	doorgaans niet het geval zal zijn). In dat geval moet het
+	balanstotaal even worden aangepast.
+
+	* Fix BTW afsluiting na export/import indien BTW periode != jaar.
+
 0.47	10-03-2006
 
 	* Additionele fixes voor duizendpuntjes in jaarafsluiting.
