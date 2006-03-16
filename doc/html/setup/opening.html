@@ -93,6 +93,8 @@
 <br />
 <a href="../setup/index.html" class="menuselect">Opzetten administratie</a>
 <br />
+&nbsp;-&nbsp;<a href="../setup/config.html" class="menu">Opzetten werkomgeving</a>
+<br />
 &nbsp;-&nbsp;<a href="../setup/createdb.html" class="menu">Aanmaken database</a>
 <br />
 &nbsp;-&nbsp;<a href="../setup/schema.html" class="menu">Administratiegegevens</a>
@@ -182,6 +184,31 @@ grootboekrekening. Aan het eind van de reeks moet het totaal van de
 debetrekeningen gelijk zijn aan het totaal van de creditrekeningen,
 en tevens gelijk aan het eerder opgegeven balanstotaal.</p>
 
+<p>Boekhouders hebben een speciale opvatting over hoe het balanstotaal
+te bepalen. Voor een boekhouder geldt dat een negatief bedrag voor een
+<strong>debet</strong>rekening aan de <strong>credit</strong> kant
+hoort, terwijl het rekenkundig normaal zou zijn een negatief getal
+gewoon van het saldo af te trekken. Hetzelfde geldt uiteraard voor
+negatieve bedragen voor creditrekeningen, die door een boekhouder als
+debet worden beschouwd.<p>
+
+<p>Bijvoorbeeld:</p>
+
+<blockquote class="code">adm_balans <var>debetrek</var>  100
+adm_balans <var>debetrek</var>  -10
+adm_balans <var>creditrek</var>  90
+</blockquote>
+
+<p>Rekenkundig gezien is de som van de debetzijde <code>100-10</code>,
+dus <code>90</code>, en gelijk aan de creditzijde. Boekhoudkundig
+gezien is de debetzijde <code>100</code>, en de creditzijde
+<code>10+90</code>, ook <code>100</code>. In beide gevallen is de
+belans in evenwicht, alleen het balanstotaal wijkt af.</p>
+
+<p>EekBoek vindt beide opvattingen correct en zal daarom zowel de
+boekhoudkundige als de rekenkundige berekening van het balanstotaal
+accepteren.</p>
+
 <a name="debcrd"></a><h3>Het invoeren van de openstaande posten</h3>
 
 <p>Indien er nog onbetaalde fakturen uit het voorgaande boekjaar
@@ -250,7 +277,7 @@ administratie geopend met volgende opdracht:</p>
 Deze site is gemaakt met de 
 <a href='http://www.squirrel.nl/people/jvromans/tt2site/'>TT2Site
 Site Builder</a>.<br />
-setup/opening.html laatste aanpassing 31 januari 2006, 12:29:55
+setup/opening.html laatste aanpassing 14 maart 2006, 14:40:44
 </p>
 
     </td>

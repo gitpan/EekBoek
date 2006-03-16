@@ -1,7 +1,14 @@
 Systeemeisen
 ============
 
-  * ActivePerl 5.8
+EekBoek is geverifieerd met de volgende componenten:
+
+  * ActivePerl    5.8.7.815
+  * DBD::Pg       1.43
+  * Crypt::SSLeay 0.51
+
+Nieuwere/andere versies kunnen mogelijk problemen opleveren, deze
+liggen buiten de scope van EekBoek.
 
 Installatie
 ===========
@@ -18,13 +25,15 @@ Gebruik dan de Perl Package Manager (ppm):
   ppm> install http://www.squirrel.nl/eekboek/dl/ppms/EekBoek.ppd
   ppm> exit
 
-(Fallback versies van de externe modules vind je op
+(Fallback versies van de externe modules waarnee EekBoek is
+ geverifeerd te werken vind je op
  http://www.squirrel.nl/eekboek/dl/ppms/DBD-Pg.ppd
  http://www.squirrel.nl/eekboek/dl/ppms/Crypt-SSLeay.ppd
 )
 
 Creëer ergens een nieuwe directory, cd erin, en maak een .eekboek.conf
-aan (met de juiste aanpassingen, uiteraard):
+aan (met de juiste aanpassingen, uiteraard). We gaan uit van een
+externe database:
 
     [locale]
     lang = nl_NL
@@ -36,6 +45,10 @@ aan (met de juiste aanpassingen, uiteraard):
     user = dbuser
 
 De command opdracht "ebshell" zou dan moeten werken.
+
+Om een PostgreSQL database onder Windows te kunnen gebruiken moet
+PostgreSQL worden geïnstalleerd. Volgens geruchten is dit eenvoudig,
+maar dit valt buiten de scope van EekBoek.
 
 Known Bugs
 ==========
