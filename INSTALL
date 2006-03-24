@@ -17,45 +17,78 @@ Perl modules (zelf te installeren):
        Config::IniFiles
        (Text::CSV_XS voor de Exact importprogramma's)
 
-Bouwen en verifiëren
---------------------
+Bouwen, verifiëren en installeren
+---------------------------------
+
+Voor het bouwen en installeren wordt gebruik gemaakt van het
+Module::Build framework. Deze wordt vooralsnog met de kit meegeleverd
+en hoeft niet afzonderlijk te worden geïnstalleerd.
+
+   $ perl Build.PL
+   $ Build
+   $ Build test
+
+Afhankelijk van de systeeminstellingen kan het nodig zijn "./Build" te
+gebruiken, en/of "perl" ervoor te zetten.
+
+"Build test" vereist generieke toegang tot een draaiende PostgreSQL
+database server, alsmede de mogelijkheid om een database met de naam
+'eekboek_sample' aan te maken of te gebruiken. Indien nodig kunnen de
+environment variabelen PGHOST PGPORT en PGUSER worden toegepast; zie
+de PostgreSQL documentatie. Als het niet mogelijk is de database
+server te benaderen, gebruik dan
+
+   $ Build test --skipdbtests
+
+Zonder een succesvolle afronding van de testprocedure inclusief
+database tests heeft het echter weinig zin om verder te gaan.
+Raadpleeg in dat geval de .log files en eventueel de mailing list (zie
+verderop).
+
+Het is niet nodig om EekBoek te installeren om het te kunnen
+gebruiken. Het is dan wel noodzakelijk om de environment variabelen
+PERL5LIB en PATH op de juiste wijze op te zetten:
+
+   $ PERL5LIB=<eekboekdir>/blib/lib:$PERL5LIB; export PERL5LIB
+   $ PATH=<eekboekdir>/blib/script:$PATH; export PATH
+
+Hierin is <eekboekdir> de plaats waar eerder de make all en make test
+is uitgevoerd.
+
+Wil je installeren:
+
+   $ su
+   # ./Build install
+
+Installatie verwijderen:
+
+   Zoek uit waar de spullen zijn neergezet onder /usr/lib/perl5.
+   De gehele directory EB kun je weghalen, evenals EekBoek.pm, EB.pm
+   en het programma /usr/bin/ebshell.
+
+Bouwen, verifiëren en installeren (traditionele aanpak)
+-------------------------------------------------------
+
+Let op: Deze wijze van bouwen maakt gebruik van de MakeMaker
+compatibility mode van het Module::Build framework. In wezen doe je
+dus hetzelfde als in de hiebovengeschetste "Build" aanpak.
 
    $ perl Makefile.PL
    $ make all
    $ make test
 
 De laatste vereist generieke toegang tot een draaiende PostgreSQL
-database server. Indien nodig kunnen de environment variabelen PGHOST
-PGPORT en PGUSER worden toegepast; zie de PostgreSQL documentatie.
-Als het niet mogelijk is de database server te benaderen, gebruik dan
+database server, alsmede de mogelijkheid om een database met de naam
+'eekboek_sample' aan te maken of te gebruiken. Indien nodig kunnen de
+environment variabelen PGHOST PGPORT en PGUSER worden toegepast; zie
+de PostgreSQL documentatie. Als het niet mogelijk is de database
+server te benaderen, zet dan de environment variabele EB_SKIPDBTESTS
+op de waarde 1 alvorens de test uit te voeren.
 
-   $ env EB_SKIPDBTESTS=1 make test
-
-Als je wel toegang hebt tot een draaiende database server, en je hebt
-permissie om databases aan te maken (zie verderop 'Aantekeningen'),
-dan kun je de uitgebreide installatie-verificatieprocedure uitvoeren:
-
-   $ make ivp
-
-De te verwachten uitvoer van de installatie-verificatieprocedure is:
-
-   Using blib version
-   === IVP === aanmaken database ===
-   === IVP === relaties ===
-   === IVP === openen administratie ===
-   === IVP === mutaties ===
-   === IVP === verificatie ===
-   EekBoek x.xx -- Copyright 2005-2006 Squirrel Consultancy
-   (Deze banner wordt een keer of 25 getoond. ELKE ANDERE UITVOER
-   DUIDT OP PROBLEMEN.)
-   === IVP === gereed ===
-
-Zonder een succesvolle afronding van de installatie-verificatie-
-procedure heeft het GEEN ZIN om verder te gaan. Raadpleeg in dat geval
-de .log files en eventueel de mailing list (zie verderop).
-
-Gebruiksklaar maken
--------------------
+Zonder een succesvolle afronding van de testprocedure inclusief
+database tests heeft het echter weinig zin om verder te gaan.
+Raadpleeg in dat geval de .log files en eventueel de mailing list (zie
+verderop).
 
 Het is niet nodig om EekBoek te installeren om het te kunnen
 gebruiken. Het is dan wel noodzakelijk om de environment variabelen
@@ -84,6 +117,10 @@ Aantekeningen
 * Liefhebbers van RPM kunnen de meeegeleverde EekBoek.spec file
   gebruiken, of een .src.rpm downloaden van de SourceForge site,
   http://sourceforge.net/project/showfiles.php?group_id=154512 .
+
+  Let op: Perl RPM's moet je altijd op je eigen systeem bouwen! Binary
+  RPM's kunnen allen worden gebruikt indien ze zijn aangemaakt op een
+  identiek systeem, met identieke perl-configuratie.
 
 * Je moet de mogelijkheid hebben om PostgreSQL databases aan te maken.
   Dat kun je bereiken met (veronderstel dat je user 'piet' bent):

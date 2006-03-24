@@ -1,16 +1,144 @@
-# http://module-build.sourceforge.net/META-spec.html
-#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
-name:         EekBoek
-version:      0.50
-version_from: lib/EB.pm
-installdirs:  site
+---
+name: EekBoek
+version: 0.51
+author:
+  - Johan Vromans (jvromans@squirrel.nl)
+abstract: Elementary Bookkeeping (for the Dutch/European market)
+license: perl
 requires:
-    Config::IniFiles:              2.38
-    DBD::Pg:                       1.41
-    DBI:                           1.4
-    Getopt::Long:                  2.13
-    Term::ReadLine:                0
-    Term::ReadLine::Gnu:           0
-
-distribution_type: module
-generated_by: ExtUtils::MakeMaker version 6.17
+  Config::IniFiles: 2.38
+  DBD::Pg: 1.41
+  DBI: 1.4
+  Getopt::Long: 2.13
+  IPC::Run3: 0.034
+  Module::Build: 0.26
+  Term::ReadLine: 0
+  Term::ReadLine::Gnu: 0
+recommends:
+  Getopt::Long: 2.32
+provides:
+  EB:
+    file: lib/EB.pm
+    version: 0.51
+  EB::Booking:
+    file: lib/EB/Booking.pm
+  EB::Booking::BKM:
+    file: lib/EB/Booking/BKM.pm
+  EB::Booking::Decode:
+    file: lib/EB/Booking/Decode.pm
+  EB::Booking::Delete:
+    file: lib/EB/Booking/Delete.pm
+  EB::Booking::IV:
+    file: lib/EB/Booking/IV.pm
+  EB::Config:
+    file: lib/EB/Config.pm
+  EB::Config::IniFiles:
+    file: lib/EB/Config.pm
+  EB::DB:
+    file: lib/EB/DB.pm
+  EB::DB::Postgres:
+    file: lib/EB/DB/Postgres.pm
+  EB::DatabaseMigrator:
+    file: lib/EB/migrate/001000001001000002.pl
+  EB::Export:
+    file: lib/EB/Export.pm
+  EB::Expression:
+    file: lib/EB/Expression.pm
+  EB::Finance:
+    file: lib/EB/Finance.pm
+  EB::Globals:
+    file: lib/EB/Globals.pm
+  EB::Import:
+    file: lib/EB/Import.pm
+  EB::Locale:
+    file: lib/EB/Locale.pm
+  EB::Relation:
+    file: lib/EB/Relation.pm
+  EB::Report:
+    file: lib/EB/Report.pm
+  EB::Report::BTWAangifte:
+    file: lib/EB/Report/BTWAangifte.pm
+  EB::Report::BTWAangifte::Html:
+    file: lib/EB/Report/BTWAangifte/Html.pm
+  EB::Report::BTWAangifte::Text:
+    file: lib/EB/Report/BTWAangifte.pm
+  EB::Report::Balres:
+    file: lib/EB/Report/Balres.pm
+  EB::Report::Balres::Csv:
+    file: lib/EB/Report/Balres.pm
+  EB::Report::Balres::Html:
+    file: lib/EB/Report/Balres.pm
+  EB::Report::Balres::Text:
+    file: lib/EB/Report/Balres.pm
+  EB::Report::Debcrd:
+    file: lib/EB/Report/Debcrd.pm
+  EB::Report::Debcrd::Csv:
+    file: lib/EB/Report/Debcrd.pm
+  EB::Report::Debcrd::Html:
+    file: lib/EB/Report/Debcrd.pm
+  EB::Report::Debcrd::Text:
+    file: lib/EB/Report/Debcrd.pm
+  EB::Report::GenBase:
+    file: lib/EB/Report/GenBase.pm
+  EB::Report::Grootboek:
+    file: lib/EB/Report/Grootboek.pm
+  EB::Report::Grootboek::Csv:
+    file: lib/EB/Report/Grootboek.pm
+  EB::Report::Grootboek::Html:
+    file: lib/EB/Report/Grootboek.pm
+  EB::Report::Grootboek::Text:
+    file: lib/EB/Report/Grootboek.pm
+  EB::Report::Journal:
+    file: lib/EB/Report/Journal.pm
+  EB::Report::Journal::Csv:
+    file: lib/EB/Report/Journal.pm
+  EB::Report::Journal::Html:
+    file: lib/EB/Report/Journal.pm
+  EB::Report::Journal::Text:
+    file: lib/EB/Report/Journal.pm
+  EB::Report::Open:
+    file: lib/EB/Report/Open.pm
+  EB::Report::Open::Csv:
+    file: lib/EB/Report/Open.pm
+  EB::Report::Open::Html:
+    file: lib/EB/Report/Open.pm
+  EB::Report::Open::Text:
+    file: lib/EB/Report/Open.pm
+  EB::Report::Proof:
+    file: lib/EB/Report/Proof.pm
+  EB::Report::Proof::Csv:
+    file: lib/EB/Report/Proof.pm
+  EB::Report::Proof::Html:
+    file: lib/EB/Report/Proof.pm
+  EB::Report::Proof::Text:
+    file: lib/EB/Report/Proof.pm
+  EB::Report::Reporter:
+    file: lib/EB/Report/Reporter.pm
+  EB::Report::Reporter::Csv:
+    file: lib/EB/Report/Reporter/Csv.pm
+  EB::Report::Reporter::Html:
+    file: lib/EB/Report/Reporter/Html.pm
+  EB::Report::Reporter::Text:
+    file: lib/EB/Report/Reporter/Text.pm
+  EB::Shell:
+    file: lib/EB/Shell.pm
+  EB::Shell::Base:
+    file: lib/EB/Shell/Base.pm
+  EB::Shell::DeLuxe:
+    file: lib/EB/Shell/DeLuxe.pm
+  EB::Tools::Einde:
+    file: lib/EB/Tools/Einde.pm
+  EB::Tools::Opening:
+    file: lib/EB/Tools/Opening.pm
+  EB::Tools::SQLEngine:
+    file: lib/EB/Tools/SQLEngine.pm
+  EB::Tools::Schema:
+    file: lib/EB/Tools/Schema.pm
+  EB::Utils:
+    file: lib/EB/Utils.pm
+  EekBoek:
+    file: lib/EekBoek.pm
+    version: 0.51
+  main:
+    file: lib/EB/Booking/IV.pm
+generated_by: Module::Build version 0.2612

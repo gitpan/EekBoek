@@ -12,14 +12,13 @@ documentatie met goed gevolg zijn uitgevoerd.
 
 Werken met de voorbeeldadministatie van de ivp:
 
-   $ cd ivp
-   $ ebshell				  -- shell interactief
+   $ ebshell --db=sample		  (shell interactief)
 
 De EekBoek shell werkt als volgt:
 
-   $ ebshell             -- interactief
-   $ ebshell < file      -- batch, leest opdrachten uit file
-   $ ebshell -c command  -- single command
+   $ ebshell             (interactief)
+   $ ebshell < file      (batch, leest opdrachten uit file)
+   $ ebshell -c command  (single command)
 
 Voor commando's -> gebruik "help".
 
