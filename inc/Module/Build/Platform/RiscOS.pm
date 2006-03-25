@@ -1,4 +1,4 @@
-package Module::Build::Platform::MPEiX;
+package Module::Build::Platform::RiscOS;
 
 use strict;
 use Module::Build::Base;
@@ -13,7 +13,7 @@ __END__
 
 =head1 NAME
 
-Module::Build::Platform::MPEiX - Builder class for MPEiX platforms
+Module::Build::Platform::RiscOS - Builder class for RiscOS platforms
 
 =head1 DESCRIPTION
 
@@ -22,7 +22,7 @@ C<Module::Build::Base>.  Please see the L<Module::Build> for the docs.
 
 =head1 AUTHOR
 
-Ken Williams, ken@mathforum.org
+Ken Williams <ken@cpan.org>
 
 =head1 SEE ALSO
 

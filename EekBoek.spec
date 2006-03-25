@@ -1,5 +1,5 @@
 %define modname EekBoek
-%define modversion 0.51
+%define modversion 0.51a
 
 Name: %modname
 Version: %modversion

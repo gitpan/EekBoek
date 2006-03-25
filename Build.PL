@@ -2,12 +2,13 @@
 # Author          : Johan Vromans
 # Created On      : Thu Sep  1 17:28:26 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Fri Mar 24 14:36:58 2006
-# Update Count    : 57
+# Last Modified On: Sat Mar 25 12:19:32 2006
+# Update Count    : 80
 # Status          : Experimental
 
 use strict;
-use Module::Build;
+use lib 'inc';
+use Module::Build 0.27_09;
 use File::Find;
 
 our $data = {};
@@ -23,16 +24,6 @@ EOD
 # checkexec("psql");
 
 my $class = Module::Build->subclass(code => <<'EOF');
-sub ACTION_ivp {
-    my $self = shift;
-    eval { require IPC::Run3 };
-    if ( $IPC::Run3::VERSION ) {
-	system("prove -b t/90_ivp.t");
-    }
-    else {
-	die("Action 'ivp' skipped -- IPC::Run3 is missing\n");
-    }
-}
 sub ACTION_test {
     my $self = shift;
     if ( $self->args("skipdbtests") ) {
@@ -49,13 +40,27 @@ my $build = $class->new
    dist_name	       => $data->{distname},
    dist_author	       => $data->{author},
    dist_abstract       => $data->{abstract},
+   dist_version	       => "0.51a",
    license	       => $data->{license},
    requires	       => $data->{prereq_pm},
    recommends	       => $data->{recomm_pm},
    script_files	       => $data->{script_files},
    pm_files	       => filelist("lib"),
-#  create_makefile_pl  => 'traditional',
    get_options	       => { skipdbtests => { } },
+   add_to_cleanup      => [ 'pod2htm*',
+			    map { +"t/ivp/*.$_" }
+				qw(sql log txt html csv)
+			  ],
+   meta_merge	       =>
+     { resources =>
+	{
+	   homepage => 'http://www.squirrel.nl/eekboek',
+	   MailingList => 'http://lists.sourceforge.net/lists/listinfo/eekboek',
+	 }
+     },
+   meta_add            => {
+     no_index          => { dir => [ qw(inc) ] },
+   },
   );
 
 $build->create_build_script;

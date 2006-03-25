@@ -1,6 +1,28 @@
+0.52	
+
+	* Fix voor falende IVP als de database nog niet bestaat.
+
 0.51	24-02-2006
 
+	* Bouwen en installeren gaat nu middels het Module::Build framework.
 
+	  $ perl Build.PL
+	  $ ./Build
+	  $ ./Build test
+	  $ su
+	  # ./Build install
+
+	* Het Module::Build framework wordt (vooralsnog) meegeleverd.
+
+	* Een compatibility-mode Makefile.PL is meegeleverd.
+
+	* De installatie-verificatieprocedure is nu geïntegreerd in de build
+	  tests. 
+
+	* De build, test en installatie kan nu ook onder ActiveState Perl
+	  onder Windows.
+
+	* Fix probleem met ophalen database naam op remote database server.
 
 0.50	17-03-2006 19:34
 
