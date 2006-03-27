@@ -122,6 +122,11 @@ Aantekeningen
   RPM's kunnen allen worden gebruikt indien ze zijn aangemaakt op een
   identiek systeem, met identieke perl-configuratie.
 
+  Bij het bouwen vanuit de RPM worden de database tests standaard niet
+  uitgevoerd. Om ze toch uit te voeren, gebruik
+
+    $ rpmbuild ... --with dbtests ...
+
 * Je moet de mogelijkheid hebben om PostgreSQL databases aan te maken.
   Dat kun je bereiken met (veronderstel dat je user 'piet' bent):
 

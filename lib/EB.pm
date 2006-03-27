@@ -3,8 +3,8 @@
 # Author          : Johan Vromans
 # Created On      : Fri Sep 16 18:38:45 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Fri Mar 24 13:34:48 2006
-# Update Count    : 132
+# Last Modified On: Mon Mar 27 15:00:04 2006
+# Update Count    : 133
 # Status          : Unknown, Use with caution!
 
 our $app;
@@ -15,7 +15,7 @@ use strict;
 use base qw(Exporter);
 
 our $VERSION;
-$VERSION = "0.51";
+$VERSION = "0.52";
 
 our @EXPORT;
 our @EXPORT_OK;

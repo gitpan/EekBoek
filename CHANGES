@@ -1,6 +1,20 @@
-0.52	
+0.52	27-03-2006
 
-	* Fix voor falende IVP als de database nog niet bestaat.
+	* Wijzigingen in packaging t.b.v. RPM-build en CPAN.
+
+	* Database-tests kunnen worden uitgevoerd met een RPM-build:
+
+	   $ rpmbuild ... --with dbtests ...
+
+	* De source-RPM is getekend met mijn GPG key. Om de source-RPM te
+	  verifiëren moet je mijn GPG key in het rpm systeem importeren,
+	  bijvoorbeeld:
+
+	   $ wget http://www.squirrel.nl/people/jvromans/pubkey.asc
+	   $ sudo rpm --import pubkey.asc
+
+	* Fix probleem met aanmaken database op remote database server.
+	  Hierdoor faalt de IVP indien de database nog niet bestaat.
 
 0.51	24-02-2006
 

@@ -2,8 +2,8 @@
 # Author          : Johan Vromans
 # Created On      : Thu Sep  1 17:28:26 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Sat Mar 25 12:19:32 2006
-# Update Count    : 80
+# Last Modified On: Mon Mar 27 11:35:46 2006
+# Update Count    : 82
 # Status          : Experimental
 
 use strict;
@@ -12,7 +12,7 @@ use Module::Build 0.27_09;
 use File::Find;
 
 our $data = {};
-require "build_common.inc";
+require "inc/build_common.pl";
 
 # Warn on non-standard install locations.
 checkbin(<<EOD);
@@ -40,7 +40,6 @@ my $build = $class->new
    dist_name	       => $data->{distname},
    dist_author	       => $data->{author},
    dist_abstract       => $data->{abstract},
-   dist_version	       => "0.51a",
    license	       => $data->{license},
    requires	       => $data->{prereq_pm},
    recommends	       => $data->{recomm_pm},

@@ -1,5 +1,4 @@
 Build.PL
-build_common.inc
 CHANGES
 doc/html/bookings/bank.html
 doc/html/bookings/btw.html
@@ -164,8 +163,10 @@ t/ivp/ref/result2.txt
 t/ivp/relaties.eb
 t/ivp/reports.eb
 TODO
+inc/build_common.pl
 inc/Module/Build/Base.pm
 inc/Module/Build/Compat.pm
+inc/Module/Build/ConfigData.pm
 inc/Module/Build/Cookbook.pm
 inc/Module/Build/Platform/aix.pm
 inc/Module/Build/Platform/Amiga.pm
