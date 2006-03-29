@@ -3,6 +3,7 @@
 
 use strict;
 
+use EB::Config qw(EekBoek);
 use EB;
 
 my @tests1;

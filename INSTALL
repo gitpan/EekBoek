@@ -13,7 +13,7 @@ PostgreSQL (zit standaard in de meeste Linux systemen)
 
 Perl modules (zelf te installeren):
        DBD::Pg 1.41 of later
-       Term::ReadLine::Gnu
+       Term::ReadLine::Gnu (optioneel, maar aangeraden)
        Config::IniFiles
        (Text::CSV_XS voor de Exact importprogramma's)
 
@@ -23,20 +23,20 @@ Bouwen, verifiëren en installeren
 Voor het bouwen en installeren wordt gebruik gemaakt van het
 Module::Build framework. Deze wordt vooralsnog met de kit meegeleverd
 en hoeft niet afzonderlijk te worden geïnstalleerd.
+BOUW NOOIT ALS ROOT!
 
    $ perl Build.PL
-   $ Build
-   $ Build test
+   $ perl Build
 
-Afhankelijk van de systeeminstellingen kan het nodig zijn "./Build" te
-gebruiken, en/of "perl" ervoor te zetten.
-
-"Build test" vereist generieke toegang tot een draaiende PostgreSQL
+Het verifiëren vereist generieke toegang tot een draaiende PostgreSQL
 database server, alsmede de mogelijkheid om een database met de naam
-'eekboek_sample' aan te maken of te gebruiken. Indien nodig kunnen de
-environment variabelen PGHOST PGPORT en PGUSER worden toegepast; zie
-de PostgreSQL documentatie. Als het niet mogelijk is de database
-server te benaderen, gebruik dan
+'eekboek_sample' aan te maken of te gebruiken. Indien nodig kunnen
+daartoe de environment variabelen PGHOST PGPORT en PGUSER worden
+toegepast; zie de PostgreSQL documentatie.
+
+   $ perl Build test
+
+Als het niet mogelijk is de database server te benaderen, gebruik dan
 
    $ Build test --skipdbtests
 
@@ -58,52 +58,7 @@ is uitgevoerd.
 Wil je installeren:
 
    $ su
-   # ./Build install
-
-Installatie verwijderen:
-
-   Zoek uit waar de spullen zijn neergezet onder /usr/lib/perl5.
-   De gehele directory EB kun je weghalen, evenals EekBoek.pm, EB.pm
-   en het programma /usr/bin/ebshell.
-
-Bouwen, verifiëren en installeren (traditionele aanpak)
--------------------------------------------------------
-
-Let op: Deze wijze van bouwen maakt gebruik van de MakeMaker
-compatibility mode van het Module::Build framework. In wezen doe je
-dus hetzelfde als in de hiebovengeschetste "Build" aanpak.
-
-   $ perl Makefile.PL
-   $ make all
-   $ make test
-
-De laatste vereist generieke toegang tot een draaiende PostgreSQL
-database server, alsmede de mogelijkheid om een database met de naam
-'eekboek_sample' aan te maken of te gebruiken. Indien nodig kunnen de
-environment variabelen PGHOST PGPORT en PGUSER worden toegepast; zie
-de PostgreSQL documentatie. Als het niet mogelijk is de database
-server te benaderen, zet dan de environment variabele EB_SKIPDBTESTS
-op de waarde 1 alvorens de test uit te voeren.
-
-Zonder een succesvolle afronding van de testprocedure inclusief
-database tests heeft het echter weinig zin om verder te gaan.
-Raadpleeg in dat geval de .log files en eventueel de mailing list (zie
-verderop).
-
-Het is niet nodig om EekBoek te installeren om het te kunnen
-gebruiken. Het is dan wel noodzakelijk om de environment variabelen
-PERL5LIB en PATH op de juiste wijze op te zetten:
-
-   $ PERL5LIB=<eekboekdir>/blib/lib:$PERL5LIB; export PERL5LIB
-   $ PATH=<eekboekdir>/blib/script:$PATH; export PATH
-
-Hierin is <eekboekdir> de plaats waar eerder de make all en make test
-is uitgevoerd.
-
-Wil je installeren:
-
-   $ su
-   # make install
+   # perl Build install
 
 Installatie verwijderen:
 
@@ -127,7 +82,9 @@ Aantekeningen
 
     $ rpmbuild ... --with dbtests ...
 
-* Je moet de mogelijkheid hebben om PostgreSQL databases aan te maken.
+* Om EekBoek te kunnen gebruiken moet je de beschikking hebben over
+  een PostgreSQL database server en een database. EekBoek kan deze
+  database voor je aanmaken, maar dan moet je daartoe bevoegd zijn.
   Dat kun je bereiken met (veronderstel dat je user 'piet' bent):
 
    $ su 
@@ -137,6 +94,10 @@ Aantekeningen
    $ exit
 
   Raadpleeg anders je systeembeheerder.
+
+  Als je die bevoegdheid niet hebt, vraag dan de systeembeheerder om
+  een database voor je aan te maken. De naam van de database moet
+  beginnen met "eekboek_", bv. "eekboek_myadmin".
 
 * Voor het uitwisselen van ervaringen, vragen om ondersteuning en zo:
   gebruik de mailing list
