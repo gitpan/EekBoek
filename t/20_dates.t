@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-# $Id: dates.t,v 1.1 2005/09/30 08:16:22 jv Exp $
+# $Id: 20_dates.t,v 1.2 2006/03/29 19:58:01 jv Exp $
 
 use strict;
 

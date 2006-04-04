@@ -1,3 +1,53 @@
+0.54
+
+	* Aanvullende fixes voor UNICODE.
+
+	* EekBoek in UNICODE accepteert geen non-UNICODE (pre-0.52)
+          databases meer. Een database kan gemakkelijk worden
+          geconverteerd met:
+
+	   $ pg_dump eekboek_XXX > xx
+	   $ dropdb eekboek_XXX
+	   $ createdb -E unicode eekboek_XXX
+	   $ psql eekboek_XXX < xx
+
+0.53	29-03-2005
+
+	* UNICODE support.  ****EXPERIMENTEEL****
+
+	  Aanzetten met de EekBoek locale in de config file:
+
+	    [locale]
+	    unicode = 1
+
+	  of
+
+	    [locale]
+	    lang = nl_NL.utf8
+
+	  Elke suffix anders dan utf8 (of utf-8) wordt als latin1
+	  geïnterpreteerd.
+
+	  ("unicode" heeft prioriteit over "lang").
+
+	  Semantiek:
+
+	  - Alle geproduceerde uitvoer (scherm, maar ook rapporten, exports,
+	    etc) wordt in UTF-8 weggeschreven.
+	  - Alle invoerbestanden (schema, opening.eb, imports, etc) moeten
+	    UTF-8 zijn.
+
+	  Geen databasewijzigingen. Echter, alle met 0,53 aangemaakte
+	  databases zijn niet te verwerken met pre-0.53 versies.
+
+	  Zonder het aanzetten van UNICODE moet alles zijn zoals het was.
+
+	  Zoals gezegd, is e.e.a. nog een beetje experimenteel. Testresultaten
+	  en feedback wordt op prijs gesteld.
+
+	  Let op: De standaardbestanden (schema's en zo) zijn nog steeds
+	  Latin1.
+
 0.52	27-03-2006
 
 	* Wijzigingen in packaging t.b.v. RPM-build en CPAN.

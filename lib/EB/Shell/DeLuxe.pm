@@ -1,20 +1,25 @@
 #!/usr/bin/perl
 
-my $RCS_Id = '$Id: DeLuxe.pm,v 1.8 2006/02/08 15:23:13 jv Exp $ ';
+my $RCS_Id = '$Id: DeLuxe.pm,v 1.11 2006/04/04 09:55:19 jv Exp $ ';
 
 # Author          : Johan Vromans
 # Created On      : Thu Jul  7 15:53:48 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Wed Feb  8 16:18:42 2006
-# Update Count    : 200
+# Last Modified On: Fri Mar 31 10:54:00 2006
+# Update Count    : 214
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
+
+package main;
+
+our $cfg;
 
 package EB::Shell::DeLuxe;
 
 use strict;
 use base qw(EB::Shell::Base);
+use EB;
 
 sub new {
     my $class = shift;
@@ -52,14 +57,21 @@ sub readline_interactive {
     return $self->term->readline($prompt);
 }
 
+use Encode;
+
 sub readline_file {
     my ($self, $fd) = @_;
-
+    # binmode($fd, ":utf8") conflicts with UNICODE checking.
+    #binmode($fd, ":utf8") if $cfg->unicode;
     my $line;
     my $pre = "";
     while ( 1 ) {
 	$line = <$fd>;
 	return unless $line;
+	if ( $cfg->unicode && !decode_utf8($line) ) {
+	    warn("?".__x("Geen geldige UNICODE tekens in regel {line} van de invoer",
+			 line => $.)."\n");
+	}
 	if ( $self->{echo} ) {
 	    my $pr = $self->{echo};
 	    $pr =~ s/\>/>>/ if $pre;

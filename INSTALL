@@ -13,20 +13,67 @@ PostgreSQL (zit standaard in de meeste Linux systemen)
 
 Perl modules (zelf te installeren):
        DBD::Pg 1.41 of later
-       Term::ReadLine::Gnu (optioneel, maar aangeraden)
        Config::IniFiles
        (Text::CSV_XS voor de Exact importprogramma's)
 
-Bouwen, verifiëren en installeren
----------------------------------
+De volgende Perl modules zijn optioneel, maar worden sterk aangeraden
+vanwege de extra functionaliteit:
+
+       Term::ReadLine::Gnu
+       HTML::Entities 1.32
+
+Installeren (RPM systemen)
+--------------------------
+
+Installeer, indien nodig, mijn GPG key:
+
+  $ sudo rpm --import http://www.squirrel.nl/people/jvromans/pubkey.asc
+
+Download de EekBoek-x.yy-z.noarch.rpm.
+Verifieer de kit:
+
+  $ rpm -K EekBoek-x.yy-z.noarch.rpm
+
+Let op dat alle verificaties, inclusief gpg, OK zijn.
+Installeer:
+
+  $ sudo rpm -Uvh EekBoek-x.yy-z.noarch.rpm
+
+Installeren (Debian systemen)
+-----------------------------
+
+Download de EekBoek-x.yy-z.noarch.rpm.
+
+Installeer alien, indien nodig:
+
+  $ sudo apt-get install alien
+
+Dan:
+
+  $ sudo alien -di EekBoek-x.yy-z.noarch.rpm
+
+De -d staat voor "maak een deb aan".
+De -i staat voor "installeer hem en verwijder de deb".
+
+Installeren (Windows systemen)
+------------------------------
+
+Zie README.WINDOWS.
+
+Bouwen, verifiëren en installeren vanaf source
+----------------------------------------------
 
 Voor het bouwen en installeren wordt gebruik gemaakt van het
 Module::Build framework. Deze wordt vooralsnog met de kit meegeleverd
 en hoeft niet afzonderlijk te worden geïnstalleerd.
 BOUW NOOIT ALS ROOT!
 
-   $ perl Build.PL
-   $ perl Build
+Pak de kit uit en cd naar de uitpakdirectory.
+
+  $ tar -zxf EekBoek-x.yy.tar.gz
+  $ cd EekBoek-x.yy
+  $ perl Build.PL
+  $ perl Build
 
 Het verifiëren vereist generieke toegang tot een draaiende PostgreSQL
 database server, alsmede de mogelijkheid om een database met de naam
@@ -34,11 +81,11 @@ database server, alsmede de mogelijkheid om een database met de naam
 daartoe de environment variabelen PGHOST PGPORT en PGUSER worden
 toegepast; zie de PostgreSQL documentatie.
 
-   $ perl Build test
+  $ perl Build test
 
 Als het niet mogelijk is de database server te benaderen, gebruik dan
 
-   $ Build test --skipdbtests
+  $ Build test --skipdbtests
 
 Zonder een succesvolle afronding van de testprocedure inclusief
 database tests heeft het echter weinig zin om verder te gaan.
@@ -49,16 +96,15 @@ Het is niet nodig om EekBoek te installeren om het te kunnen
 gebruiken. Het is dan wel noodzakelijk om de environment variabelen
 PERL5LIB en PATH op de juiste wijze op te zetten:
 
-   $ PERL5LIB=<eekboekdir>/blib/lib:$PERL5LIB; export PERL5LIB
-   $ PATH=<eekboekdir>/blib/script:$PATH; export PATH
+  $ PERL5LIB=<eekboekdir>/blib/lib:$PERL5LIB; export PERL5LIB
+  $ PATH=<eekboekdir>/blib/script:$PATH; export PATH
 
 Hierin is <eekboekdir> de plaats waar eerder de make all en make test
 is uitgevoerd.
 
 Wil je installeren:
 
-   $ su
-   # perl Build install
+   $ sudo perl Build install
 
 Installatie verwijderen:
 
@@ -72,10 +118,6 @@ Aantekeningen
 * Liefhebbers van RPM kunnen de meeegeleverde EekBoek.spec file
   gebruiken, of een .src.rpm downloaden van de SourceForge site,
   http://sourceforge.net/project/showfiles.php?group_id=154512 .
-
-  Let op: Perl RPM's moet je altijd op je eigen systeem bouwen! Binary
-  RPM's kunnen allen worden gebruikt indien ze zijn aangemaakt op een
-  identiek systeem, met identieke perl-configuratie.
 
   Bij het bouwen vanuit de RPM worden de database tests standaard niet
   uitgevoerd. Om ze toch uit te voeren, gebruik
@@ -109,5 +151,5 @@ ZIE OOK DE ON-LINE DOCUMENTATIE http://www.squirrel.nl/eekboek/docs/ .
 Johan Vromans                                           jvromans@squirrel.nl
 Squirrel Consultancy                                  Exloo, the Netherlands
 http://www.squirrel.nl                              http://johan.vromans.org
-PGP Key 2048/4783B14D                   http://johan.vromans.org/pgpkey.html
+PGP Key 1024D/1298C2B4                  http://johan.vromans.org/pgpkey.html
 ----------------------- "Arms are made for hugging" ------------------------

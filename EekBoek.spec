@@ -1,10 +1,10 @@
 %define modname EekBoek
 %define lcname eekboek
-%define modversion 0.53
+%define modversion 0.54
 
 Name: %modname
 Version: %modversion
-Release: 2
+Release: 1
 Source: http://www.squirrel.nl/eekboek/dl/%{name}-%{version}.tar.gz
 BuildArch: noarch
 URL: http://www.squirrel.nl/eekboek/

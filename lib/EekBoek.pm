@@ -1,6 +1,6 @@
 package EekBoek;
 
-$VERSION = '0.53';
+$VERSION = '0.54';
 
 # NOTE: This is a documentation-only module.
 
