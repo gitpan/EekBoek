@@ -1,10 +1,10 @@
 # Html.pm -- 
-# RCS Info        : $Id: Html.pm,v 1.6 2006/04/04 09:55:45 jv Exp $
+# RCS Info        : $Id: Html.pm,v 1.8 2006/04/04 13:21:58 jv Exp $
 # Author          : Johan Vromans
 # Created On      : Thu Dec 29 15:46:47 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Fri Mar 31 14:13:14 2006
-# Update Count    : 33
+# Last Modified On: Tue Apr  4 15:21:41 2006
+# Update Count    : 37
 # Status          : Unknown, Use with caution!
 
 package main;
@@ -16,6 +16,7 @@ package EB::Report::Reporter::Html;
 use strict;
 use warnings;
 use EB;
+use EB::Finance qw(datefmt_full);
 
 use base qw(EB::Report::Reporter);
 
@@ -45,7 +46,7 @@ sub finish {
 
     $self->{fh}->print("<p class=\"footer\">",
 		       __x("Overzicht aangemaakt op {date} door <a href=\"{url}\">{ident}</a>",
-			   ident => $ident, date => $now, url => $EB::url), "</p>\n");
+			   ident => $ident, date => datefmt_full($now), url => $EB::url), "</p>\n");
     $self->{fh}->print("</body>\n",
 		       "</html>\n");
     close($self->{fh});
@@ -119,6 +120,7 @@ sub __html {
     $t =~ s/</&lt;/g;
     $t =~ s/>/&gt;/g;
     $t =~ s/\240/&nbsp;/g;
+    $t =~ s/\x{eb}/&euml;/g;	# for IVP.
     $t;
 }
 

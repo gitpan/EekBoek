@@ -199,9 +199,22 @@ toekomstige versie komen te vervallen.</p>
     <td>Deze variable kan worden gebruikt om de door EekBoek te
 	gebruiken taal (locale) te selecteren.<br>Standaard wordt de
 	instelling van het systeem overgenomen.
+	<br>De waarde is doorgaans een string als
+	<code>nl_NL.iso8859-1</code> of <code>nl_NL.utf8</code>. Als
+	de tekensetaanduiding <code>utf8</code> is, zal EekBoek alle
+	invoer en uitvoer in Unicode verzorgen. In alle andere
+	gevallen vindt in- en uitvoer in ISO-8859-1 (Latin1) plaats.
 	<br>Fallback: <code>EB_LANG</code>.
 	<br><em>Taalinstelling is alleen effectief in de
 	internationale versie van EekBoek, en niet in de standaardversie.
+    </td>
+  </tr>
+  <tr valign="top">
+    <td><a name="locale_unicode"></a><code>unicode</code></td>
+    <td>Deze variable kan worden gebruikt om expliciet aan te geven dat
+	EekBoek UNICODE moet gebruiken. 
+	<br>Deze variabele heeft voorrang boven de waarde van
+	<code>lang</code>.
     </td>
   </tr>
   <tr valign="top">
@@ -295,6 +308,24 @@ toekomstige versie komen te vervallen.</p>
   </tr>
 </table>
 
+<p><a name="text"></a><b>Sectie "Format"</b></p>
+
+<table border="1" width="100%" cellpadding="5">
+  <tr valign="top">
+    <td><a name="format_date"></a><code>date</code></td>
+    <td>De vorm waarin datums moeten worden getoond.
+	<br>De volgende vormen zijn mogelijk:
+	<table border="0" width="100%">
+	  <tr valign="top"><td><code>YYYY-MM-DD</code></td><td>&nbsp;</td><td>ISO standaardvorm.</tr>
+	  <tr valign="top"><td><code>DD-MM-YYYY</code></td><td>&nbsp;</td><td>NEN standaardvorm.</tr>
+	  <tr valign="top"><td><code>DD-MM</code></td><td>&nbsp;</td><td>Verkorte NEN standaardvorm.<br>In dit
+	geval zullen, waar nodig, de datums toch compleet met jaartal
+	worden weergegeven.</tr>
+	</table>
+    </td>
+  </tr>
+</table>
+
 <p><a name="text"></a><b>Sectie "Text"</b></p>
 
 <table border="1" width="100%" cellpadding="5">
@@ -363,7 +394,7 @@ ongewenste problemen leiden.</em></p>
 
   <tr valign="bottom">
     <td valign="middle">
-      <a href="http://www.perl.org/"><img src="images/perl_powered.png" alt="Powered by Perl" border="0" width="134" height="48" /></a>
+      <a href="http://www.perl.org/"><a href="http://www.perl.org/"><img src="images/perl_powered.png" alt="Powered by Perl" border="0" width="134" height="48" /></a></a>
 
     </td>
     <td align="center">
@@ -371,7 +402,7 @@ ongewenste problemen leiden.</em></p>
 Deze site is gemaakt met de 
 <a href='http://www.squirrel.nl/people/jvromans/tt2site/'>TT2Site
 Site Builder</a>.<br />
-config.html laatste aanpassing 06 maart 2006, 16:37:15
+config.html laatste aanpassing 04 april 2006, 14:07:59
 </p>
 
     </td>

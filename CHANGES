@@ -1,15 +1,36 @@
+0.55
+
+	* Instelbaar datumformaat.
+
+	  In de config file:
+
+	     [format]
+	     date = yyyy-mm-dd
+
+	  Mogelijke formaten zijn: YYYY-MM-DD (default), DD-MM-YYY en
+	  DD-MM. In het laatste geval wordt, waar nodig, het formaat
+	  aangevuld tot DD-MM-YYYY.
+
 0.54
 
 	* Aanvullende fixes voor UNICODE.
 
-	* EekBoek in UNICODE accepteert geen non-UNICODE (pre-0.52)
-          databases meer. Een database kan gemakkelijk worden
+	  Bestanden worden gecontroleerd op valide UNICODE tekens.
+
+	  Non-UNICODE databases worden geweigerd indien UNICODE is
+	  geactiveerd. Een database kan gemakkelijk worden
           geconverteerd met:
 
 	   $ pg_dump eekboek_XXX > xx
 	   $ dropdb eekboek_XXX
 	   $ createdb -E unicode eekboek_XXX
 	   $ psql eekboek_XXX < xx
+
+	  Let op: De standaardbestanden (schema's en zo) zijn nog steeds
+	  Latin1.
+
+	* De HTML uitvoer kan gebruik maken van de module HTML::Entities,
+	  indien deze is geïnstalleerd.
 
 0.53	29-03-2005
 
