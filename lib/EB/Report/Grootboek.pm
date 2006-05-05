@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-my $RCS_Id = '$Id: Grootboek.pm,v 1.24 2006/04/04 13:12:41 jv Exp $ ';
+my $RCS_Id = '$Id: Grootboek.pm,v 1.26 2006/05/05 15:35:31 jv Exp $ ';
 
 package main;
 
@@ -13,8 +13,8 @@ package EB::Report::Grootboek;
 # Author          : Johan Vromans
 # Created On      : Wed Jul 27 11:58:52 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Tue Apr  4 13:35:47 2006
-# Update Count    : 244
+# Last Modified On: Thu May  4 15:49:16 2006
+# Update Count    : 248
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -26,7 +26,7 @@ use warnings;
 
 use EB;
 use EB::DB;
-use EB::Finance;
+use EB::Format;
 use EB::Report::GenBase;
 use EB::Report;
 
@@ -71,10 +71,8 @@ sub perform {
 			     (" WHERE acc_id IN ($sel)") :
 			     (" WHERE acc_ibalance <> 0".
 			      " OR acc_id in".
-			      "  ( SELECT DISTINCT jnl_acc_id FROM Journal )".
-		#	      " OR acc_id in".
-		#	      "  ( SELECT DISTINCT bkb_acc_id FROM Boekjaarbalans )".
-			      " ORDER BY acc_id")));
+			      "  ( SELECT DISTINCT jnl_acc_id FROM Journal )")).
+			      " ORDER BY acc_id");
 
     my $dgrand = 0;
     my $cgrand = 0;

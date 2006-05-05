@@ -8,6 +8,8 @@ use vars qw(@ISA);
 
 sub manpage_separator { '.' }
 
+sub have_forkpipe { 0 }
+
 1;
 __END__
 

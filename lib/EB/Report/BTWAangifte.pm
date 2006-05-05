@@ -1,11 +1,11 @@
 #!/usr/bin/perl -w
-my $RCS_Id = '$Id: BTWAangifte.pm,v 1.33 2006/04/04 13:12:31 jv Exp $ ';
+my $RCS_Id = '$Id: BTWAangifte.pm,v 1.35 2006/04/15 09:08:35 jv Exp $ ';
 
 # Author          : Johan Vromans
 # Created On      : Tue Jul 19 19:01:33 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Tue Apr  4 13:08:20 2006
-# Update Count    : 466
+# Last Modified On: Sat Apr 15 10:57:48 2006
+# Update Count    : 470
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -20,7 +20,8 @@ package EB::Report::BTWAangifte;
 use strict;
 
 use EB;
-use EB::Finance;
+use EB::Format;
+use EB::Booking;		# for norm_btw()
 
 use POSIX qw(floor ceil);
 
@@ -345,7 +346,7 @@ sub collect {
 	if ( $btw_id && $btw_acc ) {
 	    # Bepaal tariefgroep en splits bedrag uit.
 	    $btg_id = $dbh->lookup($btw_id, qw(BTWTabel btw_id btw_tariefgroep));
-	    my $a = EB::Finance::norm_btw($amt, $btw_id);
+	    my $a = EB::Booking::->norm_btw($amt, $btw_id);
 	    $amt = $a->[0] - ($btw = $a->[1]); # ex BTW
 	}
 
@@ -652,6 +653,8 @@ package EB::Report::BTWAangifte::Text;
 
 use strict;
 use EB;
+use EB::Format qw($amount_width);
+
 use base qw(EB::Report::GenBase);
 
 sub new {
@@ -678,7 +681,7 @@ sub outline {
 	return;
     }
 
-    my $w = $EB::Finance::amount_width + 1;
+    my $w = $amount_width + 1;
     $self->{fh}->printf("%-5s%-40s%${w}s%${w}s\n",
 			$tag0, $tag1,
 			defined($sub) ? $sub : "",

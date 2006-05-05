@@ -1,4 +1,7 @@
-0.55
+0.56
+
+
+0.55	04-04-2006 15:22
 
 	* Instelbaar datumformaat.
 
@@ -11,7 +14,7 @@
 	  DD-MM. In het laatste geval wordt, waar nodig, het formaat
 	  aangevuld tot DD-MM-YYYY.
 
-0.54
+0.54	  04-04-2006 12:01
 
 	* Aanvullende fixes voor UNICODE.
 
@@ -32,7 +35,7 @@
 	* De HTML uitvoer kan gebruik maken van de module HTML::Entities,
 	  indien deze is geïnstalleerd.
 
-0.53	29-03-2005
+0.53	29-03-2005 20:35
 
 	* UNICODE support.  ****EXPERIMENTEEL****
 
@@ -69,7 +72,7 @@
 	  Let op: De standaardbestanden (schema's en zo) zijn nog steeds
 	  Latin1.
 
-0.52	27-03-2006
+0.52	27-03-2006 15:21
 
 	* Wijzigingen in packaging t.b.v. RPM-build en CPAN.
 
@@ -87,7 +90,7 @@
 	* Fix probleem met aanmaken database op remote database server.
 	  Hierdoor faalt de IVP indien de database nog niet bestaat.
 
-0.51	24-02-2006
+0.51	24-02-2006 15:03
 
 	* Bouwen en installeren gaat nu middels het Module::Build framework.
 

@@ -79,7 +79,7 @@ lib/EB/DB.pm
 lib/EB/DB/Postgres.pm
 lib/EB/Export.pm
 lib/EB/Expression.pm
-lib/EB/Finance.pm
+lib/EB/Format.pm
 lib/EB/Globals.pm
 lib/EB/Import.pm
 lib/EB/Locale.pm
@@ -125,6 +125,7 @@ META.yml
 QUICKSTART
 README
 README.WINDOWS
+script/ebgui
 script/ebshell
 t/10_basic.t
 t/20_dates.t
@@ -187,6 +188,7 @@ inc/Module/Build/PPMMaker.pm
 inc/Module/Build/Authoring.pod
 inc/Module/Build/ModuleInfo.pm
 inc/Module/Build/Notes.pm
+inc/Module/Build/YAML.pm
 inc/Module/Build.pm
 inc/IPC/Run3/ProfPP.pm
 inc/IPC/Run3/ProfLogger.pm

@@ -2,6 +2,8 @@ package Module::Build::Base;
 
 use strict;
 BEGIN { require 5.00503 }
+
+use Carp;
 use Config;
 use File::Copy ();
 use File::Find ();
@@ -12,7 +14,6 @@ use File::Compare ();
 use Data::Dumper ();
 use IO::File ();
 use Text::ParseWords ();
-use Carp ();
 
 use Module::Build::ModuleInfo;
 use Module::Build::Notes;
@@ -315,86 +316,220 @@ sub cwd {
   return Cwd::cwd();
 }
 
-sub _perl_is_same {
-  my ($self, $perl) = @_;
-  return `$perl -MConfig=myconfig -e print -e myconfig` eq Config->myconfig;
+sub _quote_args {
+  # Returns a string that can become [part of] a command line with
+  # proper quoting so that the subprocess sees this same list of args.
+  my ($self, @args) = @_;
+
+  my $return_args = '';
+  my @quoted;
+
+  for (@args) {
+    if ( /^[^\s*?!$<>;\\|'"\[\]\{\}]+$/ ) {
+      # Looks pretty safe
+      push @quoted, $_;
+    } else {
+      # XXX this will obviously have to improve - is there already a
+      # core module lying around that does proper quoting?
+      s/"/"'"'"/g;
+      push @quoted, qq("$_");
+    }
+  }
+
+  return join " ", @quoted;
 }
 
-sub find_perl_interpreter {
-  return $^X if File::Spec->file_name_is_absolute($^X);
-  my $proto = shift;
-  my $c = ref($proto) ? $proto->config : \%Config::Config;
-  my $exe = $c->{exe_ext};
+sub _backticks {
+  my ($self, @cmd) = @_;
+  if ($self->have_forkpipe) {
+    local *FH;
+    my $pid = open FH, "-|";
+    if ($pid) {
+      return wantarray ? <FH> : join '', <FH>;
+    } else {
+      die "Can't execute @cmd: $!\n" unless defined $pid;
+      exec { $cmd[0] } @cmd;
+    }
+  } else {
+    my $cmd = $self->_quote_args(@cmd);
+    return `$cmd`;
+  }
+}
 
-  my $thisperl = $^X;
-  if ($proto->os_type eq 'VMS') {
-    # VMS might have a file version at the end
-    $thisperl .= $exe unless $thisperl =~ m/$exe(;\d+)?$/i;
-  } elsif (defined $exe) {
-    $thisperl .= $exe unless $thisperl =~ m/$exe$/i;
+sub have_forkpipe { 1 }
+
+# Determine whether a given binary is the same as the perl
+# (configuration) that started this process.
+sub _perl_is_same {
+  my ($self, $perl) = @_;
+
+  my @cmd = ($perl);
+
+  # When run from the perl core, @INC will include the directories
+  # where perl is yet to be installed. We need to reference the
+  # absolute path within the source distribution where it can find
+  # it's Config.pm This also prevents us from picking up a Config.pm
+  # from a different configuration that happens to be already
+  # installed in @INC.
+  if ($ENV{PERL_CORE}) {
+    push @cmd, '-I' . File::Spec->catdir(File::Basename::dirname($perl), 'lib');
   }
 
-  my $uninstperl;
+  push @cmd, qw(-MConfig=myconfig -e print -e myconfig);
+  return $self->_backticks(@cmd) eq Config->myconfig;
+}
+
+# Returns the absolute path of the perl interperter used to invoke
+# this process. The path is derived from $^X or $Config{perlpath}. On
+# some platforms $^X contains the complete absolute path of the
+# interpreter, on other it may contain a relative path, or simply
+# 'perl'. This can also vary depending on whether a path was supplied
+# when perl was invoked. Additionally, the value in $^X may omit the
+# executable extension on platforms that use one. It's a fatal error
+# if the interpreter can't be found because it can result in undefined
+# behavior by routines that depend on it (generating errors or
+# invoking the wrong perl.
+sub find_perl_interpreter {
+  my $proto = shift;
+  my $c     = ref($proto) ? $proto->config : \%Config::Config;
+
+  my $perl  = $^X;
+  my $perl_basename = File::Basename::basename($perl);
+
+  my @potential_perls;
+
+  # Try 1, Check $^X for absolute path
+  push( @potential_perls, $perl )
+      if File::Spec->file_name_is_absolute($perl);
+
+  # Try 2, Check $^X for a valid relative path
+  my $abs_perl = File::Spec->rel2abs($perl);
+  push( @potential_perls, $abs_perl );
+
+  # Try 3, Last ditch effort: These two option use hackery to try to locate
+  # a suitable perl. The hack varies depending on whether we are running
+  # from an installed perl or an uninstalled perl in the perl source dist.
   if ($ENV{PERL_CORE}) {
+
+    # Try 3.A, If we are in a perl source tree, running an uninstalled
+    # perl, we can keep moving up the directory tree until we find our
+    # binary. We wouldn't do this under any other circumstances.
+
     # CBuilder is also in the core, so it should be available here
     require ExtUtils::CBuilder;
-    $uninstperl = File::Spec->catfile(ExtUtils::CBuilder::->perl_src, $thisperl);
+    my $perl_src = ExtUtils::CBuilder->perl_src;
+    if ( defined($perl_src) && length($perl_src) ) {
+      my $uninstperl =
+        File::Spec->rel2abs(File::Spec->catfile( $perl_src, $perl_basename ));
+      push( @potential_perls, $uninstperl );
+    }
+
+  } else {
+
+    # Try 3.B, First look in $Config{perlpath}, then search the users
+    # PATH. We do not want to do either if we are running from an
+    # uninstalled perl in a perl source tree.
+
+    push( @potential_perls, $c->{perlpath} );
+
+    push( @potential_perls,
+          map File::Spec->catfile($_, $perl_basename), File::Spec->path() );
   }
 
-  foreach my $perl ( $uninstperl || (),
-                     $c->{perlpath},
-		     map File::Spec->catfile($_, $thisperl), File::Spec->path()
-		   ) {
-    return $perl if -f $perl and $proto->_perl_is_same($perl);
+  # Now that we've enumerated the potential perls, it's time to test
+  # them to see if any of them match our configuration, returning the
+  # absolute path of the first successful match.
+  my $exe = $c->{exe_ext};
+  foreach my $thisperl ( @potential_perls ) {
+
+    if ($proto->os_type eq 'VMS') {
+      # VMS might have a file version at the end
+      $thisperl .= $exe unless $thisperl =~ m/$exe(;\d+)?$/i;
+    } elsif (defined $exe) {
+      $thisperl .= $exe unless $thisperl =~ m/$exe$/i;
+    }
+
+    if ( -f $thisperl && $proto->_perl_is_same($thisperl) ) {
+      return $thisperl;
+    }
   }
-  return;
+
+  # We've tried all alternatives, and didn't find a perl that matches
+  # our configuration. Throw an exception, and list alternatives we tried.
+  my @paths = map File::Basename::dirname($_), @potential_perls;
+  die "Can't locate the perl binary used to run this script " .
+      "in (@paths)\n";
 }
 
 sub _is_interactive {
   return -t STDIN && (-t STDOUT || !(-f STDOUT || -c STDOUT)) ;   # Pipe?
 }
 
+sub _is_unattended {
+  my $self = shift;
+  return $ENV{PERL_MM_USE_DEFAULT} || ( !$self->_is_interactive && eof STDIN );
+}
+
+sub _readline {
+  my $self = shift;
+  return undef if $self->_is_unattended;
+
+  my $answer = <STDIN>;
+  chomp $answer if defined $answer;
+  return $answer;
+}
+
 sub prompt {
   my $self = shift;
-  my ($mess, $def) = @_;
-  die "prompt() called without a prompt message" unless @_;
-  
+  my $mess = shift
+    or die "prompt() called without a prompt message";
+
+  my $def;
+  if ( $self->_is_unattended && !@_ ) {
+    die <<EOF;
+ERROR: This build seems to be unattended, but there is no default value
+for this question.  Aborting.
+EOF
+  }
+  $def = shift if @_;
   ($def, my $dispdef) = defined $def ? ($def, "[$def] ") : ('', ' ');
 
-  {
-    local $|=1;
-    print "$mess $dispdef";
-  }
-  my $ans;
-  if ( ! $ENV{PERL_MM_USE_DEFAULT} &&
-       ( $self->_is_interactive || ! eof STDIN ) ) {
-    $ans = <STDIN>;
-    if ( defined $ans ) {
-      chomp $ans;
-    } else { # user hit ctrl-D
-      print "\n";
-    }
-  }
-  
-  unless (defined($ans) and length($ans)) {
+  local $|=1;
+  print "$mess $dispdef";
+
+  my $ans = $self->_readline();
+
+  if ( !defined($ans) ) {     # Ctrl-D
+    print "\n";
+  } elsif ( !length($ans) ) { # Default
     print "$def\n";
     $ans = $def;
   }
-  
+
   return $ans;
 }
 
 sub y_n {
   my $self = shift;
-  die "y_n() called without a prompt message" unless @_;
-  die "y_n() called without y or n default" unless ($_[1]||"")=~/^[yn]/i;
+  my ($mess, $def)  = @_;
 
-  my $interactive = $self->_is_interactive;
+  die "y_n() called without a prompt message" unless $mess;
+  die "Invalid default value: y_n() default must be 'y' or 'n'"
+    if $def && $def !~ /^[yn]/i;
+
+  if ( $self->_is_unattended && !$def ) {
+    die <<EOF;
+ERROR: This build seems to be unattended, but there is no default value
+for this question.  Aborting.
+EOF
+  }
+
   my $answer;
-  while (1) {
+  while (1) { # XXX Infinite or a large number followed by an exception ?
     $answer = $self->prompt(@_);
     return 1 if $answer =~ /^y/i;
     return 0 if $answer =~ /^n/i;
+    local $|=1;
     print "Please answer 'y' or 'n'.\n";
   }
 }
@@ -620,6 +755,7 @@ __PACKAGE__->add_property(installdirs => 'site');
 __PACKAGE__->add_property(metafile => 'META.yml');
 __PACKAGE__->add_property(recurse_into => []);
 __PACKAGE__->add_property(use_rcfile => 1);
+__PACKAGE__->add_property(create_packlist => 1);
 
 {
   my $Is_ActivePerl = eval {require ActivePerl::DocTools};
@@ -1159,7 +1295,7 @@ sub _added_to_INC {
     
     my $perl = ref($self) ? $self->perl : $self->find_perl_interpreter;
     
-    my @inc = `$perl -le "print for \@INC"`;
+    my @inc = $self->_backticks($perl, '-le', 'print for @INC');
     chomp @inc;
     
     return @default_inc = @inc;
@@ -1235,8 +1371,7 @@ close(*DATA) unless eof(*DATA); # ensure no open handles to this script
 use $build_package;
 
 # Some platforms have problems setting \$^X in shebang contexts, fix it up here
-\$^X = Module::Build->find_perl_interpreter
-  unless File::Spec->file_name_is_absolute(\$^X);
+\$^X = Module::Build->find_perl_interpreter;
 
 if (-e 'Build.PL' and not $build_package->up_to_date('Build.PL', \$progname)) {
    warn "Warning: Build.PL has been altered.  You may need to run 'perl Build.PL' again.\\n";
@@ -1549,15 +1684,30 @@ sub _merge_arglist {
   return %new_opts;
 }
 
-# Look for a home directory on various systems.  CPANPLUS does something like this.
+# Look for a home directory on various systems.
 sub _home_dir {
-  my @os_home_envs = qw( APPDATA HOME USERPROFILE WINDIR SYS$LOGIN );
-  
-  foreach ( @os_home_envs ) {
-    return $ENV{$_} if exists $ENV{$_} && defined $ENV{$_} && length $ENV{$_} && -d $ENV{$_};
+  my @home_dirs;
+  push( @home_dirs, $ENV{HOME} ) if $ENV{HOME};
+
+  push( @home_dirs, File::Spec->catpath($ENV{HOMEDRIVE}, $ENV{HOMEPATH}, '') )
+      if $ENV{HOMEDRIVE} && $ENV{HOMEPATH};
+
+  my @other_home_envs = qw( USERPROFILE APPDATA WINDIR SYS$LOGIN );
+  push( @home_dirs, map $ENV{$_}, grep $ENV{$_}, @other_home_envs );
+
+  my @real_home_dirs = grep -d, @home_dirs;
+
+  return wantarray ? @real_home_dirs : shift( @real_home_dirs );
+}
+
+sub _find_user_config {
+  my $self = shift;
+  my $file = shift;
+  foreach my $dir ( $self->_home_dir ) {
+    my $path = File::Spec->catfile( $dir, $file );
+    return $path if -e $path;
   }
-  
-  return;
+  return undef;
 }
 
 # read ~/.modulebuildrc returning global options '*' and
@@ -1578,10 +1728,8 @@ sub read_modulebuildrc {
 		    "No options loaded\n");
     return ();
   } else {
-    my $home = $self->_home_dir;
-    return () unless defined $home;
-    $modulebuildrc = File::Spec->catfile( $home, '.modulebuildrc' );
-    return () unless -e $modulebuildrc;
+    $modulebuildrc = $self->_find_user_config( '.modulebuildrc' );
+    return () unless $modulebuildrc;
   }
 
   my $fh = IO::File->new( $modulebuildrc )
@@ -2015,7 +2163,7 @@ sub process_script_files {
   
   foreach my $file (keys %$files) {
     my $result = $self->copy_if_modified($file, $script_dir, 'flatten') or next;
-    $self->fix_shebang_line($result);
+    $self->fix_shebang_line($result) unless $self->os_type eq 'VMS';
     $self->make_executable($result);
   }
 }
@@ -2102,6 +2250,7 @@ sub _find_file_by_type {
 
 sub localize_file_path {
   my ($self, $path) = @_;
+  $path =~ s/\.\z// if $self->os_type eq 'VMS';
   return File::Spec->catfile( split m{/}, $path );
 }
 
@@ -2609,12 +2758,19 @@ sub ACTION_dist {
 
 sub ACTION_distcheck {
   my ($self) = @_;
-  
+
   require ExtUtils::Manifest;
   local $^W; # ExtUtils::Manifest is not warnings clean.
   my ($missing, $extra) = ExtUtils::Manifest::fullcheck();
-  die "MANIFEST appears to be out of sync with the distribution\n"
-    if @$missing || @$extra;
+
+  return unless @$missing || @$extra;
+
+  my $msg = "MANIFEST appears to be out of sync with the distribution\n";
+  if ( $self->invoked_action eq 'distcheck' ) {
+    die $msg;
+  } else {
+    warn $msg;
+  }
 }
 
 sub _add_to_manifest {
@@ -2794,8 +2950,6 @@ sub ACTION_distdir {
   
   foreach my $file (keys %$dist_files) {
     my $new = $self->copy_if_modified(from => $file, to_dir => $dist_dir, verbose => 0);
-    chmod +(stat $file)[2], $new
-      or $self->log_warn("Couldn't set permissions on $new: $!");
   }
   
   $self->_sign_dir($dist_dir) if $self->{properties}{sign};
@@ -2847,6 +3001,7 @@ sub _write_default_maniskip {
 
 # Avoid Module::Build generated and utility files.
 \bBuild$
+\bBuild.bat$
 \b_build
 
 # Avoid Devel::Cover generated files
@@ -2969,44 +3124,6 @@ sub _hash_merge {
   }
 }
 
-sub _yaml_quote_string {
-  # XXX doesn't handle embedded newlines
-
-  my ($self, $string) = @_;
-  if ($string !~ /\"/) {
-    $string =~ s{\\}{\\\\}g;
-    return qq{"$string"};
-  } else {
-    $string =~ s{([\\'])}{\\$1}g;
-    return qq{'$string'};
-  }
-}
-
-sub _write_minimal_metadata {
-  my $self = shift;
-  my $p = $self->{properties};
-
-  my $file = $self->metafile;
-  my $fh = IO::File->new("> $file")
-    or die "Can't open $file: $!";
-
-  my @author = map $self->_yaml_quote_string($_), @{$self->dist_author};
-  my $abstract = $self->_yaml_quote_string($self->dist_abstract);
-
-  # XXX Add the meta_add & meta_merge stuff
-
-  print $fh <<"EOF";
---- #YAML:1.0
-name: $p->{dist_name}
-version: $p->{dist_version}
-author:
-@{[ join "\n", map "  - $_", @author ]}
-abstract: $abstract
-license: $p->{license}
-generated_by: Module::Build version $Module::Build::VERSION, without YAML.pm
-EOF
-}
-
 sub ACTION_distmeta {
   my ($self) = @_;
 
@@ -3061,26 +3178,31 @@ sub write_metafile {
     $self->{wrote_metadata} = $yaml_sub->($metafile, $node );
 
   } else {
-    $self->log_warn(<<EOF);
-
-Couldn't load YAML.pm, generating a minimal META.yml without it.
-Please check and edit the generated metadata, or consider installing YAML.pm.
-
-EOF
-
-    $self->_write_minimal_metadata;
+    require Module::Build::YAML;
+    my (%node, @order_keys);
+    $self->prepare_metadata(\%node, \@order_keys);
+    $node{_order} = \@order_keys;
+    &Module::Build::YAML::DumpFile($metafile, \%node);
+    $self->{wrote_metadata} = 1;
   }
 
   $self->_add_to_manifest('MANIFEST', $metafile);
 }
 
 sub prepare_metadata {
-  my ($self, $node) = @_;
+  my ($self, $node, $keys) = @_;
   my $p = $self->{properties};
+
+  # A little helper sub
+  my $add_node = sub {
+    my ($name, $val) = @_;
+    $node->{$name} = $val;
+    push @$keys, $name if $keys;
+  };
 
   foreach (qw(dist_name dist_version dist_author dist_abstract license)) {
     (my $name = $_) =~ s/^dist_//;
-    $node->{$name} = $self->$_();
+    $add_node->($name, $self->$_());
     die "ERROR: Missing required field '$_' for META.yml\n"
       unless defined($node->{$name}) && length($node->{$name});
   }
@@ -3091,10 +3213,14 @@ sub prepare_metadata {
   }
 
   foreach ( @{$self->prereq_action_types} ) {
-    $node->{$_} = $p->{$_} if exists $p->{$_} and keys %{ $p->{$_} };
+    if (exists $p->{$_} and keys %{ $p->{$_} }) {
+      $add_node->($_, $p->{$_});
+    }
   }
 
-  $node->{dynamic_config} = $p->{dynamic_config} if exists $p->{dynamic_config};
+  if (exists $p->{dynamic_config}) {
+    $add_node->('dynamic_config', $p->{dynamic_config});
+  }
   my $pkgs = eval { $self->find_dist_packages };
   if ($@) {
     $self->log_warn("WARNING: Possible missing or corrupt 'MANIFEST' file.\n" .
@@ -3103,18 +3229,19 @@ sub prepare_metadata {
     $node->{provides} = $pkgs if %$pkgs;
   }
 ;
-  $node->{no_index} = $p->{no_index} if exists $p->{no_index};
+  if (exists $p->{no_index}) {
+    $add_node->('no_index', $p->{no_index});
+  }
 
-  $node->{generated_by} = "Module::Build version $Module::Build::VERSION";
+  $add_node->('generated_by', "Module::Build version $Module::Build::VERSION");
 
-  $node->{'meta-spec'} = {
-    version => '1.2',
-    url     => 'http://module-build.sourceforge.net/META-spec-v1.2.html',
-  };
-
+  $add_node->('meta-spec', 
+	      {version => '1.2',
+	       url     => 'http://module-build.sourceforge.net/META-spec-v1.2.html',
+	      });
 
   while (my($k, $v) = each %{$self->meta_add}) {
-    $node->{$k} = $v;
+    $add_node->($k, $v);
   }
 
   while (my($k, $v) = each %{$self->meta_merge}) {
@@ -3309,15 +3436,39 @@ sub make_tarball {
   }
 }
 
+sub install_path {
+  my $self = shift;
+  my( $type, $value ) = ( @_, '<empty>' );
+
+  Carp::croak( 'Type argument missing' )
+    unless defined( $type );
+
+  my $map = $self->{properties}{install_path};
+  return $map unless @_;
+
+  # delete existing value if $value is literal undef()
+  unless ( defined( $value ) ) {
+    delete( $map->{$type} );
+    return undef;
+  }
+
+  # return existing value if no new $value is given
+  if ( $value eq '<empty>' ) {
+    return undef unless exists $map->{$type};
+    return $map->{$type};
+  }
+
+  # set value if $value is a valid relative path
+  return $map->{$type} = $value;
+}
+
 sub install_base_relpaths {
-  # Usage: install_base_relpaths('lib')  or install_base_relpaths();
+  # Usage: install_base_relpaths(), install_base_relpaths('lib'),
+  #   or install_base_relpaths('lib' => $value);
   my $self = shift;
   my $map = $self->{properties}{install_base_relpaths};
   return $map unless @_;
-  
-  my $type = shift;
-  return unless exists $map->{$type};
-  return File::Spec->catdir(@{$map->{$type}});
+  return $self->_relpaths($map, @_);
 }
 
 
@@ -3334,18 +3485,48 @@ sub prefix_relative {
 			  );
 }
 
+sub _relpaths {
+  my $self = shift;
+  my( $map, $type, $value ) = ( @_, '<empty>' );
+
+  Carp::croak( 'Type argument missing' )
+    unless defined( $type );
+
+  my @value = ();
+
+  # delete existing value if $value is literal undef()
+  unless ( defined( $value ) ) {
+    delete( $map->{$type} );
+    return undef;
+  }
+
+  # return existing value if no new $value is given
+  elsif ( $value eq '<empty>' ) {
+    return undef unless exists $map->{$type};
+    @value = @{ $map->{$type} };
+  }
+
+  # set value if $value is a valid relative path
+  else {
+    Carp::croak( "Value must be a relative path" )
+      if File::Spec::Unix->file_name_is_absolute($value);
+
+    @value = split( /\//, $value );
+    $map->{$type} = \@value;
+  }
+
+  return File::Spec->catdir( @value );
+}
 
 # Defaults to use in case the config install paths cannot be prefixified.
 sub prefix_relpaths {
-  # Usage: prefix_relpaths('site', 'lib')  or prefix_relpaths('site');
+  # Usage: prefix_relpaths('site'), prefix_relpaths('site', 'lib'),
+  #   or prefix_relpaths('site', 'lib' => $value);
   my $self = shift;
   my $installdirs = shift || $self->installdirs;
   my $map = $self->{properties}{prefix_relpaths}{$installdirs};
   return $map unless @_;
-  
-  my $type = shift;
-  return unless exists $map->{$type};
-  return File::Spec->catdir(@{$map->{$type}});
+  return $self->_relpaths($map, @_);
 }
 
 
@@ -3410,7 +3591,18 @@ sub install_destination {
 
 sub install_types {
   my $self = shift;
-  my %types = (%{$self->install_path}, %{ $self->install_sets($self->installdirs) });
+
+  my %types;
+  if ( $self->install_base ) {
+    %types = %{$self->install_base_relpaths};
+  } elsif ( $self->prefix ) {
+    %types = %{$self->prefix_relpaths};
+  } else {
+    %types = %{$self->install_sets($self->installdirs)};
+  }
+
+  %types = (%types, %{$self->install_path});
+
   return sort keys %types;
 }
 
@@ -3436,7 +3628,7 @@ sub install_map {
   ) if @skipping;
 
   # Write the packlist into the same place as ExtUtils::MakeMaker.
-  if (my $module_name = $self->module_name) {
+  if ($self->create_packlist and my $module_name = $self->module_name) {
     my $archdir = $self->install_destination('arch');
     my @ext = split /::/, $module_name;
     $map{write} = File::Spec->catdir($archdir, 'auto', @ext, '.packlist');
@@ -3593,17 +3785,17 @@ sub compile_xs {
     if (defined $lib_typemap and -e $lib_typemap) {
       push @typemaps, 'typemap';
     }
-    my $typemaps = join ' ', map qq{-typemap "$_"}, @typemaps;
+    @typemaps = map {+'-typemap', $_} @typemaps;
 
     my $cf = $self->config;
     my $perl = $self->{properties}{perl};
     
-    my $command = (qq{$perl "-I$cf->{installarchlib}" "-I$cf->{installprivlib}" "$xsubpp" -noprototypes } .
-		   qq{$typemaps "$file"});
+    my @command = ($perl, "-I$cf->{installarchlib}", "-I$cf->{installprivlib}", $xsubpp, '-noprototypes',
+		   @typemaps, $file);
     
-    $self->log_info("$command\n");
+    $self->log_info("@command\n");
     my $fh = IO::File->new("> $args{outfile}") or die "Couldn't write $args{outfile}: $!";
-    print $fh `$command`;
+    print {$fh} $self->_backticks(@command);
     close $fh;
   }
 }
@@ -3632,6 +3824,7 @@ sub run_perl_command {
   # this before documenting.
   my ($self, $args) = @_;
   $args = [ $self->split_like_shell($args) ] unless ref($args);
+  $args = [ split(/\s+/, $self->_quote_args($args)) ] if $self->os_type eq 'VMS';
   my $perl = ref($self) ? $self->perl : $self->find_perl_interpreter;
 
   # Make sure our local additions to @INC are propagated to the subprocess
@@ -3753,12 +3946,18 @@ sub copy_if_modified {
   }
   
   return if $self->up_to_date($file, $to_path); # Already fresh
-  
+
+  $self->delete_filetree($to_path); # delete destination if exists
+
   # Create parent directories
   File::Path::mkpath(File::Basename::dirname($to_path), 0, 0777);
   
   $self->log_info("$file -> $to_path\n") if $args{verbose};
   File::Copy::copy($file, $to_path) or die "Can't copy('$file', '$to_path'): $!";
+  # mode is read-only + (executable if source is executable)
+  my $mode = 0444 | ( -x $file ? 0111 : 0 );
+  chmod( $mode, $to_path );
+
   return $to_path;
 }
 

@@ -212,6 +212,20 @@ meerdere regels mogen worden ingegeven.</p>
 de boekingsopdracht de optie '<code>--totaal=<var>bedrag</var></code>'
 toe te voegen.</p>
 
+<h3>Creditering van verkoopfakturen</h3>
+
+<p>Met het crediteren van een verkoopfaktuur wordt deze niet
+automatisch als afgewerkt beschouwd. In het overzicht <a
+href="../reports/unpaid.html">Openstaande Posten</a> zullen dus zowel
+de oorspronkelijke, als de credit-faktuur worden getoond.</p>
+<p>De beide boekingen dienen daarom tegen elkaar te worden weggeboekt
+in een <a href="memorial.html">memoriaalboeking</a>, bijvoorbeeld:
+
+<blockquote class="code">memoriaal 20-11-2005 "Creditering" \
+  deb ACME Werkzaamheden 369,82 \
+  deb ACME "Creditering Werkzaamheden" -369,82
+</blockquote>
+
 
     </td>
   </tr>
@@ -229,7 +243,7 @@ toe te voegen.</p>
 
   <tr valign="bottom">
     <td valign="middle">
-      <a href="http://www.perl.org/"><img src="../images/perl_powered.png" alt="Powered by Perl" border="0" width="134" height="48" /></a>
+      <a href="http://www.perl.org/"><a href="http://www.perl.org/"><img src="../images/perl_powered.png" alt="Powered by Perl" border="0" width="134" height="48" /></a></a>
 
     </td>
     <td align="center">
@@ -237,7 +251,7 @@ toe te voegen.</p>
 Deze site is gemaakt met de 
 <a href='http://www.squirrel.nl/people/jvromans/tt2site/'>TT2Site
 Site Builder</a>.<br />
-bookings/receivable.html laatste aanpassing 20 februari 2006, 21:55:15
+bookings/receivable.html laatste aanpassing 20 april 2006, 15:22:12
 </p>
 
     </td>

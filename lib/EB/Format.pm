@@ -7,7 +7,7 @@ our $dbh;
 our $config;
 our $app;
 
-package EB::Finance;
+package EB::Format;
 
 use EB;
 use EB::Expression;
@@ -28,6 +28,24 @@ my $thousandsep;
 our @EXPORT;
 our $amount_width;
 our $date_width;
+
+sub numround_ieee {
+    # This somethimes does odd things.
+    # E.g. 892,5 -> 892 and 891,5 -> 892.
+    0 + sprintf("%.0f", $_[0]);
+}
+
+use POSIX qw(floor ceil);
+
+sub numround_posix {
+    my ($val) = @_;
+    if ( $val < 0 ) {
+	ceil($val - 0.5);
+    }
+    else {
+	floor($val + 0.5);
+    }
+}
 
 sub _setup  {
 
@@ -94,6 +112,15 @@ EOD
     die($@) if $@;
 
     $numpat = qr/^([-+])?(\d+)?(?:[.,])?(\d{1,@{[AMTPRECISION]}})?$/;
+
+    ################ Rounding Algorithms ################
+
+    my $numround = lc($cfg->val(qw(strategy round), "ieee"));
+    unless ( defined &{"numround_$numround"} ) {
+	die("?".__x("Onbekende afrondingsmethode: {meth}",
+		    meth => $numround)."\n");
+    }
+    *numround = \&{"numround_$numround"};
 
     ################ Date display format ################
 
@@ -172,120 +199,12 @@ sub numfmtv {
     $v;
 }
 
-sub numround {
-    # This somethimes does odd things.
-    # E.g. 892,5 -> 892 and 891,5 -> 892.
-    0 + sprintf("%.0f", $_[0]);
-}
-
-=begin alternative
-
-# Is this a beteer alternative?
-
-use POSIX qw(floor ceil);
-
-sub numround {
-    my ($val) = @_;
-    if ( $val < 0 ) {
-	ceil($val - 0.5);
-    }
-    else {
-	floor($val + 0.5);
-    }
-}
-
-=cut
-
 sub btwfmt {
     my $v = sprintf($btwfmt0, 100*$_[0]/BTWSCALE);
     $v =~ s/\./$decimalpt/;
     $v;
 }
 
-sub norm_btw {
-    my ($bsr_amt, $bsr_btw_id) = @_;
-    my ($btw_perc, $btw_incl);
-    if ( $bsr_btw_id ) {
-	my $rr = $dbh->do("SELECT btw_perc, btw_incl".
-			  " FROM BTWTabel".
-			  " WHERE btw_id = ?", $bsr_btw_id);
-	($btw_perc, $btw_incl) = @$rr;
-    }
-
-    return [ $bsr_amt, 0 ] unless $btw_perc;
-
-    my $bruto = $bsr_amt;
-    my $netto = $bsr_amt;
-
-    if ( $btw_incl ) {
-	$netto = numround($bruto * (1 / (1 + $btw_perc/BTWSCALE)));
-    }
-    else {
-	$bruto = numround($netto * (1 + $btw_perc/BTWSCALE));
-    }
-
-    [ $bruto, $bruto - $netto ];
-}
-
-sub journalise {
-    my ($bsk_id) = @_;
-
-    # date  bsk_id  bsr_seq(0)   dbk_id  (acc_id) amount debcrd desc(bsk) (rel)
-    # date (bsk_id) bsr_seq(>0) (dbk_id)  acc_id  amount debcrd desc(bsr) rel(acc=1200/1600)
-    my ($jnl_date, $jnl_bsk_id, $jnl_bsr_seq, $jnl_dbk_id, $jnl_acc_id,
-	$jnl_amount, $jnl_desc, $jnl_rel);
-
-    my $rr = $::dbh->do("SELECT bsk_nr, bsk_desc, bsk_dbk_id, bsk_date".
-		      " FROM boekstukken".
-		      " WHERE bsk_id = ?", $bsk_id);
-    my ($bsk_nr, $bsk_desc, $bsk_dbk_id, $bsk_date) = @$rr;
-
-    my ($dbktype, $dbk_acc_id) =
-      @{$::dbh->do("SELECT dbk_type, dbk_acc_id".
-		 " FROM Dagboeken".
-		 " WHERE dbk_id = ?", $bsk_dbk_id)};
-    my $sth = $::dbh->sql_exec("SELECT bsr_id, bsr_nr, bsr_date, ".
-			     "bsr_desc, bsr_amount, bsr_btw_class, bsr_btw_id, ".
-			     "bsr_btw_acc, bsr_type, bsr_acc_id, bsr_rel_code ".
-			     " FROM Boekstukregels".
-			     " WHERE bsr_bsk_id = ?", $bsk_id);
-
-    my $ret = [];
-    my $tot = 0;
-    my $nr = 1;
-
-    while ( $rr = $sth->fetchrow_arrayref ) {
-	my ($bsr_id, $bsr_nr, $bsr_date, $bsr_desc, $bsr_amount, $bsr_btw_class,
-	    $bsr_btw_id, $bsr_btw_acc, $bsr_type, $bsr_acc_id, $bsr_rel_code) = @$rr;
-	my $bsr_bsk_id = $bsk_id;
-	my $btw = 0;
-	my $amt = $bsr_amount;
-
-	if ( ($bsr_btw_class & BTWKLASSE_BTW_BIT) && $bsr_btw_id && $bsr_btw_acc ) {
-	    ( $bsr_amount, $btw ) =
-	      @{EB::Finance::norm_btw($bsr_amount, $bsr_btw_id)};
-	    $amt = $bsr_amount - $btw;
-	}
-	$tot += $bsr_amount;
-
-	push(@$ret, [$bsk_date, $bsk_dbk_id, $bsk_id, $bsr_date, $nr++,
-		     $bsr_acc_id,
-		     $bsr_amount - $btw, $bsr_desc,
-		     $bsr_type ? $bsr_rel_code : undef]);
-	push(@$ret, [$bsk_date,  $bsk_dbk_id, $bsk_id, $bsr_date, $nr++,
-		     $bsr_btw_acc,
-		     $btw, "BTW ".$bsr_desc,
-		     undef]) if $btw;
-    }
-
-    push(@$ret, [$bsk_date,  $bsk_dbk_id, $bsk_id, $bsk_date, $nr++, $dbk_acc_id,
-		 -$tot, $bsk_desc, undef])
-      if $dbk_acc_id;
-
-    unshift(@$ret, [$bsk_date, $bsk_dbk_id, $bsk_id, $bsk_date, 0, undef,
-		    undef, $bsk_desc, undef]);
-
-    $ret;
-}
+sub btwpat { $btwpat }
 
 1;

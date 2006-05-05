@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-my $RCS_Id = '$Id: BKM.pm,v 1.47 2006/03/05 20:57:29 jv Exp $ ';
+my $RCS_Id = '$Id: BKM.pm,v 1.50 2006/04/15 09:08:35 jv Exp $ ';
 
 package main;
 
@@ -13,8 +13,8 @@ package EB::Booking::BKM;
 # Author          : Johan Vromans
 # Created On      : Thu Jul  7 14:50:41 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Sun Mar  5 20:47:36 2006
-# Update Count    : 367
+# Last Modified On: Sat Apr 15 10:45:42 2006
+# Update Count    : 371
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -28,7 +28,7 @@ use warnings;
 
 use EB;
 use EB::DB;
-use EB::Finance;
+use EB::Format;
 use EB::Report::Journal;
 use base qw(EB::Booking);
 
@@ -209,7 +209,7 @@ sub perform {
 	    my ($btw_ink, $btw_verk);
 	    if ( $btw_id ) {
 		( $bsr_amount, $btw, $btw_ink, $btw_verk ) =
-		  @{EB::Finance::norm_btw($bsr_amount, $btw_id)};
+		  @{$self->norm_btw($bsr_amount, $btw_id)};
 		$amt = $bsr_amount - $btw;
 	    }
 	    $orig_amount = -$orig_amount;
@@ -387,7 +387,7 @@ sub perform {
     $dbh->sql_exec("UPDATE Boekstukken SET bsk_amount = ? WHERE bsk_id = ?",
 		   $tot, $bsk_id)->finish;
 
-    $dbh->store_journal(EB::Finance::journalise($bsk_id));
+    $dbh->store_journal($self->journalise($bsk_id));
 
     if ( $opts->{journal} ) {
 	warn("?"._T("Dit overicht is ter referentie, de boeking is niet uitgevoerd!")."\n") if $fail;

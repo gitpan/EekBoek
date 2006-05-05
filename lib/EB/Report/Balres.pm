@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-my $RCS_Id = '$Id: Balres.pm,v 1.22 2006/04/04 13:12:31 jv Exp $ ';
+my $RCS_Id = '$Id: Balres.pm,v 1.23 2006/04/15 09:08:35 jv Exp $ ';
 
 package main;
 
@@ -13,8 +13,8 @@ package EB::Report::Balres;
 # Author          : Johan Vromans
 # Created On      : Sat Jun 11 13:44:43 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Tue Apr  4 13:28:26 2006
-# Update Count    : 355
+# Last Modified On: Mon Apr 24 19:34:54 2006
+# Update Count    : 363
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -26,7 +26,7 @@ use warnings;
 
 use EB;
 use EB::Report;
-use EB::Finance;
+use EB::Format;
 
 ################ Subroutines ################
 
@@ -59,6 +59,7 @@ sub perform {
     my ($self, $opts) = @_;
 
     my $balans = $opts->{balans};
+    my $opening = $opts->{opening};
     my $detail = $opts->{detail};
     $detail = $opts->{verdicht} ? 2 : -1 unless defined $detail;
     $opts->{detail} = $detail;
@@ -94,6 +95,12 @@ sub perform {
 	my $date = $dbh->adm("begin");
 	$rep->start(_T("Openingsbalans"),
 		    __x("Datum: {date}", date => datefmt_full($now)));
+    }
+    elsif ( $opening ) {
+	my $date = $dbh->adm("begin");
+	$rep->start(_T("Openingsbalans"),
+		    __x("Datum: {date}", date => datefmt_full($now)));
+	$table = EB::Report->GetTAccountsBal($date, 1);
     }
     else {
 	if ( $balans ) {

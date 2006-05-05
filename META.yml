@@ -1,14 +1,10 @@
 ---
 name: EekBoek
-version: 0.55
+version: 0.56
 author:
   - Johan Vromans (jvromans@squirrel.nl)
 abstract: Elementary Bookkeeping (for the Dutch/European market)
 license: perl
-resources:
-  MailingList: http://lists.sourceforge.net/lists/listinfo/eekboek
-  homepage: http://www.squirrel.nl/eekboek
-  license: http://dev.perl.org/licenses/
 requires:
   Config::IniFiles: 2.38
   DBD::Pg: 1.41
@@ -20,10 +16,17 @@ requires:
   Term::ReadLine::Gnu: 0
 recommends:
   Getopt::Long: 2.32
+generated_by: Module::Build version 0.28
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2
+no_index:
+  dir:
+    - inc
 provides:
   EB:
     file: lib/EB.pm
-    version: 0.55
+    version: 0.56
   EB::Booking:
     file: lib/EB/Booking.pm
   EB::Booking::BKM:
@@ -48,8 +51,8 @@ provides:
     file: lib/EB/Export.pm
   EB::Expression:
     file: lib/EB/Expression.pm
-  EB::Finance:
-    file: lib/EB/Finance.pm
+  EB::Format:
+    file: lib/EB/Format.pm
   EB::Globals:
     file: lib/EB/Globals.pm
   EB::Import:
@@ -142,11 +145,8 @@ provides:
     file: lib/EB/Utils.pm
   EekBoek:
     file: lib/EekBoek.pm
-    version: 0.55
-generated_by: Module::Build version 0.2709
-meta-spec:
-  url: http://module-build.sourceforge.net/META-spec-v1.2.html
-  version: 1.2
-no_index:
-  dir:
-    - inc
+    version: 0.56
+resources:
+  MailingList: http://lists.sourceforge.net/lists/listinfo/eekboek
+  homepage: http://www.squirrel.nl/eekboek
+  license: http://dev.perl.org/licenses/
