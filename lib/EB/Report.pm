@@ -1,10 +1,10 @@
 # Report.pm -- Report tools
-# RCS Info        : $Id: Report.pm,v 1.4 2006/04/15 09:08:35 jv Exp $
+# RCS Info        : $Id: Report.pm,v 1.5 2006/05/25 17:15:35 jv Exp $
 # Author          : Johan Vromans
 # Created On      : Mon Nov 14 21:46:04 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Mon Apr 24 19:27:28 2006
-# Update Count    : 39
+# Last Modified On: Thu May 25 19:04:16 2006
+# Update Count    : 40
 # Status          : Unknown, Use with caution!
 
 package main;
@@ -61,7 +61,7 @@ sub GetTAccountsBal {
     # sum(boekjaarbalans, r, t' < t)
     $sth = $dbh->sql_exec("SELECT bkb_acc_id, bkb_balance".
 			  " FROM Boekjaarbalans".
-			  " WHERE bkb_end ".($inc ? "=" : "<")." ?", $end);
+			  " WHERE bkb_end ".($inc ? "<=" : "<")." ?", $end);
     while ( my $rr = $sth->fetchrow_arrayref ) {
 	my ($acc_id, $acc_balance) = @$rr;
 	warn("!".__x("Balansrekening {acct}, saldo aangepast met {exp}",

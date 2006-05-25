@@ -124,6 +124,7 @@ MANIFEST
 META.yml
 QUICKSTART
 README
+README.sampledb
 README.WINDOWS
 script/ebgui
 script/ebshell
@@ -153,6 +154,7 @@ t/ivp/ref/grootboek2.txt
 t/ivp/ref/journaal-postbank.txt
 t/ivp/ref/journaal-postbank24.txt
 t/ivp/ref/journaal.txt
+t/ivp/ref/obalans.txt
 t/ivp/ref/proef.txt
 t/ivp/ref/proef0.txt
 t/ivp/ref/proef1.txt
