@@ -1,6 +1,6 @@
 %define modname EekBoek
 %define lcname eekboek
-%define modversion 0.57
+%define modversion 0.58
 
 ################ Build Options ################
 %define gui 0
@@ -98,6 +98,10 @@ echo "#!%{__perl}" > ${RPM_BUILD_ROOT}%{_bindir}/ebshell
 echo 'my $share = "%{ebshare}";' >> ${RPM_BUILD_ROOT}%{_bindir}/ebshell
 echo 'exec $^X "perl", "-Mlib=$share/lib", "$share/script/ebshell", @ARGV;' >> ${RPM_BUILD_ROOT}%{_bindir}/ebshell
 %{__chmod} 0755 ${RPM_BUILD_ROOT}%{_bindir}/ebshell
+
+%if %{dbtests}
+pg_dump eekboek_sample -x -C -O -f example/sampledb.sql
+%endif
 
 %if %{gui}
 %{__install} -m 0755 blib/script/ebgui ${RPM_BUILD_ROOT}%{ebshare}/script

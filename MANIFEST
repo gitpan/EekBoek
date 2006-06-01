@@ -119,7 +119,6 @@ lib/EB/Tools/Schema.pm
 lib/EB/Tools/SQLEngine.pm
 lib/EB/Utils.pm
 lib/EekBoek.pm
-Makefile.PL
 MANIFEST
 META.yml
 QUICKSTART
