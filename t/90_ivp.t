@@ -1,10 +1,10 @@
 #!/usr/bin/perl
-# $Id: 90_ivp.t,v 1.2 2006/05/25 17:28:26 jv Exp $  -*-perl-*-
+# $Id: 90_ivp.t,v 1.5 2006/06/05 19:38:45 jv Exp $  -*-perl-*-
 
 use strict;
 use Test::More
   $ENV{EB_SKIPDBTESTS} ? (skip_all => "Database tests skipped on request")
-  : (tests => 33);
+  : (tests => 34);
 
 use warnings;
 BEGIN { use_ok('IPC::Run3') }
@@ -22,18 +22,13 @@ unlink(<*.txt>);
 unlink(<*.html>);
 unlink(<*.csv>);
 
-my @ebcmd = qw(ebshell -X -f ivp.conf --echo);
+my @ebcmd = qw(-MEB::Shell -e shell -- -X -f ivp.conf --echo);
 
-if ( $INC[0] =~ /\bblib\b/ ) {
-    $ebcmd[0] = "../../blib/script/ebshell";
-    unshift(@ebcmd, map { ("-I",
-			   "../../$_"
-			  ) } grep { /^\w\w/ } reverse @INC);
-    unshift(@ebcmd, "perl");
-}
-else {
-    unshift(@ebcmd, "perl", "-S");
-}
+unshift(@ebcmd, map { ("-I",
+		       "../../$_"
+		      ) } grep { /^\w\w/ } reverse @INC);
+unshift(@ebcmd, "perl");
+
 my $fail;
 
 for my $log ( "createdb.log" ) {
@@ -103,6 +98,7 @@ vfy([@ebcmd, qw(-c btwaangifte j)], "btw.txt");
 # Verify: HTML generatie.
 vfy([@ebcmd, qw(-c balans --detail=2 --gen-html)            ], "balans2.html");
 vfy([@ebcmd, qw(-c balans --detail=2 --gen-html --style=xxx)], "balans2xxx.html");
+vfy([@ebcmd, qw(-c btwaangifte j)], "btw.html");
 
 # Verify: CSV generatie.
 vfy([@ebcmd, qw(-c balans --detail=2 --gen-csv)], "balans2.csv");

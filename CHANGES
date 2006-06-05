@@ -1,5 +1,40 @@
-0.58
+0.58	2006-06-01 18:04
 
+	* CSS stylesheet afhandeling in HTML rapporten
+
+	  Er is nu een config setting `cssdir' in sectie `html' waar de
+	  directory kan worden opgegeven waar de CSS stylesheets zijn te
+	  vinden.
+
+	  Het uiteindelijke resultaat hangt af van deze `cssdir', en de voor
+	  het rapport opgegeven `style' optie.
+
+	    Style         Cssdir   Resultaat
+	    --------------------------------
+	    -             -        De EekBoek standaard style voor dit type
+				   rapport wordt opgenomen in het rapport.
+
+	    naam          -        De EekBoek standaard style `naam' wordt
+				   opgenomen in het rapport.
+
+	    -             dir      Stylesheet link naar dir/std.css, waarin std
+				   de naam is van de EekBoek standaard style
+				   voor dit type rapport.
+
+	    naam          dir      Stylesheet link naar dir/naam.css
+
+	    bestandsnaam  n.v.t.   Stylesheet link naar bestandsnaam
+
+	  Zonder wijzigingen betekent het dat de standaard stylesheet nu in de
+	  rapporten wordt opgenomen, zodat deze direct toonbaar zijn.
+
+	  Om hetzelfde resultaat te bereiken als tot nu toe het geval is, moet
+	  de config setting
+
+	    [html]
+	    cssdir = css
+
+	  worden opgegeven.
 
 0.57	25-05-2006 20:54
 
