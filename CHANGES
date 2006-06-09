@@ -1,3 +1,27 @@
+0.59	2006-06-05 21:48
+
+	* Het main programma ebshell is nu een triviale wrapper rondom
+	  module EB::Shell.
+
+	  (Dat is nu zo'n wijziging waar niemand iets van zou moeten kunnen
+	  merken, maar je weet maar nooit.)
+
+	* Er is nu een command line import en export commando.
+
+	  $ ebshell --export --dir=foo
+
+	  Equivalent met: $ ebshell -c export --dir=foo
+
+	  $ ebshell --import --dir=foo
+
+	  Equivalent met: $ ebshell --createdb -c import --dir=foo
+
+	* Bijkomende wijzigingen voor CSS handling (zie 0.58).
+
+	* Fix probleem met verwijderen script dir van geïnstalleerde rpm.
+
+	* Fix 1 januari-probleem met openingsbalans.
+
 0.58	2006-06-01 18:04
 
 	* CSS stylesheet afhandeling in HTML rapporten

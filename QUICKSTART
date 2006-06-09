@@ -10,7 +10,15 @@ Eekboek Boekhoudpakket (command line versie)
 Dit document gaat ervan uit dat alle stappen uit de INSTALL
 documentatie met goed gevolg zijn uitgevoerd.
 
-Werken met de voorbeeldadministatie van de ivp:
+Aanmaken (of opnieuw aanmaken) voorbeeldadministratie:
+
+   $ ebshell --db=sample --import --dir=<example>
+
+waarin <example> de directory is met examples. Deze kan ergens onder
+de lib/EB directory zitten in gevak van een Build install, of in de
+/usr/share/doc in gevan van een rpm install.
+
+Werken met de voorbeeldadministatie:
 
    $ ebshell --db=sample		  (shell interactief)
 

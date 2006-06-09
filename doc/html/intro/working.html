@@ -151,7 +151,7 @@ tekstbestand naar een programma te sturen.</p>
 <p>De EekBoek grafische shell (GUI), op dit moment nog in
 ontwikkeling, werkt uiteraard incrementeel.</p>
 
-<h2>Het 4-bestanden systeem</h2>
+<a name="best4"></a><h2>Het 4-bestanden systeem</h2>
 
 <p>De aanbevolen werkwijze omvat 4 bestanden.</p>
 
@@ -169,13 +169,83 @@ BTW-periode en openingsbalans.
 </p>
 
 <p><strong>De mutaties: <code>mutaties.eb</code></strong>
-<br>De boekingen.
-</p>
+<br>De boekingen. Voor een nieuwe administratie zal dit bestand nog
+leeg zijn.</p>
 
-<p>Uiteraard biedt EekBoek ook de voorziening  om de actuele
-inhoud van een administratie weer geheel weg te schrijven naar een
-volledige set bestanden. En daarmee is de cirkel weer rond.
-<br>Zie voor meer informatie <a href="../inex.html">Import en Export</a>.</p>
+<p>Het is mogelijk te werken met een <strong>2-bestanden
+systeem</strong> door de relaties, opening en mutaties in een enkel
+bestand te onderhouden. In de praktijk werkt dit echter minder
+handig.</p>
+
+<p>Tijdens het werken met de administratie kunnen nieuwe boekingen
+worden toegevoegd aan het mutaties bestand. Nieuwe relaties komen
+vanzelfsprekend in het relaties bestand. Het schema dient doorgaans
+enkel te worden aangepast als nieuwe grootboekrekeningen nodig zijn.
+De openingsgegevens zullen niet wijzigen.</p>
+
+<p>Het is niet nodig na elke nieuwe boeking de gehele set bestanden
+opnieuw te verwerken. Het is bijvoorbeeld handig om nieuwe boekingen
+in een afzonderlijk bestandje op te nemen, dit bestandje te verwerken
+in de bestaande administratie, en dan de inhoud ervan toe te voegen
+aan het mutaties bestand.</p>
+
+<h2>Import en Export</h2>
+
+<p>Met behulp van de EekBoek import voorziening kan een set bestanden
+eenvoudig worden verwerkt. Met de export voorziening kan te allen
+tijde de volledige inhoud van de administratie weer worden
+weggeschreven naar een volledige set bestanden. <br>Zie voor meer
+informatie <a href="../inex.html">Import en Export</a>.</p>
+
+<h2>Meerdere boekjaren</h2>
+
+<p>Na het einde van een boekjaar kan naar keuze in de huidige
+administratie worden doorgegaan met boeken, dan wel een nieuwe
+administratie worden opgezet. Beide methodes hebben voor- en
+nadelen.</p>
+
+<p>In het geval meerdere boekjaren in een enkele administratie
+voorkomen is het gemakkelijker om oude boekstukken terug te vinden, en
+rapportages te maken die over boekjaargrenzen lopen. Denk bijvoorbeeld
+aan een resultaatrekening van mei tot en met april voor een
+seizoensgebonden bedrijf. Of een resultaatrekening die meerdere jaren
+omvat.</p>
+
+<p>Met &eacute;&eacute;n boekjaar per administratie blijft de
+administratie echter kleiner en gemakkelijker hanteerbaar.<p>
+
+<p>EekBoek biedt voor deze laatste werkwijze een extra faciliteit: bij
+het afsluiten van een boekjaar kunnen de openingsgegevens voor het
+eropvolgende boekjaar worden aangemaakt. Door deze door middel van de
+<code>include</code> opdracht in de opening op te nemen, kunnen
+meerdere boekjaren in onafhankelijke administraties worden gevoerd,
+terwijl elke administratie toch steeds automatisch de meest actuele
+eindgegevens van het voorgaande boekjaar kan gebruiken.</p>
+
+<p>Een voorbeeld. Stel u heeft de bestanden van boekjaar 2005 in de
+directory <code>adm2005</code>, en die van 2006 in
+<code>adm2006</code>. U neemt dan in <code>adm2005/mutaties.eb</code>
+als laatste opdracht op:</p>
+
+<blockquote class="code">jaareinde --eb=opening2006.eb</blockquote>
+
+<p>Bij het verwerken van de mutaties wordt het boekjaar afgesloten en de
+openingsgegevens voor het volgende boekjaar geplaatst in het bestand
+<code>opening2006.eb</code>.</p>
+
+<p>In het bestand <code>adm2006/opening.eb</code> neemt u dan de
+volgende opdrachten op:</p>
+
+<blockquote class="code">adm_naam "Mijn Administratie 2006"
+adm_begindatum 2006
+adm_btwperiode jaar
+include "../adm2005/opening2006.eb"
+adm_open
+</blockquote>
+
+<p>Bij het openen van de administratie worden dan steeds de meest
+recente, bij het afsluiten van het voorgaande boekjaar aangemaakte,
+gegevens gebruikt.</p>
 
     </td>
   </tr>
@@ -201,7 +271,7 @@ volledige set bestanden. En daarmee is de cirkel weer rond.
 Deze site is gemaakt met de 
 <a href='http://www.squirrel.nl/people/jvromans/tt2site/'>TT2Site
 Site Builder</a>.<br />
-intro/working.html laatste aanpassing 02 juni 2006, 11:31:43
+intro/working.html laatste aanpassing 08 juni 2006, 16:33:59
 </p>
 
     </td>
