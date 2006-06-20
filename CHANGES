@@ -1,3 +1,18 @@
+0.60	2006-06-09 15:08
+
+	* Lokatie van de 'example' directory:
+
+	  - In geval van Build install: <site_perl>/EB/example
+	  - In geval van RPM   install: <share_doc>/EekBoek-x.xx/example
+	  - In geval van PPM   install: <site_perl>/EB/example
+
+	* Het sample database script is vervallen. Met de nieuwe import
+	  functionaliteit kan de sample database eenvoudig worden opgezet met
+
+	  $ ebshell --db=sample --import --dir=<example>
+
+	  waarin <example> de 'example' directory is.
+
 0.59	2006-06-05 21:48
 
 	* Het main programma ebshell is nu een triviale wrapper rondom

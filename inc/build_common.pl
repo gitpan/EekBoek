@@ -1,10 +1,10 @@
 # build_common.inc -- Build file common info -*- perl -*-
-# RCS Info        : $Id: build_common.inc,v 1.7 2006/03/24 13:59:40 jv Exp $
+# RCS Info        : $Id: build_common.pl,v 1.8 2006/06/20 19:45:59 jv Exp $
 # Author          : Johan Vromans
 # Created On      : Thu Sep  1 17:28:26 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Fri Mar 24 13:34:27 2006
-# Update Count    : 43
+# Last Modified On: Tue Jun 20 22:04:08 2006
+# Update Count    : 46
 # Status          : Unknown, Use with caution!
 
 use strict;
@@ -41,6 +41,8 @@ $data =
     },
     recomm_pm =>
     { 'Getopt::Long'        => '2.32',
+      'Archive::Zip'	    => '1.16',
+      'HTML::Entities'	    => '1.35',
     },
     usrbin => "/usr/bin",
   };

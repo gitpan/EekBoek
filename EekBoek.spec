@@ -1,6 +1,6 @@
 %define modname EekBoek
 %define lcname eekboek
-%define modversion 0.60
+%define modversion 0.61
 
 ################ Build Options ################
 %define gui 0
