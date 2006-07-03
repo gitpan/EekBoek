@@ -1,6 +1,6 @@
 ---
 name: EekBoek
-version: 0.61
+version: 0.91
 author:
   - Johan Vromans (jvromans@squirrel.nl)
 abstract: Elementary Bookkeeping (for the Dutch/European market)
@@ -28,7 +28,7 @@ no_index:
 provides:
   EB:
     file: lib/EB.pm
-    version: 0.61
+    version: 0.91
   EB::Booking:
     file: lib/EB/Booking.pm
   EB::Booking::BKM:
@@ -47,8 +47,6 @@ provides:
     file: lib/EB/DB.pm
   EB::DB::Postgres:
     file: lib/EB/DB/Postgres.pm
-  EB::DatabaseMigrator:
-    file: lib/EB/migrate/001000001001000002.pl
   EB::Export:
     file: lib/EB/Export.pm
   EB::Expression:
@@ -147,7 +145,7 @@ provides:
     file: lib/EB/Utils.pm
   EekBoek:
     file: lib/EekBoek.pm
-    version: 0.61
+    version: 0.91
 resources:
   MailingList: http://lists.sourceforge.net/lists/listinfo/eekboek
   homepage: http://www.squirrel.nl/eekboek
