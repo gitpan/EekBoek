@@ -1,3 +1,20 @@
+0.91	2006-07-03 14:37
+
+	1.0 Release Candidate 1
+
+	* UNICODE is nu default, de ebshell 'banner' toont nu in voorkomende
+	  gevallen (Latin1) in plaats van (UNICODE).
+
+	* De tekensetaanduiding in bestanden is gewijzigd van
+
+	   # Content-Type: text; charset = ...
+	  in
+	   # Content-Type: text/plain; charset = ...
+
+	  De oude vorm blijft vooralsnog herkend.
+
+	* De automigratie-bestanden zijn verwijderd.
+
 0.61	2006-06-20 22:04
 
 	* Import naar en Export van files.

@@ -124,9 +124,9 @@
       <h2>Giro- en Bankafschriften</h2>
 
 <p>Deze afschriften worden geboekt in een dagboek van het type Bank.
-Zo'n dagboek heet typisch &lsquo;Postgiro&rsquo; of &lsquo;Rabobank&rsquo;. De keuze van de
-naam is vrij, en er mogen meerdere bankdagboeken tegelijk zijn.
-</p>
+Zo'n dagboek heet typisch &lsquo;Postgiro&rsquo; of
+&lsquo;Rabobank&rsquo;. De keuze van de naam is vrij, en er mogen
+meerdere bankdagboeken tegelijk zijn. </p>
 
 <p>Aan elk bank-dagboek is een grootboekrekening gekoppeld (zie <a
 href="../stdacc.html">Koppelingen</a>). De balanswaarde van deze
@@ -136,13 +136,27 @@ giro-rekening.</p>
 <p>De naam van de boekingsopdracht is gelijk aan die van het dagboek.
 We nemen hier als voorbeeld het dagboek &lsquo;Postgiro&rsquo;.</p>
 
-<p>Er zijn twee controle-opties: het boekstuktotaal en het banksaldo.
-Het boekstuktotaal kan worden geverifieerd door aan de
-boekingsopdracht de optie &lsquo;<code>--totaal=<var>bedrag</var></code>&rsquo;
-toe te voegen. Het eindsaldo na boeking kan worden geverifieerd met de
-optie &lsquo;<code>--saldo=<var>bedrag</var></code>&rsquo;. Zowel het
-boekstuktotaal als het eindsaldo treft u als regel aan op het
-bankafschrift.</p>
+<p>Tijdens het boeken kunnnen een aantal verificaties plaatsvinden.
+<br>Het <em>boekstuktotaal</em> kan worden geverifieerd door aan de
+boekingsopdracht de optie
+&lsquo;<code>--totaal=<var>bedrag</var></code>&rsquo; toe te voegen.
+Het <em>eindsaldo</em> na boeking kan worden geverifieerd met de optie
+&lsquo;<code>--saldo=<var>bedrag</var></code>&rsquo;. Een
+<em>beginsaldo</em> kan worden opgegeven met de optie
+&lsquo;<code>--beginsaldo=<var>bedrag</var></code>&rsquo;. Als dit
+niet is opgegeven wordt het eindsaldo van het eraan
+voorafgaande boekstuk genomen, indien deze reeds in de administratie
+aanwezig is.
+<br>Zowel het
+boekstuktotaal als het begin- en eindsaldo treft u als regel aan op
+het bankafschrift.</p>
+
+<p>Naast deze verificaties zal EekBoek tevens verifi&euml;ren dat het
+beginsaldo overeenkomt met het eindsaldo van het eraan voorafgaande
+boekstuk (indien aanwezig), alsmede dat het eindsaldo overeenkomt met
+het beginsaldo van het eropvolgende boekstuk (indien aanwezig).
+Het is daarom zeer aan te bevelen om bij het invoeren van deze
+boekstukken altijd expliciet een boekstuknummer op te geven.</p>
 
 <p>Zoals alle boekingen bestaat ook de verkoopboeking uit twee delen:
 de <dfn>boekstukkop</dfn> en een of meer <dfn>boekstukregels</dfn>. Er
@@ -368,7 +382,7 @@ meegegeven:
 Deze site is gemaakt met de 
 <a href='http://www.squirrel.nl/people/jvromans/tt2site/'>TT2Site
 Site Builder</a>.<br />
-bookings/bank.html laatste aanpassing 20 februari 2006, 21:49:52
+bookings/bank.html laatste aanpassing 08 juli 2006, 23:00:57
 </p>
 
     </td>
