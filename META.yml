@@ -1,6 +1,6 @@
 ---
 name: EekBoek
-version: 0.62
+version: 0.63
 author:
   - Johan Vromans (jvromans@squirrel.nl)
 abstract: Elementary Bookkeeping (for the Dutch/European market)
@@ -28,7 +28,7 @@ no_index:
 provides:
   EB:
     file: lib/EB.pm
-    version: 0.62
+    version: 0.63
   EB::Booking:
     file: lib/EB/Booking.pm
   EB::Booking::BKM:
@@ -147,7 +147,7 @@ provides:
     file: lib/EB/Utils.pm
   EekBoek:
     file: lib/EekBoek.pm
-    version: 0.62
+    version: 0.63
 resources:
   MailingList: http://lists.sourceforge.net/lists/listinfo/eekboek
   homepage: http://www.squirrel.nl/eekboek
