@@ -1,5 +1,3 @@
-WAARSCHUWING: DIT IS BETA SOFTWARE.
-
 Let op: Dit document gebruikt de ISO-8859.1 (Latin1) tekenset.
 Niet-ASCII tekens worden alleen juist getoond indien je programma op
 deze tekenset is ingesteld.
@@ -32,11 +30,11 @@ Voor commando's -> gebruik "help".
 
 De shell ondersteunt readline en history.
 
-ZIE OOK DE ON-LINE DOCUMENTATIE http://www.squirrel.nl/eekboek/docs/ . 
+ZIE OOK DE ON-LINE DOCUMENTATIE http://www.eekboek.nl/docs/ . 
 
 Tips:
 
-ZIE OOK DE ON-LINE DOCUMENTATIE http://www.squirrel.nl/eekboek/docs/ . 
+ZIE OOK DE ON-LINE DOCUMENTATIE http://www.eekboek.nl/docs/ . 
 
    $ ebshell --journaal
    toont na elke boekingsaktie automatisch de betreffende journaalpost 
@@ -58,21 +56,7 @@ gewijzigd, b.v.
    <<wijzig Juli -> Juni>>
    eb> postbank:24 2005-07-14 "KPN" crd "KPN Juni 2005" 344.61 [Enter]
 
-ZIE OOK DE ON-LINE DOCUMENTATIE http://www.squirrel.nl/eekboek/docs/ . 
-
-WAT WIL IK VAN JE HOREN
-=======================
-
-Problemen bij het opzetten en installeren.
-
-Probeer je eigen boekingen erin uit te voeren. Wat ontbreekt er nog?
-Wat kan er handiger?
-
-Ik voer mijn eigen boekhouding, plus die van de Stichting Perl
-Promotie Nederland, geheel uit met dit programma. Anderen voeren hun
-administratie geheel of gedeeltelijk met EekBoek. Hoe ver kom jij?
-
-ZIE OOK DE ON-LINE DOCUMENTATIE http://www.squirrel.nl/eekboek/docs/ . 
+ZIE OOK DE ON-LINE DOCUMENTATIE http://www.eekboek.nl/docs/ . 
 
 Voor het uitwisselen van ervaringen, vragen om ondersteuning en zo:
 gebruik de mailing list http://lists.sourceforge.net/lists/listinfo/eekboek-users.

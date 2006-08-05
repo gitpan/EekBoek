@@ -25,9 +25,9 @@ vanwege de extra functionaliteit:
 Installeren (RPM systemen)
 --------------------------
 
-Installeer, indien nodig, mijn GPG key:
+Installeer, indien nodig, de GPG key:
 
-  $ sudo rpm --import http://www.squirrel.nl/people/jvromans/pubkey.asc
+  $ sudo rpm --import http://www.eekboek.nl/fedora/RPM-PGP-KEY-EekBoek
 
 Download de EekBoek-x.yy-z.noarch.rpm.
 Verifieer de kit:
@@ -145,7 +145,7 @@ Aantekeningen
   gebruik de mailing list
   http://lists.sourceforge.net/lists/listinfo/eekboek-users .
 
-ZIE OOK DE ON-LINE DOCUMENTATIE http://www.squirrel.nl/eekboek/docs/ . 
+ZIE OOK DE ON-LINE DOCUMENTATIE http://www.eekboek.nl/docs/ . 
 
 ----------------------------------------------------------------------------
 Johan Vromans                                           jvromans@squirrel.nl

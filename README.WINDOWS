@@ -22,7 +22,7 @@ Gebruik dan de Perl Package Manager (ppm):
 
   --> volg de aanwijzingen omtrent ssleay32.dll en libeay32.dll.
 
-  ppm> install http://www.squirrel.nl/eekboek/dl/ppms/EekBoek.ppd
+  ppm> install http://www.eekboek.nl/dl/ppms/EekBoek.ppd
   ppm> exit
 
 Recente versies van DBD-Pg vereisen de Microsoft Visual C Run-Time

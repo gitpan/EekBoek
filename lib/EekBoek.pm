@@ -1,6 +1,6 @@
 package EekBoek;
 
-$VERSION = '0.92';
+$VERSION = '0.93';
 
 # NOTE: This is a documentation-only module.
 
@@ -23,7 +23,7 @@ appreciated).
 
 =head1 DESCRIPTION
 
-For a description how to use the program, see L<http://www.squirrel.nl/eekboek/docs/index.html>.
+For a description how to use the program, see L<http://www.eekboek.nl/docs/index.html>.
 
 =head1 BUGS AND PROBLEMS
 
@@ -33,7 +33,7 @@ Please use the eekboek-users mailing list at SourceForge.
 
 Johan Vromans (jvromans@squirrel.nl) wrote this module.
 
-Web site: L<http://www.squirrel.nl/eekboek>.
+Web site: L<http://www.eekboek.nl>.
 
 =head1 COPYRIGHT AND DISCLAIMER
 
