@@ -1,3 +1,105 @@
+1.00.01	
+
+	Fix een bug waardoor de TAccounts tabel niet werd aangemaakt
+	in geval van --import. Over het algemeen onschadelijk, tenzij
+	de mutaties.eb een opdracht bevat die TAccounts nodig heeft,
+	zoals een jaareinde.
+
+	Fix detectie van Windows.
+
+1.00	2006-08-27 21:15
+
+	Op de kop af 18 maanden nadat ik de eerste regels intoetste tot wat nu
+	EekBoek geworden is is het zover: de stabiliteit, functionaliteit,
+	degelijkheid, veelzijdigheid en gebruiksgemak zijn naar tevredenheid
+	van de gebruikers (en van mij!).
+
+	Hier is hij dan: Versie 1.00! 
+
+	* http://www.eekboek.nl/dl/EekBoek-1.00-1.noarch.rpm
+	* http://www.eekboek.nl/dl/EekBoek-1.00-1.src.rpm
+	* http://www.eekboek.nl/dl/EekBoek-1.00.tar.gz
+	* http://www.eekboek.nl/dl/EekBoek.ppd
+
+	Alle kits zijn voorzien van een aparte digitale handtekening. De key
+	ervan vind je op http://www.eekboek.nl/fedora/RPM-PGP-KEY-EekBoek.
+
+	YUM liefhebbers kunnen een (experimentele) repository toevoegen door
+	het installeren van
+	http://www.eekboek.nl/fedora/EekBoek-yum-1.0-1.noarch.rpm.
+	Zie voor meer informatie http://www.eekboek.nl/fedora/repodata .
+
+	De aanbevolen manier van installeren is door middel van de RPM.
+
+	Belangrijkste wijzigingen:
+
+	* Deze versie is identiek aan 0.93, met alleen het versienummer
+	  aangepast. 
+
+1.0RC3	2006-08-05 14:45
+
+	EekBoek heeft nu een eigen web site: http://www.eekboek.nl .
+
+	EekBoek 1.0 Release Candidate 3 is daar nu beschikbaar:
+
+	* http://www.eekboek.nl/dl/EekBoek-0.93-1.noarch.rpm
+	* http://www.eekboek.nl/dl/EekBoek-0.93-1.src.rpm
+	* http://www.eekboek.nl/dl/EekBoek-0.93.tar.gz
+	* http://www.eekboek.nl/dl/EekBoek.ppd
+
+	Alle kits zijn voorzien van een aparte digitale handtekening. De key
+	ervan vind je op http://www.eekboek.nl/fedora/RPM-PGP-KEY-EekBoek.
+
+	YUM liefhebbers kunnen een (experimentele) repository toevoegen door
+	het installeren van
+	http://www.eekboek.nl/fedora/EekBoek-yum-1.0-1.noarch.rpm.
+	Zie voor meer informatie http://www.eekboek.nl/fedora/repodata .
+
+	De aanbevolen manier van installeren is door middel van de RPM.
+
+	Belangrijkste wijzigingen:
+
+	* Deze versie is identiek aan 0.92, met uitsluitend de gewijzigde web
+	  site in sources en documentatie.
+
+1.0RC2	2006-07-20 15:11
+
+	* Deze versie is identiek aan 0.63.
+
+0.63	2006-07-12 19:02
+
+	* Herstel ernstige fout in het hernieuwde saldoberekeningsmechanisme.
+
+	  VERSIE 0.62 NIET GEBRUIKEN. RESTORE DE PRE-0.62 DATABASE!
+
+	* Controleer bij het verwijderen van een boeking of het boekjaar of de
+	  BTW periode niet is afgesloten.
+
+0.62	XXXXXXXXXXXXXXXX
+
+	* Bank- en kasboekingen kunnen ook een --beginsaldo meekrijgen.
+
+	  Saldobepaling gaat op volgorde van boekstuknummer (was:
+	  invoervolgorde).
+
+	  Het beginsaldo moet overeenkoment met het eindsaldo van het eraan
+	  voorafgaande boekstuk (indien aanwezig).
+
+	  Het eindsaldo moet overeenkoment met het beginsaldo van het erop
+	  volgende boekstuk (indien aanwezig).
+
+	  Dit lost tevens een im/exportprobleem op met boekstukken die worden
+	  verwijderd en later opnieuw ingevoerd.
+
+	* Export van boekstukken gaat nu per dagboek, op volgorde van
+	  boekstuknummer.
+
+	* Database structuur is gewijzigd -- automigratie is beschikbaar.
+
+	* Boekingen laten geen informatie meer zien tenzij de optie --verbose
+	  wordt meegegeven.
+	  (Is dit een goed idee?)
+
 0.91	2006-07-03 14:37
 
 	1.0 Release Candidate 1

@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-my $RCS_Id = '$Id: Shell.pm,v 1.80 2006/07/09 16:45:58 jv Exp $ ';
+my $RCS_Id = '$Id: Shell.pm,v 1.81 2006/09/25 12:55:04 jv Exp $ ';
 
 # Author          : Johan Vromans
 # Created On      : Thu Jul  7 15:53:48 2005

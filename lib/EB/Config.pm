@@ -1,10 +1,10 @@
 # Config.pm -- 
-# RCS Info        : $Id: Config.pm,v 1.8 2006/04/15 08:25:49 jv Exp $
+# RCS Info        : $Id: Config.pm,v 1.8.4.1 2006/09/28 07:31:13 jv Exp $
 # Author          : Johan Vromans
 # Created On      : Fri Jan 20 17:57:13 2006
 # Last Modified By: Johan Vromans
-# Last Modified On: Sat Apr 15 10:23:05 2006
-# Update Count    : 69
+# Last Modified On: Thu Sep 28 09:31:02 2006
+# Update Count    : 70
 # Status          : Unknown, Use with caution!
 
 package main;
@@ -83,7 +83,7 @@ sub init_config {
 
     $ENV{EB_LANG} = $cfg->val('locale','lang',
 			      $ENV{EB_LANG}||$ENV{LANG}||
-			      ($^O =~ /^win/i ? "nl_NL.utf8" : "nl_NL"));
+			      ($^O =~ /^(ms)?win/i ? "nl_NL.utf8" : "nl_NL"));
 
     $cfg->_plug(qw(locale       lang         EB_LANG));
     unless ( defined($cfg->val(qw(locale unicode), undef)) ) {

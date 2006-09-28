@@ -1,11 +1,11 @@
 #!/usr/bin/perl -w
-my $RCS_Id = '$Id: DB.pm,v 1.43 2006/06/05 19:36:53 jv Exp $ ';
+my $RCS_Id = '$Id: DB.pm,v 1.43.4.2 2006/09/27 13:29:27 jv Exp $ ';
 
 # Author          : Johan Vromans
 # Created On      : Sat May  7 09:18:15 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Mon Jun  5 21:34:56 2006
-# Update Count    : 341
+# Last Modified On: Wed Sep 27 15:26:09 2006
+# Update Count    : 346
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -166,6 +166,12 @@ sub check_db {
 =cut
 
     die("?"._T("CONSISTENTIE-VERIFICATIE STANDAARDREKENINGEN MISLUKT")."\n") if $fail;
+
+    $self->setup;
+}
+
+sub setup {
+    my ($self) = @_;
 
     # Create temp table for account mangling.
     $dbh->do("SELECT * INTO TEMP TAccounts FROM Accounts WHERE acc_id = 0");
