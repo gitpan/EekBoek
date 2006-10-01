@@ -1,4 +1,15 @@
-1.00.01	
+1.00.02	
+
+	Forceer UNICODE onder Windows, tenzij locale:unicode dit
+	overruled.
+
+	Fix een bug in de inputafhandeling waar regels die met
+	whitespace geheel worden genegeerd.
+
+	Fix bug in het opstarten van het (ongedocumenteerde) sql
+	commando.
+
+1.00.01	2006-09-28 15:43
 
 	Fix een bug waardoor de TAccounts tabel niet werd aangemaakt
 	in geval van --import. Over het algemeen onschadelijk, tenzij

@@ -1,10 +1,10 @@
 # Config.pm -- 
-# RCS Info        : $Id: Config.pm,v 1.8.4.1 2006/09/28 07:31:13 jv Exp $
+# RCS Info        : $Id: Config.pm,v 1.8.4.2 2006/09/29 09:53:43 jv Exp $
 # Author          : Johan Vromans
 # Created On      : Fri Jan 20 17:57:13 2006
 # Last Modified By: Johan Vromans
-# Last Modified On: Thu Sep 28 09:31:02 2006
-# Update Count    : 70
+# Last Modified On: Fri Sep 29 11:46:09 2006
+# Update Count    : 71
 # Status          : Unknown, Use with caution!
 
 package main;
@@ -88,7 +88,9 @@ sub init_config {
     $cfg->_plug(qw(locale       lang         EB_LANG));
     unless ( defined($cfg->val(qw(locale unicode), undef)) ) {
 	$cfg->newval(qw(locale unicode),
-		     ($cfg->val(qw(locale lang)) =~ /\.utf-?8$/i)||0);
+		     ($^O =~ /^(ms)?win/i)
+		     || ($cfg->val(qw(locale lang)) =~ /\.utf-?8$/i)
+		     || 0);
     }
     $unicode = $cfg->val(qw(locale unicode));
 
