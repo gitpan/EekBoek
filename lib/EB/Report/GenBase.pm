@@ -1,4 +1,4 @@
-# RCS Info        : $Id: GenBase.pm,v 1.21 2006/07/12 14:19:49 jv Exp $
+# RCS Info        : $Id$
 # Author          : Johan Vromans
 # Created On      : Sat Oct  8 16:40:43 2005
 # Last Modified By: Johan Vromans

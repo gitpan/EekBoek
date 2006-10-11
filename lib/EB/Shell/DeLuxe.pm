@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-my $RCS_Id = '$Id: DeLuxe.pm,v 1.14.4.1 2006/09/29 10:53:57 jv Exp $ ';
+my $RCS_Id = '$Id$ ';
 
 # Author          : Johan Vromans
 # Created On      : Thu Jul  7 15:53:48 2005

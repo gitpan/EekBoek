@@ -1,10 +1,10 @@
 # Import.pm -- Import EekBoek administratie
-# RCS Info        : $Id: Import.pm,v 1.6.4.1 2006/09/27 13:20:05 jv Exp $
+# RCS Info        : $Id$
 # Author          : Johan Vromans
 # Created On      : Tue Feb  7 11:56:50 2006
 # Last Modified By: Johan Vromans
-# Last Modified On: Wed Sep 27 15:19:26 2006
-# Update Count    : 53
+# Last Modified On: Wed Oct 11 14:26:56 2006
+# Update Count    : 54
 # Status          : Unknown, Use with caution!
 
 package main;

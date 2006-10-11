@@ -1,4 +1,4 @@
-# $Id: 10_basic.t,v 1.5 2006/09/28 13:20:43 jv Exp $  -*-perl-*-
+# $Id$  -*-perl-*-
 
 use strict;
 use Test::More tests => 10;

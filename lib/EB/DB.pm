@@ -1,11 +1,11 @@
 #!/usr/bin/perl -w
-my $RCS_Id = '$Id: DB.pm,v 1.43.4.3 2006/10/11 10:08:21 jv Exp $ ';
+my $RCS_Id = '$Id$ ';
 
 # Author          : Johan Vromans
 # Created On      : Sat May  7 09:18:15 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Sun Oct  8 17:07:30 2006
-# Update Count    : 347
+# Last Modified On: Wed Oct 11 14:40:55 2006
+# Update Count    : 390
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -34,17 +34,17 @@ sub check_db {
     my $fail = 0;
 
     # Check the existence of the required tables.
-    my %tables = map { lc, 1 } $dbh->tables;
+    my %tables = map { $_, 1 } @{$self->tablesdb};
 
     foreach my $table ( qw(constants standaardrekeningen verdichtingen accounts
 			   relaties accounts boekstukken boekstukregels
 			   btwtabel journal metadata) ) {
-	next if $tables{$table} || $tables{"public.$table"};
+	next if $tables{$table};
 	$fail++;
 	 warn("?".__x("Tabel {table} ontbreekt in database {db}",
 		      table => $table, db => $dbh->{Name}) . "\n");
     }
-    # warn(join(" ", sort keys %tables)."\n") if $fail;
+    warn(join(" ", sort keys %tables)."\n") if $fail;
     die("?".__x("Ongeldige EekBoek database: {db}.",
 		db => $dbh->{Name}) . " " .
 	_T("Wellicht is de database nog niet geïnitialiseerd?")."\n") if $fail;
@@ -70,7 +70,7 @@ sub check_db {
 
 	    require EB::Tools::SQLEngine;
 	    eval {
-		EB::Tools::SQLEngine->new(dbh => $dbh, trace => $trace)->process($sql);
+		EB::Tools::SQLEngine->new(dbh => $self, trace => $trace)->process($sql);
 	    };
 	    warn("?".$@) if $@;
 	    $dbh->rollback if $@;
@@ -143,28 +143,6 @@ sub check_db {
 	  unless $rr->[0];
     }
 
-=begin notanymore
-
-    # Verify some grootboekrekeningen.
-    # We cannot do this anymore now we have free choice of accounts for ledgers.
-    my $sth = $self->sql_exec("SELECT acc_id, acc_desc, dbk_id, dbk_type, dbk_desc FROM Dagboeken, Accounts".
-			      " WHERE dbk_acc_id = acc_id");
-    while ( my $rr = $sth->fetchrow_arrayref ) {
-	my ($acc_id, $acc_desc, $dbk_id, $dbk_type, $dbk_desc) = @$rr;
-	if ( $dbk_type == DBKTYPE_INKOOP && $acc_id != $self->std_acc("crd") ) {
-	    $fail++;
-	    warn("?".__x("Verkeerde grootboekrekening {acct} ({adesc}) voor dagboek {dbk} ({ddesc})",
-			 acct => $acc_id, adesc => $acc_desc, dbk => $dbk_id, ddesc => $dbk_desc)."\n")
-	}
-	elsif ( $dbk_type == DBKTYPE_VERKOOP && $acc_id != $self->std_acc("deb") ) {
-	    $fail++;
-	    warn("?".__x("Verkeerde grootboekrekening {acct} ({adesc}) voor dagboek {dbk} ({ddesc})",
-			 acct => $acc_id, adesc => $acc_desc, dbk => $dbk_id, ddesc => $dbk_desc)."\n")
-	}
-    }
-
-=cut
-
     die("?"._T("CONSISTENTIE-VERIFICATIE STANDAARDREKENINGEN MISLUKT")."\n") if $fail;
 
     $self->setup;
@@ -173,8 +151,13 @@ sub check_db {
 sub setup {
     my ($self) = @_;
 
+    setupdb();
+
     # Create temp table for account mangling.
-    $dbh->do("SELECT * INTO TEMP TAccounts FROM Accounts WHERE acc_id = 0");
+    my $sql = "SELECT * INTO TEMP TAccounts FROM Accounts WHERE acc_id = 0";
+    $sql = $self->feature("filter")->($sql) if $self->feature("filter");
+    $dbh->do($sql) if $sql;
+
     # Make it semi-permanent (this connection only).
     $dbh->commit;
 }
@@ -198,7 +181,7 @@ sub store_journal {
     foreach ( @$jnl ) {
 	$self->sql_insert("Journal",
 			  [qw(jnl_date jnl_dbk_id jnl_bsk_id jnl_bsr_date jnl_bsr_seq
-			      jnl_acc_id jnl_amount jnl_desc jnl_rel)],
+			      jnl_acc_id jnl_amount jnl_damount jnl_desc jnl_rel)],
 			  @$_);
     }
 }
@@ -414,11 +397,25 @@ sub connectdb {
     $dbh;
 }
 
-sub disconnect {
+sub disconnectdb {
     my ($self) = shift;
-    $dbpkg ||= $self->_loaddbbackend;
+    return unless $dbpkg;
+    return unless $dbh;
+    resetdbcache($self);
     $dbpkg->disconnect;
     undef $dbh;
+}
+
+sub feature {
+    my ($self) = shift;
+    $dbpkg ||= $self->_loaddbbackend;
+    $dbpkg->feature(@_);
+}
+
+sub setupdb {
+    my ($self) = shift;
+    $dbpkg ||= $self->_loaddbbackend;
+    $dbpkg->setup;
 }
 
 sub listdb {
@@ -427,19 +424,25 @@ sub listdb {
     $dbpkg->list;
 }
 
+sub tablesdb {
+    my ($self) = shift;
+    $dbpkg ||= $self->_loaddbbackend;
+    $dbpkg->get_tables;
+}
+
 sub cleardb {
     my ($self) = shift;
     $dbpkg ||= $self->_loaddbbackend;
-    $dbpkg->clear;
     $self->resetdbcache;
+    $dbpkg->clear;
 }
 
 sub createdb {
     my ($self, $dbname) = @_;
     $dbpkg ||= $self->_loaddbbackend;
-    Carp::confess("OOPS") unless $dbpkg;
-    $dbpkg->create($dbname);
+    Carp::confess("DB backend setup failed") unless $dbpkg;
     $self->resetdbcache;
+    $dbpkg->create($dbname);
 }
 
 sub driverdb {
@@ -458,7 +461,8 @@ sub get_sequence {
     my ($self) = shift;
     warn("=> GET-SEQUENCE ", $_[0], "\n") if $trace;
     $self->connectdb;
-    Carp::confess("OOPS") unless $dbpkg;
+    Carp::confess("DB backend setup failed") unless $dbpkg;
+    Carp::croak("INTERNAL ERROR: get_sequence takes only one argument") if @_ != 1;
     $dbpkg->get_sequence(@_);
 }
 
@@ -466,6 +470,7 @@ sub set_sequence {
     my ($self) = shift;
     warn("=> SET-SEQUENCE ", $_[0], " TO ", $_[1], "\n") if $trace;
     $self->connectdb;
+    Carp::confess("DB backend setup failed") unless $dbpkg;
     $dbpkg->set_sequence(@_);
 }
 
@@ -506,6 +511,8 @@ my $sql_prep_cache_miss;
 sub sql_prep {
     my ($self, $sql) = @_;
     $dbh ||= $self->connectdb();
+    $sql = $self->feature("filter")->($sql) if $self->feature("filter");
+    return $dbh->prepare($sql) unless $self->feature("prepcache");
     if ( defined($sth{$sql}) ) {
 	$sql_prep_cache_hits++;
 	return $sth{$sql};
@@ -514,7 +521,7 @@ sub sql_prep {
     $sth{$sql} = $dbh->prepare($sql);
 }
 
-END {
+sub prepstats {
     warn("SQL Prep Cache: number of hits = ",
 	 $sql_prep_cache_hits || 0, ", misses = ",
 	 $sql_prep_cache_miss || 0, "\n")
@@ -524,14 +531,9 @@ END {
 sub resetdbcache {
     my ($self) = @_;
     %sth = ();
+    return unless $self;
     $self->std_acc("");
     $self->adm("");
-}
-
-sub close {
-    my ($self) = @_;
-    $self->disconnectdb;
-    $self->resetdbcache;
 }
 
 sub show_sql($$@) {
@@ -610,14 +612,8 @@ sub commit {
     $dbh->commit;
 }
 
-sub disconnectdb {
-    my ($self) = @_;
-
-    return unless $dbh;
-    $dbh->disconnect;
-}
-
 END {
+    prepstats();
     disconnectdb();
 }
 

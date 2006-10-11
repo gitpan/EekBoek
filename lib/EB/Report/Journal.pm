@@ -1,11 +1,11 @@
 #!/usr/bin/perl -w
-my $RCS_Id = '$Id: Journal.pm,v 1.30 2006/04/15 09:08:35 jv Exp $ ';
+my $RCS_Id = '$Id$ ';
 
 # Author          : Johan Vromans
 # Created On      : Sat Jun 11 13:44:43 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Sat Apr 15 10:47:50 2006
-# Update Count    : 275
+# Last Modified On: Tue Oct 10 15:43:04 2006
+# Update Count    : 294
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -23,6 +23,7 @@ use warnings;
 use EB;
 use EB::Format;
 use EB::DB;
+use EB::Booking;		# for dcfromtd()
 use EB::Report::GenBase;
 
 sub new {
@@ -52,6 +53,18 @@ sub journal {
     if ( my $t = $cfg->val(qw(internal now), 0) ) {
 	$per->[1] = $t if $t lt $per->[1];
     }
+
+    # Sort order (boekstukken).
+    my $so = join(", ",
+		  "jnl_date",					# date
+		  "jnl_dbk_id",					# dagboek
+		  "bsk_nr",					# boekstuk
+		  "CASE WHEN jnl_bsr_seq = 0 THEN 0 ELSE 1 END",# bsr 0 eerst
+		  "sign(jnl_amount) DESC",			# debet eerst
+		  "jnl_acc_id",					# rekeningnummer
+		  "jnl_amount DESC",				# grootste bedragen vooraan
+		  "jnl_bsr_seq");				# if all else fails
+
     $rep->start(_T("Journaal"));
 
     my $sth;
@@ -66,14 +79,14 @@ sub journal {
 		return;
 	    }
 	    $sth = $dbh->sql_exec("SELECT jnl_date, jnl_bsr_date, jnl_dbk_id, jnl_bsk_id, bsk_nr, jnl_bsr_seq, ".
-				  "jnl_acc_id, jnl_amount, jnl_desc, jnl_rel".
+				  "jnl_acc_id, jnl_amount, jnl_damount, jnl_desc, jnl_rel".
 				  " FROM Journal, Boekstukken, Dagboeken".
 				  " WHERE bsk_nr = ?".
 				  " AND dbk_id = ?".
 				  " AND jnl_bsk_id = bsk_id".
 				  " AND jnl_dbk_id = dbk_id".
 				  ($per ? " AND jnl_date >= ? AND jnl_date <= ?" : "").
-				  " ORDER BY jnl_date, jnl_dbk_id, bsk_nr, jnl_amount DESC, jnl_bsr_seq",
+				  " ORDER BY ".$so,
 				  $2, $rr->[1], $per ? @$per : ());
 	    $pfx ||= __x("Boekstuk {nr}", nr => "$rr->[0]:$2");
 	}
@@ -87,35 +100,35 @@ sub journal {
 		return;
 	    }
 	    $sth = $dbh->sql_exec("SELECT jnl_date, jnl_bsr_date, jnl_dbk_id, jnl_bsk_id, bsk_nr, jnl_bsr_seq, ".
-				  "jnl_acc_id, jnl_amount, jnl_desc, jnl_rel".
+				  "jnl_acc_id, jnl_amount, jnl_damount, jnl_desc, jnl_rel".
 				  " FROM Journal, Boekstukken, Dagboeken".
 				  " WHERE dbk_id = ?".
 				  " AND jnl_bsk_id = bsk_id".
 				  " AND jnl_dbk_id = dbk_id".
 				  ($per ? " AND jnl_date >= ? AND jnl_date <= ?" : "").
-				  " ORDER BY jnl_date, jnl_dbk_id, bsk_nr, jnl_amount DESC, jnl_bsr_seq",
+				  " ORDER BY ".$so,
 				  $rr->[1], $per ? @$per : ());
 	    $pfx ||= __x("Dagboek {nr}", nr => $rr->[0]);
 	}
 	else {
 	    $sth = $dbh->sql_exec("SELECT jnl_date, jnl_bsr_date, jnl_dbk_id, jnl_bsk_id, bsk_nr, jnl_bsr_seq, ".
-				  "jnl_acc_id, jnl_amount, jnl_desc, jnl_rel".
+				  "jnl_acc_id, jnl_amount, jnl_damount, jnl_desc, jnl_rel".
 				  " FROM Journal, Boekstukken".
 				  " WHERE jnl_bsk_id = ?".
 				  " AND jnl_bsk_id = bsk_id".
 				  ($per ? " AND jnl_date >= ? AND jnl_date <= ?" : "").
-				  " ORDER BY jnl_date, jnl_dbk_id, bsk_nr, jnl_amount DESC, jnl_bsr_seq",
+				  " ORDER BY ".$so,,
 				  $nr, $per ? @$per : ());
 	    $pfx ||= __x("Boekstuk {nr}", nr => $nr);
 	}
     }
     else {
 	$sth = $dbh->sql_exec("SELECT jnl_date, jnl_bsr_date, jnl_dbk_id, jnl_bsk_id, bsk_nr, jnl_bsr_seq, ".
-			      "jnl_acc_id, jnl_amount, jnl_desc, jnl_rel".
+			      "jnl_acc_id, jnl_amount, jnl_damount, jnl_desc, jnl_rel".
 			      " FROM Journal, Boekstukken".
 			      " WHERE jnl_bsk_id = bsk_id".
 			      ($per ? " AND jnl_date >= ? AND jnl_date <= ?" : "").
-			      " ORDER BY jnl_date, jnl_dbk_id, bsk_nr, sign(jnl_amount) DESC, jnl_acc_id, jnl_bsr_seq",
+			      " ORDER BY ".$so,
 			      $per ? @$per : ());
     }
     my $rr;
@@ -124,7 +137,7 @@ sub journal {
 
     while ( $rr = $sth->fetchrow_arrayref ) {
 	my ($jnl_date, $jnl_bsr_date, $jnl_dbk_id, $jnl_bsk_id, $bsk_nr, $jnl_bsr_seq, $jnl_acc_id,
-	    $jnl_amount, $jnl_desc, $jnl_rel) = @$rr;
+	    $jnl_amount, $jnl_damount, $jnl_desc, $jnl_rel) = @$rr;
 
 	if ( $jnl_bsr_seq == 0 ) {
 	    $nl++, next unless $detail;
@@ -136,15 +149,16 @@ sub journal {
 	    next;
 	}
 
-	$totd += $jnl_amount if $jnl_amount > 0;
-	$totc -= $jnl_amount if $jnl_amount < 0;
+	my ($deb, $crd) = EB::Booking::dcfromtd($jnl_amount, $jnl_damount);
+	$totd += $deb;
+	$totc += $crd;
 	next unless $detail;
 	$rep->add({ _style => 'data',
 		    date => datefmt($jnl_bsr_date),
 		    desc => _acc_desc($jnl_acc_id),
 		    acct => $jnl_acc_id,
-		    $jnl_amount >= 0 ? ( deb => numfmt($jnl_amount) )
-				     : ( crd => numfmt(-$jnl_amount) ),
+		    ($deb || defined $jnl_damount) ? (deb => numfmt($deb)) : (),
+		    ($crd || defined $jnl_damount) ? (crd => numfmt($crd)) : (),
 		    bsk  => $jnl_desc,
 		    $jnl_rel ? ( rel => $jnl_rel ) : (),
 		  });

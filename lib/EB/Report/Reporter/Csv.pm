@@ -1,5 +1,5 @@
 # Csv.pm -- 
-# RCS Info        : $Id: Csv.pm,v 1.4 2006/01/22 17:12:36 jv Exp $
+# RCS Info        : $Id$
 # Author          : Johan Vromans
 # Created On      : Thu Jan  5 18:47:37 2006
 # Last Modified By: Johan Vromans

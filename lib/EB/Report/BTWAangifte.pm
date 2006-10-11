@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-my $RCS_Id = '$Id: BTWAangifte.pm,v 1.36 2006/09/25 12:55:52 jv Exp $ ';
+my $RCS_Id = '$Id$ ';
 
 # Author          : Johan Vromans
 # Created On      : Tue Jul 19 19:01:33 2005

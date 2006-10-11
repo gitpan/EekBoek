@@ -1,4 +1,4 @@
-my $RCS_Id = '$Id: Decode.pm,v 1.19 2006/07/09 16:45:58 jv Exp $ ';
+my $RCS_Id = '$Id$ ';
 
 package main;
 
@@ -11,8 +11,8 @@ package EB::Booking::Decode;
 # Author          : Johan Vromans
 # Created On      : Tue Sep 20 15:16:31 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Sat Jul  8 21:33:41 2006
-# Update Count    : 155
+# Last Modified On: Sun Oct  8 19:20:12 2006
+# Update Count    : 158
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -121,21 +121,22 @@ sub decode {
 	}
     };
 
-    my $sth = $dbh->sql_exec("SELECT bsr_id, bsr_nr, bsr_date, ".
+    my $sth = $dbh->sql_exec("SELECT bsr_nr, bsr_date, ".
 			     "bsr_desc, bsr_amount, bsr_btw_id, bsr_btw_class, ".
 			     "bsr_type, bsr_acc_id, bsr_rel_code, bsr_paid ".
 			     " FROM Boekstukregels".
 			     " WHERE bsr_bsk_id = ?".
 			     " ORDER BY bsr_nr", $bsk);
 
-    unless ( $sth->rows ) {
+    $rr = $sth->fetchrow_arrayref;
+    unless ( $rr ) {
 	# Special case for boekstuk zonder boekstukregels.
 	$setup->(undef);
 	return $cmd;
     }
 
-    while ( $rr = $sth->fetchrow_arrayref ) {
-	my ($bsr_id, $bsr_nr, $bsr_date, $bsr_desc, $bsr_amount, $bsr_btw_id,
+    while ( $rr ) {
+	my ($bsr_nr, $bsr_date, $bsr_desc, $bsr_amount, $bsr_btw_id,
 	    $bsr_btw_class, $bsr_type, $bsr_acc_id, $bsr_rel_code, $bsr_paid) = @$rr;
 	if ( $bsr_nr == 1) {
 	    $setup->($bsr_rel_code);
@@ -151,7 +152,7 @@ sub decode {
 	my $dc = $bsr_amount >= 0 ? "debet" : "credit";
 	$dc = uc($dc) unless (($bsr_amount < 0) xor $rt);
 	$cmd .= join("",
-		     " Boekstukregel $bsr_id, nr $bsr_nr, datum $bsr_date, ",
+		     " Boekstukregel, nr $bsr_nr, datum $bsr_date, ",
 		     "\"$bsr_desc\"",
 		     ", type $bsr_type (", $bsr_types[$dbktype][$bsr_type], ")\n",
 		     "  ",
@@ -244,7 +245,7 @@ sub decode {
 		}
 	    }
 	}
-
+	$rr = $sth->fetchrow_arrayref;
     }
     return ($cmd, $tot, $bsk_amount, $acct)
       if wantarray;

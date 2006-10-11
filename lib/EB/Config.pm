@@ -1,5 +1,5 @@
 # Config.pm -- 
-# RCS Info        : $Id: Config.pm,v 1.8.4.2 2006/09/29 09:53:43 jv Exp $
+# RCS Info        : $Id$
 # Author          : Johan Vromans
 # Created On      : Fri Jan 20 17:57:13 2006
 # Last Modified By: Johan Vromans

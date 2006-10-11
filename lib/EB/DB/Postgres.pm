@@ -1,10 +1,10 @@
-# Postgres.pm -- 
-# RCS Info        : $Id: Postgres.pm,v 1.14.4.2 2006/10/06 13:05:02 jv Exp $
+# Postgres.pm -- EekBoek driver for PostgreSQL dsatabase
+# RCS Info        : $Id$
 # Author          : Johan Vromans
 # Created On      : Tue Jan 24 10:43:00 2006
 # Last Modified By: Johan Vromans
-# Last Modified On: Fri Oct  6 14:39:42 2006
-# Update Count    : 145
+# Last Modified On: Wed Oct 11 14:27:31 2006
+# Update Count    : 163
 # Status          : Unknown, Use with caution!
 
 package main;
@@ -24,6 +24,7 @@ my $dataset;
 
 my $trace = $cfg->val(__PACKAGE__, "trace", 0);
 
+# API: type  type of driver
 sub type { "Postgres" }
 
 sub _dsn {
@@ -38,6 +39,7 @@ sub _dsn {
       : $dsn;
 }
 
+# API: create a new database, reuse an existing one if possible.
 sub create {
     my ($self, $dbname) = @_;
 
@@ -88,6 +90,7 @@ sub create {
 		err => $errstr)."\n");
 }
 
+# API: connect to an existing database.
 sub connect {
     my ($self, $dbname) = @_;
     croak("?INTERNAL ERROR: connect db without dataset name") unless $dbname;
@@ -120,12 +123,17 @@ sub connect {
     return $dbh;
 }
 
+# API: Disconnect from a database.
 sub disconnect {
     my ($self) = @_;
     return unless $dbh;
     $dbh->disconnect;
     undef $dbh;
     undef $dataset;
+}
+
+# API: Setup whatever is needed.
+sub setup {
 }
 
 sub clear {
@@ -144,7 +152,7 @@ sub clear {
 	my $rr = $dbh->selectall_arrayref("SELECT relname".
 					  " FROM pg_class".
 					  " WHERE relkind = 'S'".
-					  ' AND relname LIKE \'bsk_%_seq\'');
+					  ' AND relname LIKE \'%bsk_%_seq\'');
 	foreach my $seq ( @$rr ) {
 	    warn("+ DROP SEQUENCE $seq->[0]\n") if $trace;
 	    eval { $dbh->do("DROP SEQUENCE $seq->[0]") };
@@ -154,6 +162,7 @@ sub clear {
 
 }
 
+# API: List available data sources.
 sub list {
     my @ds;
 
@@ -170,16 +179,29 @@ sub list {
     [ map { $_ =~ s/^.*?dbname=eekboek_// and $_ } @ds ];
 }
 
+# API: Get a array ref with table names (lowcased).
+sub get_tables {
+    my $self = shift;
+    my @t;
+    foreach ( $dbh->tables ) {
+	next unless /^public\.(.+)/i;
+	push(@t, lc($1));
+    }
+    \@t;
+}
+
+################ Sequences ################
+
+# API: Get the next value for a sequence, incrementing it.
 sub get_sequence {
-    my ($self, $seq, $noinc) = @_;
+    my ($self, $seq) = @_;
     croak("?INTERNAL ERROR: get sequence while not connected") unless $dbh;
 
-    my $rr = $dbh->selectall_arrayref("SELECT ".
-				      ($noinc ? "currval" : "nextval").
-				      "('$seq')");
+    my $rr = $dbh->selectall_arrayref("SELECT nextval('$seq')");
     return ($rr && defined($rr->[0]) && defined($rr->[0]->[0])? $rr->[0]->[0] : undef);
 }
 
+# API: Set the next value for a sequence.
 sub set_sequence {
     my ($self, $seq, $value) = @_;
     croak("?INTERNAL ERROR: set sequence while not connected") unless $dbh;
@@ -190,6 +212,9 @@ sub set_sequence {
     $value;
 }
 
+################ Interactive SQL ################
+
+# API: Interactive SQL.
 sub isql {
     my ($self, @args) = @_;
 
@@ -201,10 +226,6 @@ sub isql {
 	next unless $_;
 	push(@cmd, "-U", $_);
     }
-#    for ( $cfg->val("database", "password", undef) ) {
-#	next unless $_;
-#	push(@cmd, "--password");
-#    }
     for ( $cfg->val("database", "host", undef) ) {
 	next unless $_;
 	push(@cmd, "-h", $_);
@@ -223,5 +244,35 @@ sub isql {
     # warn(sprintf("=> ret = %02x", $res)."\n") if $res;
 
 }
+
+################ PostgreSQL Compatibility ################
+
+# API: feature  Can we?
+sub feature {
+    my $self = shift;
+    my $feat = lc(shift);
+
+    # Known features:
+    #
+    # pgcopy	F PostgreSQL fast input copying
+    # prepcache T Statement handles may be cached
+    # filter    C SQL filter routine
+    #
+    # Unknown/unsupported features may be ignored.
+
+    if ( $feat eq "pgcopy" ) {
+	return 1 if ($DBD::Pg::VERSION||0) >= 1.41;
+	warn("%"."Not using PostgreSQL fast load. DBD::Pg::VERSION = ",
+	     ($DBD::Pg::VERSION||0), ", needs 1.41 or later\n");
+	return;
+    }
+
+    return 1 if $feat eq "prepcache";
+
+    # Return false for all others.
+    return;
+}
+
+################ End PostgreSQL Compatibility ################
 
 1;

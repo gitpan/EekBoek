@@ -1,5 +1,5 @@
 # Html.pm -- HTML backend for BTWAangifte
-# RCS Info        : $Id: Html.pm,v 1.12 2006/06/02 13:38:57 jv Exp $
+# RCS Info        : $Id$
 # Author          : Johan Vromans
 # Created On      : Wed Sep 14 14:51:19 2005
 # Last Modified By: Johan Vromans

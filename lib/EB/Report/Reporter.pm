@@ -1,5 +1,5 @@
 # Reporter.pm -- 
-# RCS Info        : $Id: Reporter.pm,v 1.10 2006/04/15 09:08:34 jv Exp $
+# RCS Info        : $Id$
 # Author          : Johan Vromans
 # Created On      : Wed Dec 28 13:18:40 2005
 # Last Modified By: Johan Vromans

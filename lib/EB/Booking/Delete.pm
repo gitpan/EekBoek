@@ -1,4 +1,4 @@
-my $RCS_Id = '$Id: Delete.pm,v 1.9 2006/07/12 14:20:42 jv Exp $ ';
+my $RCS_Id = '$Id$ ';
 
 package main;
 

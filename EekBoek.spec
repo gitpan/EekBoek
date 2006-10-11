@@ -1,6 +1,6 @@
 %define modname EekBoek
 %define lcname eekboek
-%define modversion 1.00.04
+%define modversion 1.01.00
 
 ################ Build Options ################
 %define gui 0
@@ -43,11 +43,11 @@ Group: Applications/Productivity
 %description
 EekBoek is a bookkeeping package for small and medium-size businesses.
 Unlike other accounting software, EekBoek has both a command-line
-interface (CLI) and a graphical user-interface (GUI). Furthermore, it
-has a complete Perl API to create your own custom applications.
-EekBoek is designed for the Dutch/European market and currently
-available in Dutch only. An English translation is in the works (help
-appreciated).
+interface (CLI) and a graphical user-interface (GUI, currently under
+development). Furthermore, it has a complete Perl API to create your
+own custom applications. EekBoek is designed for the Dutch/European
+market and currently available in Dutch only. An English translation
+is in the works (help appreciated).
 
 %if %{gui}
 %package gui

@@ -1,5 +1,5 @@
 -- EekBoek Database Schema
--- $Id: eekboek.sql,v 1.28 2006/07/09 16:45:57 jv Exp $
+-- $Id$
 
 -- Constanten. Deze worden gegenereerd door de EB::Globals module.
 CREATE TABLE Constants (
@@ -70,6 +70,7 @@ CREATE TABLE Dagboeken (
     dbk_id        varchar(4) primary key,
     dbk_desc      text not null,
     dbk_type      smallint not null, -- inkoop, verkoop, bank/giro, kas, memoriaal
+    dbk_dcsplit	  boolean default false, -- splits journaal bedrag in debet/credit
     dbk_acc_id    int references Accounts,
     CONSTRAINT "dbk_types"
 	CHECK (dbk_type >= 1 AND dbk_type <= 5)
@@ -117,7 +118,7 @@ INSERT INTO Boekjaren
 
 -- Boekstukken
 CREATE TABLE Boekstukken (
-    bsk_id       serial not null primary key,
+    bsk_id       int not null primary key,
     bsk_nr       int not null,	-- serienummer
     bsk_desc     text not null,
     bsk_dbk_id   varchar(4) references Dagboeken,
@@ -130,9 +131,11 @@ CREATE TABLE Boekstukken (
     UNIQUE(bsk_nr, bsk_dbk_id, bsk_bky)
 );
 
+-- Sequence voor Boekstuknummers
+CREATE SEQUENCE boekstukken_bsk_id_seq;
+
 -- Boekstukregels
 CREATE TABLE Boekstukregels (
-    bsr_id       serial not null primary key,
     bsr_nr       int,	-- volgnummer in dit boekstuk (1, 2, 3, ...)
     bsr_date     date,
     bsr_bsk_id   int references Boekstukken,
@@ -171,7 +174,8 @@ CREATE TABLE Journal (
     jnl_bsr_date date not null,	--boekstukregeldatum
     jnl_bsr_seq	int not null,
     jnl_acc_id	int references Accounts,
-    jnl_amount	int8,
+    jnl_amount	int8,	-- total amount
+    jnl_damount	int8,	-- debet portion
     jnl_desc	text,
     jnl_rel	CHAR(10) references Relaties,
     UNIQUE(jnl_bsk_id, jnl_dbk_id, jnl_bsr_seq)
@@ -195,6 +199,6 @@ CREATE TABLE Metadata (
 
 -- Harde waarden, moeten overeenkomen met de code.
 INSERT INTO metadata (adm_scm_majversion, adm_scm_minversion, adm_scm_revision)
-  VALUES (1, 0, 9);
+  VALUES (1, 0, 10);
 
 UPDATE Metadata SET adm_bky = '<<<<'; -- Voorgaand boekjaar

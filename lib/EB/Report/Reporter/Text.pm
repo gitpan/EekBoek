@@ -1,5 +1,5 @@
 # Text.pm -- 
-# RCS Info        : $Id: Text.pm,v 1.6 2006/01/22 16:47:21 jv Exp $
+# RCS Info        : $Id$
 # Author          : Johan Vromans
 # Created On      : Wed Dec 28 13:21:11 2005
 # Last Modified By: Johan Vromans

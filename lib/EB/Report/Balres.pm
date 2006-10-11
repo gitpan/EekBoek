@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-my $RCS_Id = '$Id: Balres.pm,v 1.24 2006/05/25 17:15:30 jv Exp $ ';
+my $RCS_Id = '$Id$ ';
 
 package main;
 

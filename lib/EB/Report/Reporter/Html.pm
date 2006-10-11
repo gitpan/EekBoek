@@ -1,5 +1,5 @@
 # Html.pm -- 
-# RCS Info        : $Id: Html.pm,v 1.11 2006/06/02 13:33:02 jv Exp $
+# RCS Info        : $Id$
 # Author          : Johan Vromans
 # Created On      : Thu Dec 29 15:46:47 2005
 # Last Modified By: Johan Vromans

@@ -1,5 +1,5 @@
 # Locale.pm -- EB Locale setup (core version)
-# RCS Info        : $Id: Locale.pm,v 1.6 2006/05/05 15:37:41 jv Exp $
+# RCS Info        : $Id$
 # Author          : Johan Vromans
 # Created On      : Fri Sep 16 20:27:25 2005
 # Last Modified By: Johan Vromans

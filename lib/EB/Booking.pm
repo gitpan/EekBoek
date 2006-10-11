@@ -1,13 +1,13 @@
 # Booking.pm -- Base class for Bookings.
-# RCS Info        : $Id: Booking.pm,v 1.12 2006/05/19 10:41:37 jv Exp $
+# RCS Info        : $Id$
 # Author          : Johan Vromans
 # Created On      : Sat Oct 15 23:36:51 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Fri May 19 12:39:45 2006
-# Update Count    : 49
+# Last Modified On: Fri Oct  6 22:13:25 2006
+# Update Count    : 63
 # Status          : Unknown, Use with caution!
 
-my $RCS_Id = '$Id: Booking.pm,v 1.12 2006/05/19 10:41:37 jv Exp $ ';
+my $RCS_Id = '$Id$ ';
 
 package main;
 
@@ -191,6 +191,15 @@ sub norm_btw {
 }
 
 #### Class method
+sub dcfromtd {
+    # Calculate a (debet,credit) pair from a (total,debet) pair.
+    my ($total, $debet) = @_;
+    return ($debet, $debet-$total) if defined($debet);
+    return ($total, 0) if $total >= 0;
+    (0, -$total);
+}
+
+#### Class method
 sub journalise {
     my ($self, $bsk_id) = @_;
 
@@ -204,11 +213,11 @@ sub journalise {
 		      " WHERE bsk_id = ?", $bsk_id);
     my ($bsk_nr, $bsk_desc, $bsk_dbk_id, $bsk_date) = @$rr;
 
-    my ($dbktype, $dbk_acc_id) =
-      @{$::dbh->do("SELECT dbk_type, dbk_acc_id".
+    my ($dbktype, $dbkdcsplit, $dbk_acc_id) =
+      @{$::dbh->do("SELECT dbk_type, dbk_dcsplit, dbk_acc_id".
 		 " FROM Dagboeken".
 		 " WHERE dbk_id = ?", $bsk_dbk_id)};
-    my $sth = $::dbh->sql_exec("SELECT bsr_id, bsr_nr, bsr_date, ".
+    my $sth = $::dbh->sql_exec("SELECT bsr_nr, bsr_date, ".
 			     "bsr_desc, bsr_amount, bsr_btw_class, bsr_btw_id, ".
 			     "bsr_btw_acc, bsr_type, bsr_acc_id, bsr_rel_code ".
 			     " FROM Boekstukregels".
@@ -216,10 +225,11 @@ sub journalise {
 
     my $ret = [];
     my $tot = 0;
+    my ($dtot, $ctot) = (0, 0);
     my $nr = 1;
 
     while ( $rr = $sth->fetchrow_arrayref ) {
-	my ($bsr_id, $bsr_nr, $bsr_date, $bsr_desc, $bsr_amount, $bsr_btw_class,
+	my ($bsr_nr, $bsr_date, $bsr_desc, $bsr_amount, $bsr_btw_class,
 	    $bsr_btw_id, $bsr_btw_acc, $bsr_type, $bsr_acc_id, $bsr_rel_code) = @$rr;
 	my $bsr_bsk_id = $bsk_id;
 	my $btw = 0;
@@ -231,23 +241,32 @@ sub journalise {
 	    $amt = $bsr_amount - $btw;
 	}
 	$tot += $bsr_amount;
+	$dtot += $bsr_amount if $bsr_amount < 0;
+	$ctot += $bsr_amount if $bsr_amount > 0;
 
 	push(@$ret, [$bsk_date, $bsk_dbk_id, $bsk_id, $bsr_date, $nr++,
 		     $bsr_acc_id,
-		     $bsr_amount - $btw, $bsr_desc,
+		     $bsr_amount - $btw, undef, $bsr_desc,
 		     $bsr_type ? $bsr_rel_code : undef]);
 	push(@$ret, [$bsk_date,  $bsk_dbk_id, $bsk_id, $bsr_date, $nr++,
 		     $bsr_btw_acc,
-		     $btw, "BTW ".$bsr_desc,
+		     $btw, undef, "BTW ".$bsr_desc,
 		     undef]) if $btw;
     }
 
-    push(@$ret, [$bsk_date,  $bsk_dbk_id, $bsk_id, $bsk_date, $nr++, $dbk_acc_id,
-		 -$tot, $bsk_desc, undef])
-      if $dbk_acc_id;
+    if ( $dbk_acc_id ) {
+	if ( $dbkdcsplit ) {
+	    push(@$ret, [$bsk_date,  $bsk_dbk_id, $bsk_id, $bsk_date, $nr++, $dbk_acc_id,
+			 -$tot, -$dtot, $bsk_desc, undef]);
+	}
+	else {
+	    push(@$ret, [$bsk_date,  $bsk_dbk_id, $bsk_id, $bsk_date, $nr++, $dbk_acc_id,
+			 -$tot, undef, $bsk_desc, undef]);
+	}
+    }
 
     unshift(@$ret, [$bsk_date, $bsk_dbk_id, $bsk_id, $bsk_date, 0, undef,
-		    undef, $bsk_desc, undef]);
+		    undef, undef, $bsk_desc, undef]);
 
     $ret;
 }
