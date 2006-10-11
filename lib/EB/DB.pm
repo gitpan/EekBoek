@@ -1,11 +1,11 @@
 #!/usr/bin/perl -w
-my $RCS_Id = '$Id: DB.pm,v 1.43.4.2 2006/09/27 13:29:27 jv Exp $ ';
+my $RCS_Id = '$Id: DB.pm,v 1.43.4.3 2006/10/11 10:08:21 jv Exp $ ';
 
 # Author          : Johan Vromans
 # Created On      : Sat May  7 09:18:15 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Wed Sep 27 15:26:09 2006
-# Update Count    : 346
+# Last Modified On: Sun Oct  8 17:07:30 2006
+# Update Count    : 347
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -456,6 +456,7 @@ sub isql {
 
 sub get_sequence {
     my ($self) = shift;
+    warn("=> GET-SEQUENCE ", $_[0], "\n") if $trace;
     $self->connectdb;
     Carp::confess("OOPS") unless $dbpkg;
     $dbpkg->get_sequence(@_);
@@ -463,6 +464,7 @@ sub get_sequence {
 
 sub set_sequence {
     my ($self) = shift;
+    warn("=> SET-SEQUENCE ", $_[0], " TO ", $_[1], "\n") if $trace;
     $self->connectdb;
     $dbpkg->set_sequence(@_);
 }
