@@ -3,8 +3,8 @@
 # Author          : Johan Vromans
 # Created On      : Fri Sep 16 18:38:45 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Wed Oct 11 14:25:57 2006
-# Update Count    : 171
+# Last Modified On: Mon Oct 16 18:42:30 2006
+# Update Count    : 189
 # Status          : Unknown, Use with caution!
 
 package main;
@@ -17,8 +17,9 @@ package EB;
 use strict;
 use base qw(Exporter);
 
-use EekBoek;
 our $VERSION = $EekBoek::VERSION;
+use EekBoek;
+BEGIN { $VERSION = $EekBoek::VERSION }
 
 our @EXPORT;
 our @EXPORT_OK;
@@ -73,16 +74,20 @@ our @day_names;
 our $ident;
 our $url = "http://www.eekboek.nl";
 
-INIT {
-    # Banner. Wow! Static code!
+# Most elegant (and correct) would be to use an INIT block here, but
+# currently PAR is not able to handle INIT blocks.
+BEGIN {
+    return if $ident;		# already done
+
     my $year = 2005;
     my $thisyear = (localtime(time))[5] + 1900;
     $year .= "-$thisyear" unless $year == $thisyear;
-    $ident = __x("EekBoek {version}", version => $VERSION);
-    my $u = $cfg->val(qw(locale unicode),0);
+    $ident = __x("{name} {version}",
+		 name    => $EekBoek::PACKAGE,
+		 version => $EekBoek::VERSION);
     my @locextra;
     push(@locextra, _T("Nederlands")) if LOCALISER;
-    push(@locextra, "Latin1") unless $u;
+    push(@locextra, "Latin1") unless $cfg->val(qw(locale unicode), 0);
     warn(__x("{ident}{extra}{locale} -- Copyright {year} Squirrel Consultancy",
 		 ident   => $ident,
 		 extra   => ($app ? " Wx " : ""),

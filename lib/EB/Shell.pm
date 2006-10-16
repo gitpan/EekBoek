@@ -5,8 +5,8 @@ my $RCS_Id = '$Id$ ';
 # Author          : Johan Vromans
 # Created On      : Thu Jul  7 15:53:48 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Wed Oct 11 14:27:13 2006
-# Update Count    : 826
+# Last Modified On: Mon Oct 16 15:01:55 2006
+# Update Count    : 829
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -21,7 +21,8 @@ use strict;
 # require 'common.pl';
 
 # Package name.
-my $my_package; BEGIN { $my_package = 'EekBoek' }
+use EekBoek;
+my $my_package; BEGIN { $my_package = $EekBoek::PACKAGE }
 
 # Program name and version.
 my ($my_name, $my_version) = $RCS_Id =~ /: (.+),v ([\d.]+)/;
@@ -438,10 +439,6 @@ sub parseline {
 ################ Subroutines ################
 
 use EB;
-
-# Standard options for report generating backends.
-my @outopts;
-INIT { @outopts = qw(html csv text output=s page=i) }
 
 # Plug in some commands dynamically.
 sub _plug_cmds {

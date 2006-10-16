@@ -1,7 +1,26 @@
+%define unstable 1
+
 %define modname EekBoek
-%define modsuffix -unstable
+%define modversion 1.01.02
 %define lcname eekboek
-%define modversion 1.01.01
+
+#%if %{unstable}
+#%define modsuffix -Unstable
+#%define lcmodsuffix -unstable
+#%else
+#%define modsuffix %{nil}
+#%define lcmodsuffix %{nil}
+#%endif
+
+%if %{unstable}
+%define modsuffix -unstable
+%define lcmodsuffix %{nil}
+%else
+%define modsuffix %{nil}
+%define lcmodsuffix %{nil}
+%endif
+
+%define lcmod  %{lcname}%{lcmodsuffix}
 
 ################ Build Options ################
 %define gui 0
@@ -30,11 +49,12 @@ Requires: perl >= 5.8
 Requires: perl(Config::IniFiles) >= 2.38
 Requires: perl(Term::ReadLine)
 Requires: perl(DBI) >= 1.40
-Requires: perl(DBD::Pg) >= 1.41
+#Requires: perl(DBD::Pg) >= 1.41
+#Requires: perl(DBD::SQLite) >= 1.13
 
 BuildRequires: perl >= 5.8
 
-Provides: %{modname}   = %{version}
+Provides: %{modname}%{modsuffix} = %{version}
 #Provides: %{lcname} = %{version}
 
 Summary: Bookkeeping software for small and medium-size businesses
@@ -81,13 +101,13 @@ mv blib/lib/EB/example .
 
 %install
 
-%define ebconf  %{_sysconfdir}/%{lcname}
+%define ebconf  %{_sysconfdir}/%{lcmod}
 %define ebshare %{_datadir}/%{modname}%{modsuffix}-%{version}
 
 %{__rm} -rf $RPM_BUILD_ROOT
 
 %{__mkdir_p} ${RPM_BUILD_ROOT}%{ebconf}
-%{__install} -m 0644 example/eekboek.conf ${RPM_BUILD_ROOT}%{ebconf}
+%{__install} -m 0644 example/%{lcname}.conf ${RPM_BUILD_ROOT}%{ebconf}/%{lcmod}.conf
 
 %{__mkdir_p} ${RPM_BUILD_ROOT}%{ebshare}/lib
 
@@ -96,11 +116,11 @@ find blib/lib ! -type d -printf "%{__install} -m 0444 %p ${RPM_BUILD_ROOT}%{ebsh
 
 %{__mkdir_p} ${RPM_BUILD_ROOT}%{_bindir}
 
-echo "#!%{__perl}" > ${RPM_BUILD_ROOT}%{_bindir}/ebshell
+echo "#!%{__perl}" > ${RPM_BUILD_ROOT}%{_bindir}/ebshell%{lcmodsuffix}
 
 sed -s "s;# use lib qw(EekBoekLibrary;use lib qw(%{ebshare}/lib;" \
-	< script/ebshell >> ${RPM_BUILD_ROOT}%{_bindir}/ebshell
-%{__chmod} 0755 ${RPM_BUILD_ROOT}%{_bindir}/ebshell
+	< script/ebshell >> ${RPM_BUILD_ROOT}%{_bindir}/ebshell%{lcmodsuffix}
+%{__chmod} 0755 ${RPM_BUILD_ROOT}%{_bindir}/ebshell%{lcmodsuffix}
 
 %if %{gui}
 %{__mkdir_p} ${RPM_BUILD_ROOT}%{ebshare}/script
@@ -113,7 +133,7 @@ echo 'exec $^X "perl", "-Mlib=$share/lib", "-Mlib=$share/libgui", "$share/script
 %endif
 
 %{__mkdir_p} ${RPM_BUILD_ROOT}%{_mandir}/man1
-pod2man blib/script/ebshell > ${RPM_BUILD_ROOT}%{_mandir}/man1/ebshell.1
+pod2man blib/script/ebshell > ${RPM_BUILD_ROOT}%{_mandir}/man1/ebshell%{lcmodsuffix}.1
 
 %clean
 %{__rm} -rf $RPM_BUILD_ROOT
@@ -121,11 +141,11 @@ pod2man blib/script/ebshell > ${RPM_BUILD_ROOT}%{_mandir}/man1/ebshell.1
 %files
 %defattr(-,root,root)
 %doc CHANGES README INSTALL QUICKSTART example doc/html TODO
-%dir %{_sysconfdir}/%{lcname}
-%config(noreplace) %{_sysconfdir}/%{lcname}/eekboek.conf
+%dir %{_sysconfdir}/%{lcmod}
+%config(noreplace) %{_sysconfdir}/%{lcmod}/%{lcmod}.conf
 %dir %{ebshare}
 %{ebshare}/lib
-%{_bindir}/ebshell
+%{_bindir}/ebshell%{lcmodsuffix}
 %{_mandir}/man1/*
 
 %if %{gui}
@@ -136,6 +156,9 @@ pod2man blib/script/ebshell > ${RPM_BUILD_ROOT}%{_mandir}/man1/ebshell.1
 %{ebshare}/script/ebgui
 %{_bindir}/ebgui
 %endif
+
+%post
+echo prefix = %{_prefix}
 
 %changelog
 * Wed Aug 02 2006 Johan Vromans <jvromans@squirrel.nl> 0.92

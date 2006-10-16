@@ -13,8 +13,8 @@ package EB::Report::Grootboek;
 # Author          : Johan Vromans
 # Created On      : Wed Jul 27 11:58:52 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Tue Oct 10 20:36:54 2006
-# Update Count    : 273
+# Last Modified On: Mon Oct 16 18:40:49 2006
+# Update Count    : 282
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -108,23 +108,22 @@ sub perform {
 		    desc   => $acc_desc,
 		  }) if $detail;
 
-	my @d = ($n0, $n0);
-
+	my $a = { _style => 'h2', desc   => _T("Beginsaldo") };
 	if ( $acc_ibalance ) {
-	    if ( $acc_ibalance > 0 ) {
-		$d[0] = numfmt($acc_ibalance);
+	    if ( $acc_ibalance < 0 ) {
+		$a->{crd} = numfmt(-$acc_ibalance);
+		$a->{deb} = $n0;
 	    }
 	    else {
-		$d[1] = numfmt(-$acc_ibalance);
+		$a->{crd} = $n0;
+		$a->{deb} = numfmt($acc_ibalance);
 	    }
 	}
+	else {
+	    $a->{deb} = $a->{crd} = $n0;
+	}
 
-	$rep->add({ _style => 'h2',
-		    desc   => _T("Beginsaldo"),
-		    deb    => $d[0],
-		    crd    => $d[1],
-		  })
-	  if $detail > 0;
+	$rep->add($a) if $detail > 0;
 
 	my $dtot = 0;
 	my $ctot = 0;
@@ -151,7 +150,7 @@ sub perform {
 	    $rr = $sth->fetchrow_arrayref;
 	}
 
-	my $a = { _style => 't2', desc   => _T("Totaal mutaties") };
+	$a = { _style => 't2', desc   => _T("Totaal mutaties") };
 	if ( $dcsplit ) {
 	    $a->{crd} = numfmt($ctot);
 	    $a->{deb} = numfmt($dtot);
@@ -193,8 +192,8 @@ sub perform {
 		  });
 	$rep->add({ _style => 'tg',
 		    desc   => _T("Totaal"),
-		    deb    => numfmt($dgrand),
-		    crd    => numfmt($cgrand),
+		    $cgrand || 1        ? ( crd => numfmt($cgrand) ) : (),
+		    $dgrand || !$cgrand ? ( deb => numfmt($dgrand) ) : (),
 		   });
     }
     else {

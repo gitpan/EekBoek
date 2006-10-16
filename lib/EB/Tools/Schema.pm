@@ -3,8 +3,8 @@ my $RCS_Id = '$Id$ ';
 # Author          : Johan Vromans
 # Created On      : Sun Aug 14 18:10:49 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Tue Sep 26 14:25:34 2006
-# Update Count    : 633
+# Last Modified On: Mon Oct 16 12:36:43 2006
+# Update Count    : 635
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -508,7 +508,7 @@ sub _tsv {
 sub sql_eekboek {
     my $f = findlib("schema/eekboek.sql");
     open (my $fh, '<', $f)
-      or die("?"._T("Installatiefout -- geen schema")."\n");
+      or die("?"._T("Installatiefout -- geen database schema")."\n");
 
     local $/;
     my $sql = <$fh>;
@@ -937,8 +937,8 @@ sub dump_dbk {
 	$acc_id = 0 if $type == DBKTYPE_VERKOOP && $dbh->std_acc("deb", 0) == $acc_id;
 	my $t = sprintf("  %-4s  %-20s  :type=%-10s %s",
 			$id, $desc, lc(DBKTYPES->[$type]),
-			($acc_id ? ":rekening=$acc_id" : ""),
-			($dc ? ":dc" : ""),
+			($acc_id ? ":rekening=$acc_id" : "").
+			($dc ? " :dc" : ""),
 		       );
 	$t =~ s/\s+$//;
 	print {$fh} ($t, "\n");
