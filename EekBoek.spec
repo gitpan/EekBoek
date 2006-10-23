@@ -1,7 +1,9 @@
-%define unstable 1
+# -*- rpm-spec -*-
+
+%define unstable 0
 
 %define modname EekBoek
-%define modversion 1.01.02
+%define modversion 1.02.00
 %define lcname eekboek
 
 #%if %{unstable}
@@ -161,6 +163,8 @@ pod2man blib/script/ebshell > ${RPM_BUILD_ROOT}%{_mandir}/man1/ebshell%{lcmodsuf
 echo prefix = %{_prefix}
 
 %changelog
+* Mon Oct 16 2006 Johan Vromans <jvromans@squirrel.nl> - 1.01.02
+- Prepare (but don't use) suffixes to separate production and unstable versions.
 * Wed Aug 02 2006 Johan Vromans <jvromans@squirrel.nl> 0.92
 - New URL. Add Vendor.
 * Fri Jun 09 2006 Johan Vromans <jvromans@squirrel.nl> 0.60

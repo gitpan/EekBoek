@@ -671,14 +671,14 @@ sub parseline {
     %env = ();
 
     while (@args) {
-        if ($args[0] =~ /=/) {
-            my ($n, $v) = split /=/, shift(@args), 2;
-            $env{$n} = $v || "";
-        }
-        else {
+#        if ($args[0] =~ /=/) {
+#            my ($n, $v) = split /=/, shift(@args), 2;
+#            $env{$n} = $v || "";
+#        }
+#        else {
             $cmd = shift @args;
             last;
-        }
+#        }
     }
 
     return (($cmd or ""), \%env, @args);
