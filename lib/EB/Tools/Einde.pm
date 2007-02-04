@@ -3,8 +3,8 @@
 # Author          : Johan Vromans
 # Created On      : Sun Oct 16 21:27:40 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Sat Apr 15 10:49:30 2006
-# Update Count    : 217
+# Last Modified On: Thu Dec 14 14:48:53 2006
+# Update Count    : 223
 # Status          : Unknown, Use with caution!
 
 my $RCS_Id = '$Id$ ';
@@ -76,6 +76,8 @@ sub perform {
 	return;
     }
 
+    $dbh->begin_work;
+
     $dbh->sql_exec("DELETE FROM Boekjaarbalans where bkb_bky = ?", $bky)->finish;
 
     $dbh->commit, return if $opts->{verwijder};
@@ -85,8 +87,8 @@ sub perform {
       [ { name => "date", title => _T("Datum"),              width => $date_width, },
 	{ name => "desc", title => _T("Boekstuk/Grootboek"), width => 30, },
 	{ name => "acct", title => _T("Rek"),                width =>  5, align => ">", },
-	{ name => "deb",  title => _T("Debet"),              width =>  9, align => ">", },
-	{ name => "crd",  title => _T("Credit"),             width =>  9, align => ">", },
+	{ name => "deb",  title => _T("Debet"),              width =>  $amount_width, align => ">", },
+	{ name => "crd",  title => _T("Credit"),             width =>  $amount_width, align => ">", },
 	{ name => "bsk",  title => _T("Boekstuk/regel"),     width => 30, },
 	{ name => "rel",  title => _T("Relatie"),            width => 10, },
       ];
@@ -161,7 +163,12 @@ sub perform {
 
     $tot = 0;
     $desc = "";
-    for ( qw(ih il vh vl) ) {
+
+    if ( $dbh->does_btw ) {
+
+      ## Afboeken BTW
+
+      for ( qw(ih il vh vl) ) {
 	($acc_id, $acc_desc, $acc_balance) =
 	  @{$dbh->do("SELECT acc_id,acc_desc,acc_balance".
 		     " FROM ${tbl}".
@@ -199,8 +206,8 @@ sub perform {
 		  });
 	$dtot += $acc_balance if $acc_balance > 0;
 	$ctot -= $acc_balance if $acc_balance < 0;
-    }
-    if ( $did ) {
+      }
+      if ( $did && $dbh->does_btw ) {
 	($acc_id, $acc_desc, $acc_balance) =
 	  @{$dbh->do("SELECT acc_id,acc_desc,acc_balance".
 		     " FROM ${tbl}".
@@ -221,7 +228,9 @@ sub perform {
 		  });
 	$ctot += $tot if $tot > 0;
 	$dtot -= $tot if $tot < 0;
-    }
+      }
+
+    }	## End afboeken BTW
 
     if ( $did ) {
 	$rep->add({ _style => 'total',

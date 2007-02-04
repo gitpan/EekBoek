@@ -13,8 +13,8 @@ package EB::Booking::BKM;
 # Author          : Johan Vromans
 # Created On      : Thu Jul  7 14:50:41 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Fri Oct  6 22:12:49 2006
-# Update Count    : 402
+# Last Modified On: Fri Dec 15 22:44:35 2006
+# Update Count    : 404
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -120,6 +120,7 @@ sub perform {
     }
 
     $bsk_id = $dbh->get_sequence("boekstukken_bsk_id_seq");
+    $dbh->begin_work;
     $dbh->sql_insert("Boekstukken",
 		     [qw(bsk_id bsk_nr bsk_desc bsk_dbk_id bsk_date bsk_bky)],
 		     $bsk_id, $bsk_nr, $gdesc, $dagboek, $date, $bky);
@@ -245,11 +246,11 @@ sub perform {
 	    $dbh->sql_insert("Boekstukregels",
 			     [qw(bsr_nr bsr_date bsr_bsk_id bsr_desc bsr_amount
 				 bsr_btw_id bsr_btw_acc bsr_btw_class bsr_type
-				 bsr_acc_id bsr_rel_code)],
+				 bsr_acc_id bsr_rel_code bsr_dbk_id)],
 			     $nr++, $dd, $bsk_id, $desc, $orig_amount,
 			     $btw_id, $btw_acc,
 			     BTWKLASSE($does_btw ? defined($kstomz) : 0, BTWTYPE_NORMAAL, $kstomz||0),
-			     0, $acct, undef);
+			     0, $acct, undef, undef);
 
 #	    warn("update $acct with ".numfmt(-$amt)."\n") if $trace_updates;
 #	    $dbh->upd_account($acct, -$amt);
@@ -366,9 +367,9 @@ sub perform {
 	    $dbh->sql_insert("Boekstukregels",
 			     [qw(bsr_nr bsr_date bsr_bsk_id bsr_desc bsr_amount
 				 bsr_btw_id bsr_type bsr_acc_id bsr_btw_class
-				 bsr_rel_code bsr_paid)],
+				 bsr_rel_code bsr_dbk_id bsr_paid)],
 			     $nr++, $dd, $bsk_id, "*".$bsk_desc, -$amt, 0,
-			     $type eq "deb" ? 1 : 2, $acct, 0, $bsr_rel, $bskid);
+			     $type eq "deb" ? 1 : 2, $acct, 0, $bsr_rel, $dbk_id, $bskid);
 	    $dbh->sql_exec("UPDATE Boekstukken".
 			   " SET bsk_open = bsk_open - ?".
 			   " WHERE bsk_id = ?",

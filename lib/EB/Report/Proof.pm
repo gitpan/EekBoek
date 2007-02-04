@@ -13,8 +13,8 @@ package EB::Report::Proof;
 # Author          : Johan Vromans
 # Created On      : Sat Jun 11 13:44:43 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Sat Apr 15 10:48:11 2006
-# Update Count    : 303
+# Last Modified On: Tue Oct 24 15:26:59 2006
+# Update Count    : 304
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -70,6 +70,7 @@ sub perform {
     my $rr;
     $rep->{periodex} = 1;
     my ($begin, $end) = @{$rep->{periode}};
+    $dbh->begin_work;
     my $table = EB::Report->GetTAccountsAll($begin, $end);
 
     $rep->start(_T("Proef- en Saldibalans"));
@@ -296,6 +297,7 @@ sub perform {
 		  });
     }
     $rep->finish;
+    $dbh->rollback;
 }
 
 package EB::Report::Proof::Text;

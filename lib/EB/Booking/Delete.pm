@@ -11,8 +11,8 @@ package EB::Booking::Delete;
 # Author          : Johan Vromans
 # Created On      : Mon Sep 19 22:19:05 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Wed Jul 12 16:14:54 2006
-# Update Count    : 81
+# Last Modified On: Tue Oct 24 15:23:45 2006
+# Update Count    : 82
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -89,6 +89,8 @@ sub perform {
     }
 
     eval {
+	$dbh->begin_work;
+
 	# Adjust saldi grootboekrekeningen.
 	# Hoewel in veel gevallen niet nodig, is het toch noodzakelijk i.v.m.
 	# de saldi van bankrekeningen.

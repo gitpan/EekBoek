@@ -3,8 +3,8 @@
 # Author          : Johan Vromans
 # Created On      : Mon Jan 16 20:47:38 2006
 # Last Modified By: Johan Vromans
-# Last Modified On: Sun Oct  8 19:13:59 2006
-# Update Count    : 183
+# Last Modified On: Sun Feb  4 21:01:44 2007
+# Update Count    : 207
 # Status          : Unknown, Use with caution!
 
 package main;
@@ -64,11 +64,12 @@ sub export {
 	$m->desiredCompressionMethod(8);
 
 	# The others can be added directly.
-	$m = $zip->addString($self->_relaties, "relaties.eb");
+	# Note that the encoding needs to be fixed since there's no IO involved.
+	$m = $zip->addString(_enc($self->_relaties), "relaties.eb");
 	$m->desiredCompressionMethod(8);
-	$m = $zip->addString($self->_opening, "opening.eb");
+	$m = $zip->addString(_enc($self->_opening), "opening.eb");
 	$m->desiredCompressionMethod(8);
-	$m = $zip->addString($self->_mutaties, "mutaties.eb");
+	$m = $zip->addString(_enc($self->_mutaties), "mutaties.eb");
 	$m->desiredCompressionMethod(8);
 	my $status = $zip->writeToFileNamed($out);
 	unlink($tmpname);
@@ -110,6 +111,18 @@ sub _quote {
     '"'.$t.'"';
 }
 
+sub _enc {
+    my $line = shift;
+    return $line if $cfg->unicode;
+    # Encode to latin1.
+    eval {
+	my $s = $line;
+	$line = Encode::encode('latin1', $s, 1);
+    };
+    warn("?".__x("Geen geldige {cs} tekens in uitvoerregel", cs => "UTF-8")."\n") if $@;
+    $line;
+}
+
 sub _relaties {
     my ($self) = @_;
 
@@ -117,7 +130,7 @@ sub _relaties {
 			     " rel_btw_status, dbk_desc, rel_acc_id".
 			     " FROM Relaties, Dagboeken".
 			     " WHERE rel_ledger = dbk_id".
-			     " ORDER BY rel_ledger, rel_btw_status");
+			     " ORDER BY rel_ledger, rel_btw_status, rel_code");
 
     my $cur_dbk = "";
     my $cur_btw = -1;
@@ -139,7 +152,7 @@ sub _relaties {
 	    $out .= " --btw=".lc(BTWTYPES->[$btw]) unless $btw == BTWTYPE_NORMAAL;
 	}
 	$out .= " \\\n        ";
-	$out .= sprintf("%-10s %s %d", _quote($code), _quote($desc), $acct);
+	$out .= sprintf("%-12s %-40s %d", _quote($code), _quote($desc), $acct);
     }
 
     $out .= "\n\n# " . __x("Einde {what}", what => _T("Relaties")) . "\n";
@@ -171,7 +184,7 @@ sub _opening {
     $out .= "adm_begindatum   " . substr($begin, 0, 4) . "\n";
     $out .= "adm_boekjaarcode " . _quote($dbh->lookup($begin, qw(Boekjaren bky_begin bky_code))) . "\n";
     $out .= "adm_btwperiode   " .
-      (qw(geen jaar x x kwartaal x x x x x x x maand)[$dbh->adm("btwperiod")]).
+      (qw(geen jaar x x kwartaal x x x x x x x maand)[$dbh->lookup($begin, qw(Boekjaren bky_begin bky_btwperiod))]).
 	"\n" if $dbh->does_btw;
 
     $out .= "\n# " . _T("Openingsbalans") . "\n";
@@ -296,7 +309,10 @@ sub _mutaties {
 	next if $bky eq BKY_PREVIOUS;
 	if ( $cur_bky ne $bky ) {
 	    $check_je->($cur_bky);
+	    my $bp = $dbh->lookup($bky, qw(Boekjaren bky_code bky_btwperiod));
+	    $out .= "\n# ". _T("Openen nieuw boekjaar") . "\n\n";
 	    $out .= "adm_boekjaarcode " . _quote($bky) . "\n";
+	    $out .= "adm_btwperiode " . lc(BTWPERIODES->[$bp]) . "\n" if $bp;
 	    $out .= "adm_open\n";
 	    $cur_bky = $bky;
 	}

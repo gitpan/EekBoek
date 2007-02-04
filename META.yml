@@ -1,6 +1,6 @@
 ---
 name: EekBoek
-version: 1.02.00
+version: 1.03.02
 author:
   - Johan Vromans (jvromans@squirrel.nl)
 abstract: Elementary Bookkeeping (for the Dutch/European market)
@@ -10,7 +10,6 @@ resources:
   homepage: http://www.eekboek.nl
   license: http://dev.perl.org/licenses/
 requires:
-  Config::IniFiles: 2.38
   DBD::Pg: 1.41
   DBI: 1.4
   Getopt::Long: 2.13
@@ -38,6 +37,9 @@ provides:
   EB::Config:
     file: lib/EB/Config.pm
   EB::Config::IniFiles:
+    file: lib/EB/Config/IniFiles.pm
+    version: 2.38
+  EB::Config::IniFiles::Wrapper:
     file: lib/EB/Config.pm
   EB::DB:
     file: lib/EB/DB.pm
@@ -145,7 +147,7 @@ provides:
     file: lib/EB/Utils.pm
   EekBoek:
     file: lib/EekBoek.pm
-    version: 1.02.00
+    version: 1.03.02
 generated_by: Module::Build version 0.28
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.2.html

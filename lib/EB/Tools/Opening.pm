@@ -3,8 +3,8 @@
 # Author          : Johan Vromans
 # Created On      : Tue Aug 30 09:49:11 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Fri Oct  6 22:00:35 2006
-# Update Count    : 227
+# Last Modified On: Fri Dec 15 22:45:55 2006
+# Update Count    : 233
 # Status          : Unknown, Use with caution!
 
 package main;
@@ -229,6 +229,8 @@ sub open {
 	$adeb{0+$rr->[0]} = 0;
     }
 
+    $dbh->begin_work;
+
     if ( defined($o->{balanstotaal}) ) {
 	my $adeb;
 	my $acrd;
@@ -381,7 +383,10 @@ sub open {
 	    }
 	}
     }
-    return _T("DE OPENING IS NIET UITGEVOERD!")."\n" if $fail;
+    if ( $fail ) {
+	$dbh->rollback if $dbh->in_transaction;
+	return _T("DE OPENING IS NIET UITGEVOERD!")."\n";
+    }
 
     my $now = iso8601date();
 
@@ -442,9 +447,9 @@ sub open {
 			     $bsk_id, $nr, $desc, $dagboek, $date, $bky, $amt, $amt);
 	    $dbh->sql_insert("Boekstukregels",
 			     [qw(bsr_nr bsr_date bsr_bsk_id bsr_desc bsr_rel_code bsr_amount
-				 bsr_type bsr_btw_class)],
+				 bsr_dbk_id bsr_type bsr_btw_class)],
 			     1, $date, $bsk_id,
-			     $desc, $code, 0-$amt, 9, 0);
+			     $desc, $code, 0-$amt, $dagboek, 9, 0);
 	}
 #	my $highest = $dbh->get_sequence("bsk_nr_0_seq") + 1;
 #	$dbh->set_sequence("bsk_nr_${dbk_inkoop}_seq", $highest)
@@ -497,6 +502,8 @@ sub reopen {
 
     my $now = iso8601date();
 
+    $dbh->begin_work;
+
     $dbh->sql_insert("Boekjaren",
 		     [qw(bky_code bky_name bky_begin bky_end bky_btwperiod bky_opened)],
 		     $o->{boekjaarcode},
@@ -505,7 +512,7 @@ sub reopen {
 		     defined $o->{btwperiode} ? $o->{btwperiode} : $dbh->adm("btwperiod"),
 		     $now);
 
-    $dbh->adm("bky", $o->{boekjaarcode});
+    $dbh->adm("bky", $o->{boekjaarcode}, "use_existing_transaction");
     $dbh->adm("");		# flush cache
 
     # Reset boekstuknummer sequences.

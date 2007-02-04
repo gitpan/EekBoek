@@ -3,8 +3,8 @@
 # Author          : Johan Vromans
 # Created On      : Tue Jan 24 10:43:00 2006
 # Last Modified By: Johan Vromans
-# Last Modified On: Wed Oct 11 14:27:31 2006
-# Update Count    : 163
+# Last Modified On: Tue Oct 24 15:41:19 2006
+# Update Count    : 164
 # Status          : Unknown, Use with caution!
 
 package main;
@@ -50,7 +50,7 @@ sub create {
 	$self->clear;
 	$dbh->{RaiseError} = 1;
 	$dbh->{PrintError} = 1;
-	$dbh->{AutoCommit} = 0;
+#	$dbh->{AutoCommit} = 0;
 	return;
     }
 

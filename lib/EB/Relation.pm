@@ -79,14 +79,6 @@ sub add {
     # Koppeling met dagboek op basis van het laagstgenummerde
     # inkoop/verkoop dagboek (tenzij meegegeven).
 
-    if ( my $rr = $dbh->do("SELECT rel_code,rel_desc".
-			   " FROM Relaties".
-			   " WHERE upper(rel_code) = ?",
-			   uc($code)) ) {
-	warn("?".__x("Relatiecode {code} is niet uniek", code => uc($code))."\n");
-	return;
-    }
-
     my $dbcd = "acc_debcrd";
     if ( $acct =~ /^(\d+)([DC]$)/i) {
 	$acct = $1;
@@ -127,6 +119,17 @@ sub add {
 	($dbk, $ddesc) = @$rr;
     }
 
+    $rr = $dbh->do("SELECT COUNT(*)".
+		   " FROM Relaties".
+		   " WHERE upper(rel_code) = ? AND rel_ledger = ?",
+		   uc($code), $dbk);
+    if ( $rr->[0]) {
+	warn("?".__x("Relatiecode {code} is niet uniek in dagboek {dbk}",
+		     code => uc($code), dbk => $ddesc)."\n");
+	return;
+    }
+
+    $dbh->begin_work;
     $dbh->sql_insert("Relaties",
 		       [qw(rel_code rel_desc rel_debcrd rel_btw_status rel_ledger rel_acc_id)],
 		       $code, $desc, $debcrd, $bstate || 0, $dbk, $acct);

@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id$  -*-perl-*-
+# $Id: 91_ivp_sqlite.t,v 1.1 2006/10/23 16:42:49 jv Exp $  -*-perl-*-
 
 use strict;
 use Test::More

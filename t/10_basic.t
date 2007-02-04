@@ -1,7 +1,7 @@
 # $Id$  -*-perl-*-
 
 use strict;
-use Test::More tests => 10;
+use Test::More tests => 11;
 
 # Some basic tests.
 
@@ -16,8 +16,13 @@ BEGIN {
 
 # Check some data files.
 
-foreach ( qw(eekboek.sql bvnv.dat) ) {
+foreach ( qw(eekboek.sql) ) {
     my $t = findlib("schema/$_");
+    ok(-s $t, $t);
+}
+
+foreach ( qw(schema.dat bvnv.dat) ) {
+    my $t = findlib("examples/$_");
     ok(-s $t, $t);
 }
 

@@ -1,7 +1,7 @@
 package EekBoek;
 
 $PACKAGE = 'EekBoek';
-$VERSION = '1.02.00';
+$VERSION = '1.03.02';
 
 # NOTE: This is a documentation-only module.
 
@@ -38,7 +38,7 @@ Web site: L<http://www.eekboek.nl>.
 
 =head1 COPYRIGHT AND DISCLAIMER
 
-This program is Copyright 2005-2006 by Squirrel Consultancy. All
+This program is Copyright 2005-2007 by Squirrel Consultancy. All
 rights reserved.
 
 This program is free software; you can redistribute it and/or modify

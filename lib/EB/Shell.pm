@@ -1,12 +1,12 @@
 #!/usr/bin/perl
 
-my $RCS_Id = '$Id$ ';
+my $RCS_Id = '$Id: Shell.pm,v 1.89 2006/12/27 12:40:09 jv Exp $ ';
 
 # Author          : Johan Vromans
 # Created On      : Thu Jul  7 15:53:48 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Mon Oct 16 15:01:55 2006
-# Update Count    : 829
+# Last Modified On: Wed Dec 27 13:35:28 2006
+# Update Count    : 850
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -22,12 +22,6 @@ use strict;
 
 # Package name.
 use EekBoek;
-my $my_package; BEGIN { $my_package = $EekBoek::PACKAGE }
-
-# Program name and version.
-my ($my_name, $my_version) = $RCS_Id =~ /: (.+),v ([\d.]+)/;
-# Tack '*' if it is not checked in into RCS.
-$my_version .= '*' if length('$Locker$ ') > 12;
 
 ################ Configuration ################
 
@@ -37,7 +31,7 @@ our $dbh;
 sub shell {
 
 # This will set up the config at 'use' time.
-use EB::Config $my_package;
+use EB::Config $EekBoek::PACKAGE;
 
 if ( @ARGV && ( $ARGV[0] eq '-P' || $ARGV[0] =~ /^--?printcfg$/ ) ) {
     shift(@ARGV);
@@ -55,6 +49,7 @@ my $command;
 my $echo;
 my $dataset;
 my $createdb;			# create database
+my $createsampledb;		# create demo database
 my $schema;			# initialise w/ schema
 my $confirm = 0;
 my $journal = 0;
@@ -84,13 +79,17 @@ my $TMPDIR = $ENV{TMPDIR} || $ENV{TEMP} || '/usr/tmp';
 use EB;
 #use base qw(EB::Shell);
 
-my $app = $my_package;
+my $app = $EekBoek::PACKAGE;
 my $userdir = glob("~/.".lc($app));
 mkdir($userdir) unless -d $userdir;
 
 $echo = "eb> " if $echo;
-
-$dataset ||= $cfg->val(qw(database name), undef);
+if ( $createsampledb ) {
+    $dataset = "sample" unless defined $dataset;
+}
+else {
+    $dataset ||= $cfg->val(qw(database name), undef);
+}
 
 unless ( $dataset ) {
     die("?"._T("Geen dataset opgegeven.".
@@ -121,6 +120,16 @@ if ( defined $inexport ) {
     }
 }
 
+if ( $createsampledb ) {
+    $command = 1;
+    $createdb = 1;
+    my $file = findlib("schema/sampledb.ebz");
+    die("?".__x("Geen demo gegevens: {ebz}",
+	       ebz => "schema/sampledb.ebz")."\n") unless $file;
+    @ARGV = qw(import --noclean);
+    push(@ARGV, "--file", $file);
+}
+
 if ( $createdb ) {
     $dbh->createdb($dataset);
     warn("%".__x("Lege dataset {db} is aangemaakt", db => $dataset)."\n");
@@ -130,6 +139,7 @@ if ( $schema ) {
     require EB::Tools::Schema;
     $dbh->connectdb(1);
     EB::Tools::Schema->create($schema);
+    $dbh->setup;
 }
 
 exit(0) if $command && !@ARGV;
@@ -203,6 +213,7 @@ sub app_options {
 			 $inexport = 0;
 		     },
 		     'createdb' => \$createdb,
+		     'createsampledb' => \$createsampledb,
 		     'define|D=s%' => sub {
 			 my ($opt, $key, $arg) = @_;
 			 if ( $key =~ /^(.+?)::?([^:]+)$/ ) {
@@ -234,10 +245,11 @@ sub app_options {
 }
 
 sub app_ident {
+    return;
     print STDERR (__x("Dit is {pkg} [{name} {version}]",
-		      pkg     => $my_package,
-		      name    => $my_name,
-		      version => $my_version) . "\n");
+		      pkg     => $EekBoek::PACKAGE,
+		      name    => "Shell",
+		      version => $EekBoek::VERSION) . "\n");
 }
 
 sub app_usage {
@@ -253,6 +265,7 @@ Gebruik: {prog} [options] [file ...]
     --db=DB             specificeer database
     --boekjaar=XXX	specificeer boekjaar
     --createdb		maak nieuwe database aan
+    --createsampledb	maak nieuwe demo database aan
     --schema=XXX        initialisser database met schema
     --import            importeer een nieuwe administratie
     --export            exporteer een administratie
@@ -333,7 +346,14 @@ sub intro {
     undef;
 }
 sub outro { undef }
-sub postcmd { shift; $dbh->rollback; shift }
+sub postcmd {
+    shift;
+    if ( $dbh->in_transaction ) {
+	warn("%"._T("Openstaande transactie teruggedraaid")."\n");
+	$dbh->rollback;
+    }
+    shift
+}
 
 sub bky_msg {
     my $sth = $dbh->sql_exec("SELECT bky_code".

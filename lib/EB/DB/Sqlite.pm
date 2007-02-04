@@ -3,8 +3,8 @@
 # Author          : Johan Vromans
 # Created On      : Sat Oct  7 10:10:36 2006
 # Last Modified By: Johan Vromans
-# Last Modified On: Sun Oct 15 14:53:30 2006
-# Update Count    : 134
+# Last Modified On: Wed Dec 27 15:13:08 2006
+# Update Count    : 139
 # Status          : Unknown, Use with caution!
 
 package main;
@@ -55,11 +55,11 @@ sub create {
     open(my $db, '>', $dbname);
     close($db);
     unlink("$dbname-journal")
-      or warn("%".__x("Database journal voor {db} verwijderd",
-		      db => $dbname)."\n");
+      and warn("%".__x("Database journal voor {db} verwijderd",
+		       db => $dbname)."\n");
     unlink("$dbname-seq")
-      or warn("%".__x("Database sequences voor {db} verwijderd",
-		      db => $dbname)."\n");
+      and warn("%".__x("Database sequences voor {db} verwijderd",
+		       db => $dbname)."\n");
 }
 
 # API: connect to an existing database.
@@ -271,7 +271,7 @@ sub sqlfilter {
 
     # Constraints are ignored in table defs, but an
     # explicit alter needs to be skipped.
-    return if /^alter\s+table\b.*\badd\s+constraint\b/i;
+    return if /^alter\s+table\b.*\b(add|drop)\s+constraint\b/i;
 
     # UNSOLVED: No insert into temp tables.
     return if /^select\s+\*\s+into\s+temp\b/i;
@@ -291,6 +291,12 @@ sub register_functions {
     $dbh->func("sign", 1,
 	       sub {
 		   defined $_[0] ? $_[0] <=> 0 : 0
+	       },
+	       "create_function");
+
+    $dbh->func("int2", 1,
+	       sub {
+		   0+$_[0]
 	       },
 	       "create_function");
 }

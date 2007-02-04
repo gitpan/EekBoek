@@ -960,7 +960,7 @@ EB::Shell::Base - A generic class to build line-oriented command interpreters.
 =head1 DESCRIPTION
 
 EB::Shell::Base is a slightly modified version of L<Shell::Base>. It
-is modifed for the EekBoek program L<http://www.squirrel.nl/eekboek>
+is modifed for the EekBoek program L<http://www.eekboek.nl>
 and B<NOT> intended for general use. Please use L<Shell::Base>
 instead.
 
