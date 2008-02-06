@@ -39,7 +39,7 @@ chdir("ivp") if -d "ivp";
 my $f;
 for ( qw(opening.eb relaties.eb mutaties.eb schema.dat) ) {
     ok(1, $_), next if -s $_;
-    if ( $f = findlib("example/$_") and -s $f ) {
+    if ( $f = findlib("examples/$_") and -s $f ) {
 	copy($f, $_);
     }
     ok(-s $_, $_);

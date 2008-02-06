@@ -1,12 +1,12 @@
 #!/usr/bin/perl
 
-my $RCS_Id = '$Id: Shell.pm,v 1.89 2006/12/27 12:40:09 jv Exp $ ';
+my $RCS_Id = '$Id: Shell.pm,v 1.100 2008/02/06 17:10:27 jv Exp $ ';
 
 # Author          : Johan Vromans
 # Created On      : Thu Jul  7 15:53:48 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Wed Dec 27 13:35:28 2006
-# Update Count    : 850
+# Last Modified On: Wed Feb  6 16:42:06 2008
+# Update Count    : 888
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -52,10 +52,11 @@ my $createdb;			# create database
 my $createsampledb;		# create demo database
 my $schema;			# initialise w/ schema
 my $confirm = 0;
-my $journal = 0;
+my $journal;
 my $inexport;			# in/export
 my $inex_file;			# file voor in/export
 my $inex_dir;			# directory voor in/export
+my $errexit = 0;		# disallow errors in batch
 my $verbose = 0;		# verbose processing
 my $bky;
 
@@ -94,12 +95,13 @@ else {
 unless ( $dataset ) {
     die("?"._T("Geen dataset opgegeven.".
 	       " Specificeer een dataset in de configuratiefile,".
-	       " of geef een dataset".
-	       " naam mee op de command line met \"--dataset=...\".").
+	       " of selecteer een andere configuratiefile".
+	       " op de command line met \"--config=...\".").
 	"\n");
 }
 
 $cfg->newval(qw(database name), $dataset);
+$cfg->newval(qw(preferences journal), $journal) if defined $journal;
 
 use EB::DB;
 our $dbh = EB::DB->new(trace => $trace);
@@ -148,9 +150,10 @@ my $shell = EB::Shell->new
   ({ HISTFILE	  => $userdir."/history",
      command	  => $command,
      interactive  => $interactive,
+     errexit      => $errexit,
      verbose	  => $verbose,
      trace	  => $trace,
-     journal	  => $journal,
+     journal	  => $cfg->val(qw(preferences journal), 0),
      echo	  => $echo,
      prompt	  => lc($app),
      boekjaar	  => $bky,
@@ -212,17 +215,15 @@ sub app_options {
 		     'export' => sub {
 			 $inexport = 0;
 		     },
+		     'init'   => sub {
+			 $inexport = 1;
+			 $inex_dir = ".";
+		     },
 		     'createdb' => \$createdb,
 		     'createsampledb' => \$createsampledb,
 		     'define|D=s%' => sub {
-			 my ($opt, $key, $arg) = @_;
-			 if ( $key =~ /^(.+?)::?([^:]+)$/ ) {
-			     $cfg->newval($1, $2, $arg);
-			 }
-			 else {
-			     die(__x("Ongeldige aanduiding voor config setting: {arg}",
-				    arg => $key)."\n");
-			 }
+			 die(__x("Ongeldige aanduiding voor config setting: {arg}",
+				 arg => $_[1])."\n");
 		     },
 		     'schema=s' => \$schema,
 		     'echo|e!'	=> \$echo,
@@ -233,6 +234,8 @@ sub app_options {
 		     'db|dataset=s' => \$dataset,
 		     'dir=s'	=> \$inex_dir,
 		     'file=s'	=> \$inex_file,
+		     'interactive!' => \$interactive,
+		     'errexit'  => \$errexit,
 		     'trace'	=> \$trace,
 		     'help|?'	=> \$help,
 		     'debug'	=> \$debug,
@@ -242,6 +245,10 @@ sub app_options {
     }
     app_usage(2) if @ARGV && !$command;
     app_ident() if $ident;
+    if ( $dataset ) {
+	print STDERR (_T("De optie '--dataset' (of '--db') komt binnenkort te vervallen.".
+			 " Gebruik in plaats daarvan '--config' (of '-f') om een configuratiebestand te selecteren.")."\n");
+    }
 }
 
 sub app_ident {
@@ -260,9 +267,6 @@ Gebruik: {prog} [options] [file ...]
 
     --command  -c       voer de rest van de opdrachtregel uit als command
     --echo  -e          toon ingelezen opdrachten
-    --journaal          toon de journaalregels na elke opdracht
-    --dataset=DB        specificeer database
-    --db=DB             specificeer database
     --boekjaar=XXX	specificeer boekjaar
     --createdb		maak nieuwe database aan
     --createsampledb	maak nieuwe demo database aan
@@ -271,7 +275,10 @@ Gebruik: {prog} [options] [file ...]
     --export            exporteer een administratie
     --dir=XXX           directory voor im/export
     --file=XXX          bestand voor im/export
+    --init		creëer nieuwe administratie
     --define=XXX -D     definieer configuratiesetting
+    --[no]interactive   forceer [non]interactieve modus
+    --errexit           stop direct na een fout in de invoer
     --help		deze hulpboodschap
     --ident		toon identificatie
     --verbose		geef meer uitgebreide information
@@ -359,6 +366,7 @@ sub bky_msg {
     my $sth = $dbh->sql_exec("SELECT bky_code".
 			     " FROM Boekjaren".
 			     " WHERE bky_end < ?".
+			     " AND NOT bky_opened IS NULL".
 			     " AND bky_closed IS NULL".
 			     " ORDER BY bky_begin",
 			     defined $bky ?
@@ -660,6 +668,7 @@ sub _add {
 		 d_boekjaar   => $bky || $dbh->adm("bky"),
 		 journal      => $self->{journal},
 		 totaal	      => undef,
+		 ref	      => undef,
 		 verbose      => $self->{verbose},
 		 confirm      => $self->{confirm},
 	       };
@@ -671,6 +680,7 @@ sub _add {
 		 'boekjaar=s',
 		 'journal!',
 		 'totaal=s',
+		 'ref=s',
 		 'confirm!',
 		 ( $dagboek_type == DBKTYPE_BANK
 		   || $dagboek_type == DBKTYPE_KAS ) ? ( 'saldo=s', 'beginsaldo=s' ) : (),
@@ -946,6 +956,7 @@ sub _do_btwaangifte {
 		 "definitief" => sub { $opts->{close} = 1 },
 		 EB::Report::GenBase->backend_options(EB::Report::BTWAangifte::, $opts),
 		 "noreport",
+		 "noround",
 	       ], $opts)
       or goto &_help_btwaangifte;
 
@@ -1007,6 +1018,7 @@ sub do_debiteuren {
 	       [ "boekjaar=s",
 		 EB::Report::GenBase->backend_options(EB::Report::Debcrd::, $opts),
 		 'periode=s' => sub { periode_arg($opts, @_) },
+		 'openstaand',
 	       ], $opts);
 
     EB::Report::Debcrd->new->debiteuren(\@args, $opts);
@@ -1022,6 +1034,7 @@ Opties:
 
   --periode <periode>         Periode
   --boekjaar=<code>           Selecteer boekjaar
+  --openstaand                Alleen met openstaande posten
 
 Zie verder "help rapporten" voor algemene informatie over aan te maken
 rapporten.
@@ -1041,6 +1054,7 @@ sub do_crediteuren {
 	       [ "boekjaar=s",
 		 EB::Report::GenBase->backend_options(EB::Report::Debcrd::, $opts),
 		 'periode=s' => sub { periode_arg($opts, @_) },
+		 'openstaand',
 	       ], $opts);
 
     EB::Report::Debcrd->new->crediteuren(\@args, $opts);
@@ -1056,6 +1070,7 @@ Opties:
 
   --periode=<periode>         Periode
   --boekjaar=<code>           Selecteer boekjaar
+  --openstaand                Alleen met openstaande posten
 
 Zie verder "help rapporten" voor algemene informatie over aan te maken
 rapporten.
@@ -1075,22 +1090,26 @@ sub do_openstaand {
 	       [ "boekjaar=s",
 		 EB::Report::GenBase->backend_options(EB::Report::Open::, $opts),
 		 'per=s' => sub { date_arg($opts, @_) },
+		 'deb|debiteuren',
+		 'crd|crediteuren',
 	       ], $opts);
 
-    return unless argcnt(@args, 0);
-    EB::Report::Open->new->perform($opts);
+    return unless argcnt(@args, 0, 1);
+    EB::Report::Open->new->perform($opts, \@args);
 }
 
 sub help_openstaand {
     <<EOS;
 Toont een overzicht van openstaande posten.
 
-  openstaand [ <opties> ]
+  openstaand [ <opties> ] [ <relatie> ]
 
 Opties:
 
   --per=<datum>               Einddatum
   --boekjaar=<code>           Selecteer boekjaar
+  --deb --debiteuren          Alleen debiteuren
+  --crd --crediteuren         Alleen crediteuren
 
 Zie verder "help rapporten" voor algemene informatie over aan te maken
 rapporten.
@@ -1265,6 +1284,13 @@ sub do_import {
     }
 
     return unless argcnt(scalar(@args), 0);
+
+    if ( $opts->{clean} && !$dbh->feature("import") ) {
+	warn("?".__x("Database type {drv} ondersteunt niet het import commando. Gebruik de --import command line optie.",
+		     drv => $dbh->driverdb)."\n");
+	return;
+    }
+
     require EB::Import;
     EB::Import->do_import($self, $opts);
 
@@ -1344,40 +1370,8 @@ EOS
 sub do_dump_schema {
     my ($self, @args) = @_;
 
-    my $opts = { sql => 0,
-	       };
-
-    return unless
-    parse_args(\@args,
-	       [ 'sql!',
-	       ], $opts)
-      or goto &help_dump_schema;
-
-    require EB::Tools::Schema;
-
-    if ( $opts->{sql} ) {
-	return unless argcnt(scalar(@args), 1);
-	EB::Tools::Schema->dump_sql(@args);
-    }
-    else {
-	return unless argcnt(scalar(@args), 0);
-	EB::Tools::Schema->dump_schema;
-    }
-    "";
-}
-
-sub help_dump_schema {
     <<EOS;
-Reproduceert het schema van de huidige database en schrijft deze naar
-standaard uitvoer.
-
-  dump_schema                 Reproduceert het schema van de huidige database
-                              en schrijft deze naar standaard uitvoer.
-
-  dump_schema --sql <naam>    Creëert losse SQL bestandjes om het genoemde
-                              schema aan te kunnen maken.
-
-Zie ook "help export".
+Deze opdracht is vervallen. Gebruik in plaats daarvan "export".
 EOS
 }
 

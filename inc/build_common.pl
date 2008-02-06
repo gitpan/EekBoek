@@ -1,10 +1,10 @@
 # build_common.inc -- Build file common info -*- perl -*-
-# RCS Info        : $Id: build_common.pl,v 1.12 2007/02/02 10:09:27 jv Exp $
+# RCS Info        : $Id: build_common.pl,v 1.14 2008/01/22 19:08:03 jv Exp $
 # Author          : Johan Vromans
 # Created On      : Thu Sep  1 17:28:26 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Wed Dec 13 21:54:10 2006
-# Update Count    : 52
+# Last Modified On: Tue Feb  5 11:52:34 2008
+# Update Count    : 57
 # Status          : Unknown, Use with caution!
 
 use strict;
@@ -28,20 +28,21 @@ $data =
     { 'Getopt::Long'        => '2.13',
       'Term::ReadLine'      => 0,
       $^O eq "linux" ? ('Term::ReadLine::Gnu' => 0) : (),
-      'DBI'                 => 1.40,
-      'DBD::Pg'             => 1.41,
-#     'Config::IniFiles'    => 2.38,
+      'DBI'                 => '1.40',
+#     'Config::IniFiles'    => '2.38',
 #     'Text::CSV_XS'        => 0,
-#     'Locale::gettext'     => 1.05,
+#     'Locale::gettext'     => '1.05',
       #
       # These are required for the build/test, and will be included.
-      'Module::Build'	    => 0.26,
-      'IPC::Run3'	    => 0.034,
+      'Module::Build'	    => '0.26',
+      'IPC::Run3'	    => '0.034',
     },
     recomm_pm =>
     { 'Getopt::Long'        => '2.32',
       'Archive::Zip'	    => '1.16',
       'HTML::Entities'	    => '1.35',
+      'DBD::Pg'             => '1.41',
+      'DBD::SQLite'         => '1.13',
     },
     usrbin => "/usr/bin",
   };

@@ -402,17 +402,31 @@ sub run {
 	    $meth = "do_$cmd";
 	    if ( $self->can($meth) ) {
 		eval {
+		    # Check warnings for ? (errors).
+		    my $fail = 0;
+		    local $SIG{__WARN__} = sub {
+			$fail++ if $_[0] =~ /^\?/;
+			warn(@_);
+		    };
 		    $output = $self->$meth(@args);
+		    # Throw error if errors detected.
+		    die(bless {}, 'FatalError') if $fail && $self->{errexit};
 		};
 		if ($@) {
 # jv                $output = sprintf "%s: Bad command or filename", $self->progname;
-		    my $err = $@;
-		    chomp $err;
-# jv                warn "$output ($err)\n";
-		    warn "?$err\n";
+		    unless ( UNIVERSAL::isa($@, 'FatalError') ) {
+			my $err = $@;
+			chomp $err;
+			# jv                warn "$output ($err)\n";
+			warn "?$err\n";
+		    }
 		    eval {
 			$output = $self->default($cmd, @args);
 		    };
+		    if ( $self->{errexit} ) {
+			warn("?"._T(" ****** Afgebroken wegens fouten in de invoer ******")."\n");
+			last;
+		    }
 		}
 	    }
 	    else {

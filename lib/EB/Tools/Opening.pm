@@ -3,8 +3,8 @@
 # Author          : Johan Vromans
 # Created On      : Tue Aug 30 09:49:11 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Fri Dec 15 22:45:55 2006
-# Update Count    : 233
+# Last Modified On: Wed Feb  6 17:13:02 2008
+# Update Count    : 257
 # Status          : Unknown, Use with caution!
 
 package main;
@@ -57,11 +57,20 @@ sub set_btwperiode {
 
 sub set_begindatum {
     return shellhelp() unless @_ == 2;
-    my ($self, $jaar) = @_;
-    return __x("Ongeldige jaar-aanduiding: {year}", year => $jaar)."\n" unless $jaar =~ /^\d+$/
+    my ($self, $date) = @_;
+
+    if ( $date =~ /^\d{4}$/ ) {
+	$date .= "-01-01";
+    }
+    my $d = parse_date($date);
+
+    my ($jaar) = $d =~ /^(\d{4})/;
+    return __x("Ongeldige openingsdatum: {date}", date => $date)."\n" unless $jaar =~ /^\d+$/
       && $jaar >= 1990 && $jaar < 2099;	# TODO
     $self->check_open(0);
-    $self->{o}->{begindatum} = $jaar;
+    $self->{o}->{begindatum} = $d;
+    $d =~ s/^(\d{4})/$1+1/e;
+    $self->{o}->{einddatum} = parse_date($d, undef, -1);
     "";
 }
 
@@ -150,7 +159,7 @@ sub set_relatie {
     $date = $t;
     return __x("Datum {date} valt niet vóór het boekjaar",
 	       date => datefmt_full($date))."\n"
-      if $self->{o}->{begindatum} && $self->{o}->{begindatum} <= $1;
+      if $self->{o}->{begindatum} && $self->{o}->{begindatum} le $t;
     $bky = substr($date, 0, 4) unless defined $bky;
 
     unless ( defined($dbk) ) {
@@ -161,11 +170,22 @@ sub set_relatie {
 	$dbk = $sth->fetchrow_arrayref->[0];
 	$sth->finish;
     }
+    else {
+	my $sth = $dbh->sql_exec("SELECT dbk_id".
+				 " FROM Dagboeken".
+				 " WHERE UPPER(dbk_desc) = ?",
+				 uc($dbk));
+	$dbk = $sth->fetchrow_arrayref->[0];
+    }
 
-    my $debcrd = $dbh->lookup($code, qw(Relaties rel_code rel_debcrd));
-    return __x("Onbekende relatie: {rel}", rel => $code)."\n" unless defined $debcrd;
-    return __x("Ongeldige relatie: {rel}", rel => $code)."\n"
-      if $type  ^ $debcrd;
+    my $rr = $dbh->do("SELECT rel_code FROM Relaties" .
+			   " WHERE UPPER(rel_code) = ?" .
+			   "  AND " . ($type ? "" : "NOT ") . "rel_debcrd" .
+		           "  AND rel_ledger = ?",
+		      uc($code), $dbk);
+
+    return __x("Onbekende relatie: {rel}", rel => $code)."\n"
+      unless defined $rr;
 
     my $anew;
     return __x("Ongeldig bedrag: {amount}", amount => $amt)."\n" unless defined($anew = amount($amt));
@@ -331,20 +351,20 @@ sub open {
 		    $sth->finish;
 		    if ( defined($rr) ) {
 			my ($begin, $end) = @$rr;
-			if ( $date < $begin || $date > $end ) {
+			if ( $date lt $begin || $date gt $end ) {
 			    $fail++;
 			    warn(_T("Boekingsdatum valt niet binnen het boekjaar")."\n");
 			}
 		    }
 		    else {
-			my $begin = substr($date, 0, 4) . "-01-01";	# TODO
-			my $end   = substr($date, 0, 4) . "-12-31";	# TODO
+			# Add a (pseudo) boekjaar.
+			my $t = $o->{begindatum};
+			$t .= "-01-01" if length($t) == 4;
+			(my $begin = $t) =~ s/^(\d{4})/substr($date,0,4)/e;
+			my $end   = parse_date($begin, undef, -1, undef, +1);
 			$dbh->sql_insert("Boekjaren",
 					 [qw(bky_code bky_name bky_begin bky_end bky_btwperiod bky_opened bky_closed)],
-					 $bky, "$begin - $end", $begin, $end, 0,
-					 scalar(parse_date($o->{begindatum} . "-01-01", undef, -1)),
-					 scalar(parse_date($o->{begindatum} . "-01-01", undef, -1)),
-					);
+					 $bky, "$begin - $end", $begin, $end, 0, undef, undef);
 		    }
 		}
 		else {
@@ -393,18 +413,16 @@ sub open {
     $dbh->sql_insert("Boekjaren",
 		     [qw(bky_code bky_name bky_begin bky_end bky_btwperiod bky_opened)],
 		     $o->{boekjaarcode}, $o->{naam},
-		     $o->{begindatum} . "-01-01", $o->{begindatum} . "-12-31", # TODO
+		     $o->{begindatum}, $o->{einddatum},
 		     $o->{btwperiode}||0, $now);
     $dbh->sql_exec("UPDATE Metadata".
 		   " SET adm_bky = ?, adm_btwbegin = ?",
 		   $o->{boekjaarcode},
-		   $does_btw ? $o->{begindatum} . "-01-01" : undef);
+		   $does_btw ? $o->{begindatum} : undef);
+    my $t = parse_date($o->{begindatum}, undef, -1);
     $dbh->sql_exec("UPDATE Boekjaren".
 		   " SET bky_closed = ?, bky_end = ?".
-		   " WHERE bky_code = ?",
-		   scalar(parse_date($o->{begindatum} . "-01-01", undef, -1)),
-		   scalar(parse_date($o->{begindatum} . "-01-01", undef, -1)),
-		   BKY_PREVIOUS);
+		   " WHERE bky_code = ?", $t, $t, BKY_PREVIOUS);
 
     if ( defined $o->{balanstotaal} ) {
 	while ( my ($acct, $e) = each(%{$o->{balans}}) ) {
@@ -481,15 +499,16 @@ sub reopen {
     my $fail = 0;
 
     # New begin date is old + one year.
-    my $y = $dbh->adm("begin");
-    $y =~ s/^(\d\d\d\d)/sprintf("%04d", $1+1)/e;
+    my $y = parse_date($dbh->adm("end"), undef, 1);
     if ( $y gt iso8601date() ) {
 	warn(__x("Begindatum {year} komt in de toekomst te liggen",
-		 year => substr($y, 0, 4))."\n");
+		 year => $y)."\n");
 	$fail++;
     }
 
     $o->{begindatum} = $y;
+    $y =~ s/^(\d{4})/$1+1/e;
+    $o->{einddatum} = parse_date($y, undef, -1);
 
     warn(_T("Er is geen nieuwe BTW periode opgegeven, deze blijft ongewijzigd")."\n")
       if $dbh->does_btw && !$o->{btwperiode};
@@ -508,7 +527,7 @@ sub reopen {
 		     [qw(bky_code bky_name bky_begin bky_end bky_btwperiod bky_opened)],
 		     $o->{boekjaarcode},
 		     defined $o->{naam} ? $o->{naam} : $dbh->adm("name"),
-		     $o->{begindatum}, substr($o->{begindatum}, 0, 4) . "-12-31",
+		     $o->{begindatum}, $o->{einddatum},
 		     defined $o->{btwperiode} ? $o->{btwperiode} : $dbh->adm("btwperiod"),
 		     $now);
 

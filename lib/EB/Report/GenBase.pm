@@ -2,8 +2,8 @@
 # Author          : Johan Vromans
 # Created On      : Sat Oct  8 16:40:43 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Wed Jul 12 16:17:29 2006
-# Update Count    : 139
+# Last Modified On: Sat Dec 29 19:25:11 2007
+# Update Count    : 147
 # Status          : Unknown, Use with caution!
 
 package main;
@@ -51,6 +51,9 @@ sub backend {
 	$gen = $1;
     }
 
+    # Override by explicit --generate option(s).
+    $gen = $opts->{generate} if $opts->{generate};
+
     # Infer from filename extension.
     my $t;
     if ( !defined($gen) && ($t = $opts->{output}) && $t =~ /\.([^.]+)$/ ) {
@@ -62,8 +65,8 @@ sub backend {
     # Fallback to text.
     $gen ||= "text";
 
-    # Build class and package name.
-    my $class = (ref($self)||$self) . "::" . ucfirst($gen);
+    # Build class and package name. Last chance to override...
+    my $class = $opts->{backend} || (ref($self)||$self) . "::" . ucfirst($gen);
     my $pkg = $class;
     $pkg =~ s;::;/;g;;
     $pkg .= ".pm";
@@ -157,7 +160,7 @@ sub backend {
     if ( $be->{per_begin} lt $opendate ) {
 	die("?".__x("Datum {per} valt vóór het begin van de administratie {begin}",
 		    per   => datefmt_full($be->{per_begin}),
-		    begin => datfmt_full($opendate))."\n");
+		    begin => datefmt_full($opendate))."\n");
     }
     if ( $be->{per_end} lt $opendate ) {
 	die("?".__x("Datum {per} valt vóór het begin van de administratie {begin}",

@@ -13,8 +13,8 @@ package EB::Booking::BKM;
 # Author          : Johan Vromans
 # Created On      : Thu Jul  7 14:50:41 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Fri Dec 15 22:44:35 2006
-# Update Count    : 404
+# Last Modified On: Mon Dec 31 15:11:45 2007
+# Update Count    : 506
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -128,6 +128,7 @@ sub perform {
     my $did = 0;
     my $fail = 0;
 
+  ENTRY:
     while ( @$args ) {
 	my $type = shift(@$args);
 
@@ -308,7 +309,7 @@ sub perform {
 		    $fail++;
 		    next;
 		}
-		$sql = "SELECT bsk_id, dbk_id, bsk_desc, bsk_amount, bsr_rel_code".
+		$sql = "SELECT bsk_nr, bsk_id, dbk_id, bsk_desc, bsk_amount, bsr_rel_code".
 		  " FROM Boekstukken, Boekstukregels, Dagboeken" .
 		    " WHERE bsk_id = ?".
 		      "  AND bsk_dbk_id = dbk_id".
@@ -318,10 +319,145 @@ sub perform {
 		@sql_args = ( $id, $debcrd ? DBKTYPE_VERKOOP : DBKTYPE_INKOOP);
 		$rr = $dbh->do($sql, @sql_args);
 		unless ( defined($rr) ) {
-		    warn("?"._T("Geen bijbehorende open post gevonden")."\n");
+		    # Can this happen???
+		    warn("?".__x("Geen post gevonden voor boekstuk {bsk}",
+				 bsk => $rel)."\n");
 		    $fail++;
 		    next;
 		}
+	    }
+	    elsif ( 1 ) {
+		# Lookup rel code.
+		$rr = $dbh->do("SELECT rel_code FROM Relaties" .
+			       " WHERE upper(rel_code) = ?" .
+			       "  AND " . ($debcrd ? "" : "NOT ") . "rel_debcrd",
+			       uc($rel));
+		unless ( defined($rr) ) {
+		    warn("?".__x("Onbekende {what}: {who}",
+				 what => lc($type eq "deb" ? _T("Debiteur") : _T("Crediteur")),
+				 who => $rel)."\n");
+		    $fail++;
+		    next;
+		}
+		# Get actual code.
+		$rel = $rr->[0];
+
+		# Zoek open posten.
+		$sql = "SELECT bsk_open, bsk_nr, bsk_id, dbk_id, bsk_desc, bsk_amount ".
+		  " FROM Boekstukken, Boekstukregels, Dagboeken" .
+		    " WHERE bsk_open != 0".
+			"  AND dbk_type = ?".
+			  "  AND bsk_dbk_id = dbk_id".
+			    "  AND bsr_bsk_id = bsk_id".
+			      "  AND bsr_rel_code = ?".
+				" AND bsr_nr = 1".
+				  " ORDER BY bsk_id";
+		@sql_args = ( $debcrd ? DBKTYPE_VERKOOP : DBKTYPE_INKOOP, $rel);
+
+		# Resultset of candidates.
+		my $res = [];
+		my $sth = $dbh->sql_exec($sql, @sql_args);
+		while ( $rr = $sth->fetchrow_arrayref ) {
+		    if ( $rr->[0] == $amt ) { # exact match
+			$res = [[@$rr]];
+			last;
+		    }
+		    else {
+			# Add.
+			push(@$res, [@$rr]);
+		    }
+		}
+		$sth->finish;
+
+		my $wmsg;
+		if ( @$res == 0 ) {
+		    # Nothing.
+		    undef $rr;
+		}
+		elsif ( @$res == 1 && $res->[0]->[0] == $amt ) {
+		    # Exact match. Use it.
+		    $rr = $res->[0];
+		}
+		# Knapsack slows down terribly with large search sets. Limit it.
+		elsif ( @$res <= $cfg->val(qw(strategy bkm_multi_max), 15) ) {
+		    # Use exact knapsack matching to find possible components.
+		    my @amts = map { $_->[0] } @$res;
+		    if ( my @k = partition($amt, \@amts) ) {
+			# We found something. Check strategy.
+			if ( $cfg->val(qw(strategy bkm_multi), 0) ) {
+			    # We may split.
+			    my @t; # for reporting
+			    foreach ( @{$k[0]} ) {
+				push(@t, numfmt($amts[$_]));
+				# Push back the data in the input queue.
+				unshift(@$args, $type, $dd, $rel, $t[-1]);
+			    }
+			    # Inform the user.
+			    my $t = shift(@t);
+			    warn("!".__x("Betaling {rel} {amt} voldoet de open posten {amtss} en {amts}",
+					 rel => $rel,
+					 amt => numfmt($amt),
+					 amtss => join(", ", @t),
+					 amts => $t)."\n");
+			    next ENTRY;
+			}
+			else {
+			    undef $rr;
+			    foreach my $k ( @k ) {
+				my @t; # for reporting
+				foreach ( @{$k} ) {
+				    push(@t, numfmt($amts[$_]));
+				}
+				my $t = shift(@t);
+				$wmsg .= "\n%" if $wmsg;
+#				$wmsg .= __x("Wellicht de betaling van de open posten {amtss} en {amts}?",
+#					     amtss => join(", ", @t),
+#					     amts => $t);
+				$wmsg .= _T("Wellicht de betaling van de volgende open posten:");
+				foreach ( @{$k} ) {
+				    my ($open, $bsknr, $bskid, $dbk_id, $bsk_desc, $bsk_amount) = @{$res->[$_]};
+				    $wmsg .= sprintf("\n%% %s %s %s",
+						     join(":",
+							  $dbh->lookup($dbk_id,
+								       qw(Dagboeken dbk_id dbk_desc)),
+							  $bsknr), numfmt($open), $bsk_desc);
+				}
+			    }
+			}
+		    }
+		    # Punt it.
+		    else {
+			undef $rr;
+		    }
+		}
+		else {
+		    $wmsg = __x("Geen alternatieven beschikbaar (teveel open posten)");
+		    undef $rr;
+		}
+
+		unless ( defined($rr) ) {
+		    warn("?".__x("Geen open post van {amt} gevonden voor relatie {rel}",
+				 amt => numfmt($amt),
+				 rel => $rel)."\n");
+		    if ( $wmsg) {
+			warn("%".$wmsg."\n");
+		    }
+		    elsif ( @$res ) {
+			warn("%".__x("Open posten voor relatie {rel}:", rel => $rel)."\n");
+			foreach ( @$res ) {
+			    my ($open, $bsknr, $bskid, $dbk_id, $bsk_desc, $bsk_amount) = @$_;
+			    warn(sprintf("%% %s %s %s\n",
+					 join(":",
+					      $dbh->lookup($dbk_id,
+							   qw(Dagboeken dbk_id dbk_desc)),
+					      $bsknr), numfmt($open), $bsk_desc));
+			}
+		    }
+		    $fail++;
+		    next;
+		}
+		$rr = [@$rr, $rel];
+		shift(@$rr);
 	    }
 	    else {
 		# Lookup rel code.
@@ -336,7 +472,7 @@ sub perform {
 		    $fail++;
 		    next;
 		}
-		# Get actuqal code.
+		# Get actual code.
 		$rel = $rr->[0];
 
 		# Find associated booking.
@@ -354,14 +490,16 @@ sub perform {
 			      $rel);
 		$rr = $dbh->do($sql, @sql_args);
 		unless ( defined($rr) ) {
-		    warn("?"._T("Geen bijbehorende open post gevonden")."\n");
+		    warn("?".__x("Geen open post van {amt} gevonden voor relatie {rel}",
+				amt => numfmt($amt),
+				rel => $rel)."\n");
 		    $fail++;
 		    next;
 		}
 		$rr = [@$rr, $rel];
 	    }
 
-	    my ($bskid, $dbk_id, $bsk_desc, $bsk_amount, $bsr_rel) = @$rr;
+	    my ($bsknr, $bskid, $dbk_id, $bsk_desc, $bsk_amount, $bsr_rel) = @$rr;
 	    my $acct = $dbh->std_acc($debcrd ? "deb" : "crd");
 
 	    $dbh->sql_insert("Boekstukregels",
@@ -435,7 +573,9 @@ sub perform {
     }
 
     if ( $fail ) {
-	warn("?"._T("De boeking is niet uitgevoerd!")."\n");
+	warn("?"._T("Boeking ".
+		    join(":", ($dbh->lookup($dagboek, qw(Dagboeken dbk_id dbk_desc)), $bsk_nr)).
+		    " is niet uitgevoerd!")."\n");
 	$dbh->rollback;
 	return undef;
     }
@@ -459,6 +599,22 @@ sub saldo_for {
 	return $rr->[0];
     }
     return;
+}
+
+# Adapted from 'Higher Order Perl' (Mark Jason Dominus),
+# sec 5.1.1 "Finding All Possible Partitions".
+
+sub partition {
+    my ($target, $values, $ix) = @_;
+    return [] if $target == 0;
+
+    $ix = [ 0 .. $#{$values} ] unless defined $ix;
+    return () if @$ix == 0;
+
+    my ($first, @rest) = @$ix;
+    my @solutions = partition($target - $values->[$first], $values, \@rest);
+    return ( (map { [ $first, @$_ ] } @solutions),
+	     partition($target, $values, \@rest));
 }
 
 1;

@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+ <head>
+  <title>EekBoek</title>
+    <link rel="stylesheet" href="css/site.css" type="text/css">
+      <meta name="robots" content="all">
+ </head>
+
+ <body bgcolor="#FFFFFF"
+       text="#000000" link="#0000FF"
+       vlink="#0000FF" alink="#C81900" background="images/bg.gif" >
+  <table width="100%" border="0" cellpadding="0" cellspacing="5">
+
+  <tr valign="top">
+    <td width="161" align="left">
+      <a href="index.html"><img src="images/eb.jpg" alt="EekBoek Boekhouden" border="0" width="149" height="87"></a>
+
+    </td>
+    <td>
+              <h1 class="title">EekBoek</h1>
+<div class="info">
+  Electronisch Boekhouden voor het MKB
+</div>
+
+          </td>
+  </tr>
+
+  <tr>
+    <td>
+      <a href="index.html"><img src="images/ebname.jpg" alt="EekBoek" border="0" width="151" height="22"></a>
+
+    </td>
+    <td>
+      <table width="100%" border="0" cellpadding="0" cellspacing="0">
+  <tr valign="middle">
+    <td align="left">
+      <table border="0" cellpadding="0" cellspacing="2">
+  <tr valign="middle">
+
+    <td class="info"></td>
+    <td><a href="inex.html" class="menu">Import en Export</a>
+</td>
+	
+  </tr>
+</table>
+
+
+    </td>
+    <td align="right">
+      
+    </td>
+  </tr>
+</table>
+
+    </td>
+  </tr>
+
+  <tr>
+    <td>
+      <hr>
+
+    </td>
+    <td>
+      <hr>
+
+    </td>
+  </tr>
+
+  <tr valign="top">
+    <td>
+      <div class="sidemenu">
+<table border="0" cellpadding="0" cellspacing="0">
+  <tr>
+    <td align="left" class="menutitle">Documentatie
+    </td>
+  </tr>
+  <tr>
+    <td><hr>
+</td>
+  </tr>
+  <tr valign="top">
+    <td align="left">
+      <a href="intro/index.html" class="menu">Inleiding</a>
+<br>
+<a href="ebshell/index.html" class="menu">De EekBoek shell</a>
+<br>
+<a href="config.html" class="menu">Configuratie</a>
+<br>
+<a href="setup/index.html" class="menu">Opzetten administratie</a>
+<br>
+<a href="bookings/index.html" class="menu">Boekingen</a>
+<br>
+<a href="reports/index.html" class="menu">Overzichten</a>
+<br>
+<a href="yearend.html" class="menu">Jaarafsluiting</a>
+<br>
+<a href="inex.html" class="menuselect">Import en Export</a>
+<br>
+          </td>
+  </tr>
+</table>
+</div>
+
+    </td>
+    <td>
+      
+
+<h2>Import en Export</h2>
+
+<p>Een EekBoek administratie kan te allen tijde worden
+ge&euml;xporteerd in de vorm van een set EekBoek bestanden, zoals
+beschreven in <a href="intro/working.html">Werkwijze</a>. Deze set
+bestanden kan vervolgens weer worden ge&iuml;mporteerd. De
+resulterende administratie is dan zoveel mogelijk identiek aan het
+origineel.</p>
+
+<h3>Export</h3>
+
+<p>De opdracht tot exporteren is <code>export</code> en heeft
+&eacute;&eacute;n argument: de bestemming. Dit kan zowel een
+bestandsnaam zijn, als een directory, welke zo nodig wordt
+aangemaakt.</p>
+
+<blockquote class="code">export --dir=<var>directory</var></blockquote>
+
+<p>Het is ook mogelijk deze opdracht direct op de command-line uit te voeren:</p>
+
+<blockquote class="code">ebshell --export --dir=<var>directory</var></blockquote>
+
+<p>In de opgegeven directory worden de volgende bestanden geplaatst:</p>
+
+<ul>
+<li>Het schema: <code>schema.dat</code></li>
+<li>De relaties: <code>relaties.eb</code></li>
+<li>De openingsgegevens: <code>opening.eb</code></li>
+<li>De mutaties: <code>mutaties.eb</code></li>
+</ul>
+
+<p>Indien wordt ge&euml;xporteerd naar een bestand:</p>
+
+<blockquote class="code">export --file=<var>archive</var></blockquote>
+
+<p>Dit cre&euml;ert het opgeven bestand met daarin alle benodigde
+data. Een eventueel reeds bestaand bestand wordt daarbij overschreven.</p>
+<p>Het export-bestand is een ZIP file met daarin de eerdergenoemde
+bestanden. Het kan daarom ook met standaard <code>zip</code> utilities worden
+benaderd, bijvoorbeeld:</p>
+
+<blockquote class="code">$ <strong>unzip -v export.ebx</strong>
+Archive:  export.ebx
+Export van dataset sample aangemaakt door EekBoek 0.61 op 2006-06-20
+ Length   Method    Size  Ratio   Date   Time   CRC-32    Name
+--------  ------  ------- -----   ----   ----   ------    ----
+   16887  Defl:N     5001  70%  06-20-06 17:48  a5c19c12  schema.dat
+     425  Defl:N      252  41%  06-20-06 17:48  6a23ef70  relaties.eb
+     713  Defl:N      365  49%  06-20-06 17:48  ab8a8032  opening.eb
+    4776  Defl:N     1125  76%  06-20-06 17:48  f363779e  mutaties.eb
+--------          -------  ---                            -------
+   22801             6743  70%                            4 files
+</blockquote>
+
+<h3>Import</h3>
+
+<p>Met de opdracht <code>import</code> wordt een eerder aangemaakt
+export bestand of set exportbestanden weer ge&iuml;mporteerd.</p>
+
+<blockquote class="code">import --dir=<var>directory</var>
+import --file=<var>archive</var></blockquote>
+
+<p>Het is ook mogelijk deze opdracht direct op de command-line uit te
+voeren. Daarbij wordt, indien nodig, de database automatisch
+aangemaakt:</p>
+
+<blockquote class="code">ebshell --import --dir=<var>directory</var>
+ebshell --import --file=<var>archive</var></blockquote>
+
+<p>In dit geval moeten de <code>--import</code> en
+<code>--file</code> of <code>--dir</code> opties achteraan de
+opdrachregel staan. </p>
+
+    </td>
+  </tr>
+
+  <tr>
+    <td>
+      <hr>
+
+    </td>
+    <td>
+      <hr>
+
+    </td>
+  </tr>
+
+  <tr valign="bottom">
+    <td valign="middle">
+      <a href="http://www.perl.org/"><img src="images/perl_powered.png" alt="Powered by Perl" border="0" width="134" height="48"></a>
+    </td>
+    <td align="center">
+      <p style="float:right;margin-top:0pt">
+      <img src="images/valid-html401.png" alt="[Valid HTML 4.01 Transitional]" border="0" width="88" height="31">
+
+      <img src="images/validcss.png" alt="[Valid CSS]" border="0" width="88" height="31">
+
+      </p>
+      <p class="info">Copyright &copy; 2005-2008 <a href="http://www.squirrel.nl">Squirrel Consultancy</a>. All Rights Reserved.<br />
+Deze site is gemaakt met de 
+<a href='http://www.squirrel.nl/people/jvromans/tt2site/'>TT2Site
+Site Builder</a>.<br />
+inex.html laatste aanpassing 20 juni 2006, 21:45:38
+</p>
+
+    </td>
+  </tr>
+
+</table>
+
+ </body>
+</html>

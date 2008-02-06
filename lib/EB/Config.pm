@@ -3,8 +3,8 @@
 # Author          : Johan Vromans
 # Created On      : Fri Jan 20 17:57:13 2006
 # Last Modified By: Johan Vromans
-# Last Modified On: Wed Dec 13 21:44:06 2006
-# Update Count    : 76
+# Last Modified On: Thu Jan 10 15:26:18 2008
+# Update Count    : 85
 # Status          : Unknown, Use with caution!
 
 package main;
@@ -80,6 +80,20 @@ sub init_config {
 
     # Make sure we have an object, even if no config files.
     $cfg ||= EB::Config::IniFiles::Wrapper->new;
+
+    $i = 0;
+    while ( $i < @ARGV ) {
+	if ( $ARGV[$i] eq "-D" &&
+	     $i+1 < @ARGV && $ARGV[$i+1] =~ /^(\w+(?:::\w+)*)::?(\w+)=(.*)/ ) {
+	    $cfg->newval($1, $2, $3);
+	    splice(@ARGV, $i, 2);
+	}
+	elsif ( $ARGV[$i] =~ /^--define=(\w+(?:::\w+)*)::?(\w+)=(.*)/ ) {
+	    $cfg->newval($1, $2, $3);
+	    splice(@ARGV, $i, 1);
+	}
+	$i++;
+    }
 
     $ENV{EB_LANG} = $cfg->val('locale','lang',
 			      $ENV{EB_LANG}||$ENV{LANG}||

@@ -3,8 +3,8 @@
 # Author          : Johan Vromans
 # Created On      : Tue Jan 24 10:43:00 2006
 # Last Modified By: Johan Vromans
-# Last Modified On: Tue Oct 24 15:41:19 2006
-# Update Count    : 164
+# Last Modified On: Wed Jan 23 17:30:30 2008
+# Update Count    : 168
 # Status          : Unknown, Use with caution!
 
 package main;
@@ -71,7 +71,9 @@ sub create {
 
     $dbname =~ s/^(?!=eekboek_)/eekboek_/;
 
-    my $sql = "CREATE DATABASE $dbname";
+    # Normally, sql treats names as lowcased. By using " " we can
+    # maintain the case of the database name.
+    my $sql = "CREATE DATABASE \"$dbname\"";
     $sql .= " ENCODING 'UNICODE'";
     for ( $cfg->val("database", "user", undef) ) {
 	next unless $_;
@@ -268,6 +270,8 @@ sub feature {
     }
 
     return 1 if $feat eq "prepcache";
+
+    return 1 if $feat eq "import";
 
     # Return false for all others.
     return;

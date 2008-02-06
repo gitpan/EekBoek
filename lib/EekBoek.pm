@@ -1,7 +1,7 @@
 package EekBoek;
 
 $PACKAGE = 'EekBoek';
-$VERSION = '1.03.02';
+$VERSION = '1.03.07';
 
 # NOTE: This is a documentation-only module.
 

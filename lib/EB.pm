@@ -3,8 +3,8 @@
 # Author          : Johan Vromans
 # Created On      : Fri Sep 16 18:38:45 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Fri Feb  2 11:11:51 2007
-# Update Count    : 204
+# Last Modified On: Fri Feb  1 16:37:30 2008
+# Update Count    : 210
 # Status          : Unknown, Use with caution!
 
 package main;
@@ -72,6 +72,7 @@ our @month_names;
 our @days;
 our @day_names;
 our $ident;
+our $imsg;
 our $url = "http://www.eekboek.nl";
 
 # Most elegant (and correct) would be to use an INIT block here, but
@@ -89,15 +90,16 @@ INIT {
     my @locextra;
     push(@locextra, _T("Nederlands")) if LOCALISER;
     push(@locextra, "Latin1") unless $cfg->val(qw(locale unicode), 0);
-    warn(__x("{ident}{extra}{locale} -- Copyright {year} Squirrel Consultancy",
-		 ident   => $ident,
-		 extra   => ($app ? " Wx " : ""),
-		 locale  => (@locextra ? " (".join(", ", @locextra).")" : ""),
-		 year    => $year)."\n") unless @ARGV && $ARGV[0] =~ /-(P|-?printcfg)$/;
+    $imsg = __x("{ident}{extra}{locale} -- Copyright {year} Squirrel Consultancy",
+		ident   => $ident,
+		extra   => ($app ? " Wx " : ""),
+		locale  => (@locextra ? " (".join(", ", @locextra).")" : ""),
+		year    => $year);
+    warn($imsg, "\n") unless @ARGV && $ARGV[0] =~ /-(P|-?printcfg)$/;
 
     eval {
 	require Win32;
-	my @a = Win32::GetOSVersion(); 
+	my @a = Win32::GetOSVersion();
 	my ($id, $major) = @a[4,1];
 	die unless defined $id;
 	warn(_T("EekBoek is VRIJE software, ontwikkeld om vrij over uw eigen gegevens te kunnen beschikken.")."\n");

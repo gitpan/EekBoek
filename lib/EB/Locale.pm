@@ -56,7 +56,7 @@ unless ( $gotone ) {
 
 unless ( $gotone ) {
 
-    if ( $cfg->val(qw(locale unicode), 0) ) {
+    if ( !$cfg || $cfg->val(qw(locale unicode), 0) ) {
 	require Encode;
 	eval 'sub _T($) { Encode::decode("ISO-8859-1", $_[0]) };';
 	binmode(STDIN,  ":utf8");

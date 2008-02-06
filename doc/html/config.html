@@ -1,11 +1,10 @@
-<?xml version="1.0" encoding="iso-8859-15"?>
+<?xml version="1.0" encoding="iso-8859-1"?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
  <head>
   <title>EekBoek</title>
-  <link rel="stylesheet" href="css/site.css">
-  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-15">
-  <meta name="robots" content="all">
+    <link rel="stylesheet" href="css/site.css" type="text/css">
+      <meta name="robots" content="all">
  </head>
 
  <body bgcolor="#FFFFFF"
@@ -15,7 +14,7 @@
 
   <tr valign="top">
     <td width="161" align="left">
-      <a href="index.html"><img src="images/eb.jpg" alt="EekBoek Boekhouden" border="0" width="149" height="87" /></a>
+      <a href="index.html"><img src="images/eb.jpg" alt="EekBoek Boekhouden" border="0" width="149" height="87"></a>
 
     </td>
     <td>
@@ -29,7 +28,7 @@
 
   <tr>
     <td>
-      <a href="index.html"><img src="images/ebname.jpg" alt="EekBoek" border="0" width="151" height="22" /></a>
+      <a href="index.html"><img src="images/ebname.jpg" alt="EekBoek" border="0" width="151" height="22"></a>
 
     </td>
     <td>
@@ -46,6 +45,7 @@
   </tr>
 </table>
 
+
     </td>
     <td align="right">
       
@@ -58,11 +58,11 @@
 
   <tr>
     <td>
-      <hr />
+      <hr>
 
     </td>
     <td>
-      <hr />
+      <hr>
 
     </td>
   </tr>
@@ -76,29 +76,27 @@
     </td>
   </tr>
   <tr>
-    <td><hr />
+    <td><hr>
 </td>
   </tr>
   <tr valign="top">
     <td align="left">
       <a href="intro/index.html" class="menu">Inleiding</a>
-<br />
+<br>
 <a href="ebshell/index.html" class="menu">De EekBoek shell</a>
-<br />
+<br>
 <a href="config.html" class="menuselect">Configuratie</a>
-<br />
+<br>
 <a href="setup/index.html" class="menu">Opzetten administratie</a>
-<br />
-<a href="debcrd.html" class="menu">Relaties</a>
-<br />
+<br>
 <a href="bookings/index.html" class="menu">Boekingen</a>
-<br />
+<br>
 <a href="reports/index.html" class="menu">Overzichten</a>
-<br />
+<br>
 <a href="yearend.html" class="menu">Jaarafsluiting</a>
-<br />
+<br>
 <a href="inex.html" class="menu">Import en Export</a>
-<br />
+<br>
           </td>
   </tr>
 </table>
@@ -246,11 +244,11 @@ toekomstige versie komen te vervallen.</p>
     <td>De naam van de te gebruiken database.<br>
 	De command line optie <code>--dataset</code> (zie hierboven)
 	prevaleert over het zetten van deze configuratievariabele.
-	Let op! De werkelijke naam wordt, indien nodig, voorzien van
-	het voorvoegsel	<code>eekboek_</code>. Dit om de EekBoek
+	Let op! De werkelijke naam wordt voorzien van
+	een voorvoegsel, om de EekBoek
 	databases te kunnen onderscheiden van de overige databases.
 	Deze configuratievariabele, indien opgevraagd, zal altijd de
-	naam weergeven <em>zonder</em> voorvoegsel. Zie ook
+	naam weergeven <em>zonder</em> dit voorvoegsel. Zie ook
 	<code>fullname</code> hieronder.
 	<br>Fallback: <code>EB_DB_NAME</code>.
     </td>
@@ -258,7 +256,7 @@ toekomstige versie komen te vervallen.</p>
   <tr valign="top">
     <td><a name="database_fullname"></a><code>fullname</code></td>
     <td>De volledige naam van de database, dus inclusief het
-	<code>eekboek_</code> voorvoegsel.<br>
+	voorvoegsel.<br>
 	Deze variabele kan niet worden opgegeven in de
 	configuratiebestanden maar wordt automatisch afgeleid van de
 	database naam.
@@ -301,6 +299,54 @@ toekomstige versie komen te vervallen.</p>
 	database-specifieke standaardwaarde genomen.
 	<br>Fallback: <code>EB_DB_PORT</code>.
     </td>
+  </tr>
+</table>
+
+<p><a name="strategy"></a><b>Sectie "Strategy"</b></p>
+<table border="1" width="100%" cellpadding="5">
+  <tr valign="top">
+    <td><a name="strategy_round"></a><code>round</code></td>
+    <td>Hiermee kan worden ingesteld op welke wijze EekBoek bij
+	berekeningen bedragen moet afronden.
+	<br>De volgende methoden worden ondersteund:
+	<table border="0" width="100%">
+	  <tr valign="top">
+	    <td><code>ieee</code></td><td>Afronding volgens de IEEE
+		standaard.<br>Dit is de standaardinstelling.</td>
+	  </tr>
+	  <tr valign="top">
+	    <td><code>bankers</code></td><td>Afronding naar even getallen (het zg. Bankers
+		algoritme)</td>
+	  </tr>
+	  <tr valign="top">
+	    <td><code>posix</code></td><td>Afronding volgens de POSIX standaard.</td>
+	  </tr>
+        </table>
+    </td>
+  </tr>
+  <tr valign="top">
+    <td><a name="strategy_bkm_multi"></a><code>bkm_multi</code></td>
+    <td>Indien ingesteld op een waarde anders dan 0 (default) zal
+	EekBoek proberen boekingen in een Bank, Kas of
+	Memoriaaldagboek waarvoor geen overeenstemmende open post kan
+	worden gevonden te verdelen over meerdere open posten.
+	<br>De boeking wordt alleen uitgevoerd indien er meerdere
+	open posten zijn die tezamen exact het gewenste bedrag uitmaken.
+  </tr>
+  <tr valign="top">
+    <td><a name="strategy_iv_vc"></a><code>iv_vc</code></td>
+    <td>Bij het boeken in een Inkoop- of Verkoopdagboek wordt BTW
+	berekend per boekstukregel. Sommige leveranciers berekenen
+	echter de BTW over het totaal van de boekstukregels. Daardoor
+	kunnen afrondingsverschillen ontstaan met als gevolg een
+	boekstuktotaal dat niet klopt met de opgegeven waarde. De
+	boeking zal dan worden geweigerd.
+	<p>EekBoek zal echter eerst proberen zo'n boeking te
+	corrigeren door de BTW 	te herberekenen over het totaal. Er
+	wordt dan een melding 	gegeven, en een correctieboekstukregel
+	aangemaakt.
+	<p>Dit gedrag kan worden <em>afgezet</em> door de strategy
+	optie <code>iv_vc</code> de waarde 0 te geven.
   </tr>
 </table>
 
@@ -431,26 +477,31 @@ ongewenste problemen leiden.</em></p>
 
   <tr>
     <td>
-      <hr />
+      <hr>
 
     </td>
     <td>
-      <hr />
+      <hr>
 
     </td>
   </tr>
 
   <tr valign="bottom">
     <td valign="middle">
-      <a href="http://www.perl.org/"><a href="http://www.perl.org/"><img src="images/perl_powered.png" alt="Powered by Perl" border="0" width="134" height="48" /></a></a>
-
+      <a href="http://www.perl.org/"><img src="images/perl_powered.png" alt="Powered by Perl" border="0" width="134" height="48"></a>
     </td>
     <td align="center">
-      <p class="info">Copyright &copy; 2005-2006 <a href="http://www.squirrel.nl">Squirrel Consultancy</a>. All Rights Reserved.<br />
+      <p style="float:right;margin-top:0pt">
+      <img src="images/valid-html401.png" alt="[Valid HTML 4.01 Transitional]" border="0" width="88" height="31">
+
+      <img src="images/validcss.png" alt="[Valid CSS]" border="0" width="88" height="31">
+
+      </p>
+      <p class="info">Copyright &copy; 2005-2008 <a href="http://www.squirrel.nl">Squirrel Consultancy</a>. All Rights Reserved.<br />
 Deze site is gemaakt met de 
 <a href='http://www.squirrel.nl/people/jvromans/tt2site/'>TT2Site
 Site Builder</a>.<br />
-config.html laatste aanpassing 10 oktober 2006, 23:43:11
+config.html laatste aanpassing 28 oktober 2007, 21:15:58
 </p>
 
     </td>

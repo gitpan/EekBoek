@@ -1,11 +1,10 @@
-<?xml version="1.0" encoding="iso-8859-15"?>
+<?xml version="1.0" encoding="iso-8859-1"?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
  <head>
   <title>EekBoek</title>
-  <link rel="stylesheet" href="../css/site.css">
-  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-15">
-  <meta name="robots" content="all">
+    <link rel="stylesheet" href="../css/site.css" type="text/css">
+      <meta name="robots" content="all">
  </head>
 
  <body bgcolor="#FFFFFF"
@@ -15,7 +14,7 @@
 
   <tr valign="top">
     <td width="161" align="left">
-      <a href="../index.html"><img src="../images/eb.jpg" alt="EekBoek Boekhouden" border="0" width="149" height="87" /></a>
+      <a href="../index.html"><img src="../images/eb.jpg" alt="EekBoek Boekhouden" border="0" width="149" height="87"></a>
 
     </td>
     <td>
@@ -29,7 +28,7 @@
 
   <tr>
     <td>
-      <a href="../index.html"><img src="../images/ebname.jpg" alt="EekBoek" border="0" width="151" height="22" /></a>
+      <a href="../index.html"><img src="../images/ebname.jpg" alt="EekBoek" border="0" width="151" height="22"></a>
 
     </td>
     <td>
@@ -50,6 +49,7 @@
   </tr>
 </table>
 
+
     </td>
     <td align="right">
       
@@ -62,11 +62,11 @@
 
   <tr>
     <td>
-      <hr />
+      <hr>
 
     </td>
     <td>
-      <hr />
+      <hr>
 
     </td>
   </tr>
@@ -80,40 +80,38 @@
     </td>
   </tr>
   <tr>
-    <td><hr />
+    <td><hr>
 </td>
   </tr>
   <tr valign="top">
     <td align="left">
       <a href="../intro/index.html" class="menu">Inleiding</a>
-<br />
+<br>
 <a href="../ebshell/index.html" class="menu">De EekBoek shell</a>
-<br />
+<br>
 <a href="../config.html" class="menu">Configuratie</a>
-<br />
+<br>
 <a href="../setup/index.html" class="menu">Opzetten administratie</a>
-<br />
-<a href="../debcrd.html" class="menu">Relaties</a>
-<br />
+<br>
 <a href="../bookings/index.html" class="menuselect">Boekingen</a>
-<br />
+<br>
 &nbsp;-&nbsp;<a href="../bookings/payable.html" class="menu">Inkoopfakturen</a>
-<br />
+<br>
 &nbsp;-&nbsp;<a href="../bookings/receivable.html" class="menu">Verkoopfakturen</a>
-<br />
+<br>
 &nbsp;-&nbsp;<a href="../bookings/bank.html" class="menuselect">Bankafschriften</a>
-<br />
+<br>
 &nbsp;-&nbsp;<a href="../bookings/cash.html" class="menu">Kas</a>
-<br />
+<br>
 &nbsp;-&nbsp;<a href="../bookings/memorial.html" class="menu">Memoriaal</a>
-<br />
-<br />
+<br>
+<br>
 <a href="../reports/index.html" class="menu">Overzichten</a>
-<br />
+<br>
 <a href="../yearend.html" class="menu">Jaarafsluiting</a>
-<br />
+<br>
 <a href="../inex.html" class="menu">Import en Export</a>
-<br />
+<br>
           </td>
   </tr>
 </table>
@@ -146,7 +144,8 @@ Het <em>eindsaldo</em> na boeking kan worden geverifieerd met de optie
 &lsquo;<code>--beginsaldo=<var>bedrag</var></code>&rsquo;. Als dit
 niet is opgegeven wordt het eindsaldo van het eraan
 voorafgaande boekstuk genomen, indien deze reeds in de administratie
-aanwezig is.
+aanwezig is. Het beginstaldo van de eerste boeking is uiteraard het op
+de openingsbalans opgevoerde bedrag.
 <br>Zowel het
 boekstuktotaal als het begin- en eindsaldo treft u als regel aan op
 het bankafschrift.</p>
@@ -331,12 +330,18 @@ boekstuk?</h3>
 debiteur, dan zal EekBoek in de openstaande posten van het huidige
 &eacute;n eventuele voorafgaande boekjaren zoeken naar een boekstuk
 (inkoop resp. verkoop) waarvan het boekstuktotaal overeenkomt met het
-opgegeven bedrag. Hiermee kunnen 98% van de betalingen soepel en
+opgegeven bedrag. Hiermee kunnen bijna alle betalingen soepel en
 eenvoudig worden afgewerkt.</p>
 
 <p>Wanneer er meerdere openstaande posten zijn voor dezelfde relatie
 met hetzelfde bedrag, dan wordt de oudste openstaande post geacht te
 zijn voldaan.</p>
+
+<p>De configuratie-instelling <a
+href="../config.html#strategy_bkm_multi">bkm_multi</a> kan worden
+gebruikt om dit proces te versoepelen: De boeking wordt dan ook
+uitgevoerd indien er meerdere open posten zijn die tezamen exact het
+gewenste bedrag uitmaken.</p>
 
 <p>Een complicatie ontstaat wanneer een betaling niet precies
 overeenkomt met het bedrag van een inkoop/verkoop boekstuk. Dit kan
@@ -363,26 +368,31 @@ meegegeven:
 
   <tr>
     <td>
-      <hr />
+      <hr>
 
     </td>
     <td>
-      <hr />
+      <hr>
 
     </td>
   </tr>
 
   <tr valign="bottom">
     <td valign="middle">
-      <a href="http://www.perl.org/"><a href="http://www.perl.org/"><img src="../images/perl_powered.png" alt="Powered by Perl" border="0" width="134" height="48" /></a></a>
-
+      <a href="http://www.perl.org/"><img src="../images/perl_powered.png" alt="Powered by Perl" border="0" width="134" height="48"></a>
     </td>
     <td align="center">
-      <p class="info">Copyright &copy; 2005-2006 <a href="http://www.squirrel.nl">Squirrel Consultancy</a>. All Rights Reserved.<br />
+      <p style="float:right;margin-top:0pt">
+      <img src="../images/valid-html401.png" alt="[Valid HTML 4.01 Transitional]" border="0" width="88" height="31">
+
+      <img src="../images/validcss.png" alt="[Valid CSS]" border="0" width="88" height="31">
+
+      </p>
+      <p class="info">Copyright &copy; 2005-2008 <a href="http://www.squirrel.nl">Squirrel Consultancy</a>. All Rights Reserved.<br />
 Deze site is gemaakt met de 
 <a href='http://www.squirrel.nl/people/jvromans/tt2site/'>TT2Site
 Site Builder</a>.<br />
-bookings/bank.html laatste aanpassing 08 juli 2006, 23:00:57
+bookings/bank.html laatste aanpassing 01 december 2007, 22:49:27
 </p>
 
     </td>

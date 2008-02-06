@@ -3,8 +3,8 @@
 # Author          : Johan Vromans
 # Created On      : Sat Oct 15 23:36:51 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Sat Dec 16 17:36:20 2006
-# Update Count    : 72
+# Last Modified On: Wed Jan  2 20:47:32 2008
+# Update Count    : 134
 # Status          : Unknown, Use with caution!
 
 my $RCS_Id = '$Id$ ';
@@ -189,7 +189,7 @@ sub norm_btw {
     my ($self, $bsr_amt, $bsr_btw_id) = @_;
     my ($btw_perc, $btw_incl);
     if ( $bsr_btw_id ) {
-	my $rr = $dbh->do("SELECT btw_perc, btw_incl".
+	my $rr = $dbh->do("SELECT btw_perc, btw_incl, btw_tariefgroep".
 			  " FROM BTWTabel".
 			  " WHERE btw_id = ?", $bsr_btw_id);
 	($btw_perc, $btw_incl) = @$rr;
@@ -207,7 +207,7 @@ sub norm_btw {
 	$bruto = numround($netto * (1 + $btw_perc/BTWSCALE));
     }
 
-    [ $bruto, $bruto - $netto ];
+    [ $bruto, $bruto - $netto, $btw_perc ];
 }
 
 #### Class method
@@ -221,17 +221,18 @@ sub dcfromtd {
 
 #### Class method
 sub journalise {
-    my ($self, $bsk_id) = @_;
+    my ($self, $bsk_id, $iv, $total) = @_;
+    $total = -$total if defined($total) && !$iv;
 
     # date  bsk_id  bsr_seq(0)   dbk_id  (acc_id) amount debcrd desc(bsk) (rel)
     # date (bsk_id) bsr_seq(>0) (dbk_id)  acc_id  amount debcrd desc(bsr) rel(acc=1200/1600)
     my ($jnl_date, $jnl_bsk_id, $jnl_bsr_seq, $jnl_dbk_id, $jnl_acc_id,
 	$jnl_amount, $jnl_desc, $jnl_rel);
 
-    my $rr = $::dbh->do("SELECT bsk_nr, bsk_desc, bsk_dbk_id, bsk_date".
+    my $rr = $::dbh->do("SELECT bsk_nr, bsk_desc, bsk_dbk_id, bsk_date, bsk_ref".
 		      " FROM boekstukken".
 		      " WHERE bsk_id = ?", $bsk_id);
-    my ($bsk_nr, $bsk_desc, $bsk_dbk_id, $bsk_date) = @$rr;
+    my ($bsk_nr, $bsk_desc, $bsk_dbk_id, $bsk_date, $bsk_ref) = @$rr;
 
     my ($dbktype, $dbkdcsplit, $dbk_acc_id) =
       @{$::dbh->do("SELECT dbk_type, dbk_dcsplit, dbk_acc_id".
@@ -246,19 +247,27 @@ sub journalise {
     my $ret = [];
     my $tot = 0;
     my ($dtot, $ctot) = (0, 0);
+    my ($vhtot, $vltot) = (0, 0);
     my $nr = 1;
+    my $vat; 			# for automatic rounding VAT calc
+    my $g_bsr_rel_code;
 
     while ( $rr = $sth->fetchrow_arrayref ) {
 	my ($bsr_nr, $bsr_date, $bsr_desc, $bsr_amount, $bsr_btw_class,
-	    $bsr_btw_id, $bsr_btw_acc, $bsr_type, $bsr_acc_id, $bsr_rel_code, $bsr_rel_dbk) = @$rr;
+	    $bsr_btw_id, $bsr_btw_acc, $bsr_type, $bsr_acc_id, $bsr_rel_code,
+	    $bsr_rel_dbk) = @$rr;
 	my $bsr_bsk_id = $bsk_id;
 	my $btw = 0;
 	my $amt = $bsr_amount;
+	$g_bsr_rel_code = $bsr_rel_code if defined $iv && $bsr_rel_code;
 
 	if ( ($bsr_btw_class & BTWKLASSE_BTW_BIT) && $bsr_btw_id && $bsr_btw_acc ) {
-	    ( $bsr_amount, $btw ) =
+	    ( $bsr_amount, $btw, my $perc ) =
 	      @{$self->norm_btw($bsr_amount, $bsr_btw_id)};
 	    $amt = $bsr_amount - $btw;
+	    $vat->{$bsr_btw_acc}->{amt} += $amt;
+	    $vat->{$bsr_btw_acc}->{btw} += $btw;
+	    $vat->{$bsr_btw_acc}->{prc} = $perc;
 	}
 	$tot += $bsr_amount;
 	$dtot += $bsr_amount if $bsr_amount < 0;
@@ -267,26 +276,52 @@ sub journalise {
 	push(@$ret, [$bsk_date, $bsk_dbk_id, $bsk_id, $bsr_date, $nr++,
 		     $bsr_acc_id,
 		     $bsr_amount - $btw, undef, $bsr_desc,
-		     $bsr_type ? ($bsr_rel_code, $bsr_rel_dbk) : (undef, undef)]);
+		     $bsr_type ? ($bsr_rel_code, $bsr_rel_dbk) : (undef, undef), undef]);
 	push(@$ret, [$bsk_date,  $bsk_dbk_id, $bsk_id, $bsr_date, $nr++,
 		     $bsr_btw_acc,
 		     $btw, undef, "BTW ".$bsr_desc,
-		     undef, undef]) if $btw;
+		     undef, undef, undef]) if $btw;
+    }
+
+    if ( defined($total) && $tot != $total
+	 && $cfg->val(qw(strategy iv_vc), 1)
+       ) { # mismatch!
+	#warn("=> $tot <-> $total\n");
+	# Vaak het gevolg van verschil in BTW berekening per
+	# boekingsregel versus per boekstuktotaal.
+
+	while ( my($k,$v) = each(%$vat) ) {
+	    # Bereken BTW over totaal van deze tariefgroep.
+	    my $t = numround($v->{amt} * ($v->{prc}/BTWSCALE));
+	    if ( $t != $v->{btw} ) { # Aha!
+		#warn("=> [$k] $v->{btw} <-> $t\n");
+		# Corrigeer het totaal, en maak een correctieboekstukregel.
+		$tot -= $v->{btw} - $t;
+		push(@$ret, [$bsk_date,  $bsk_dbk_id, $bsk_id, $bsk_date, $nr++,
+			     $k,
+			     $t - $v->{btw},
+			     undef,
+			     "BTW Afr. ".$bsk_desc,
+			     undef, undef, undef]);
+		warn("!".__x("BTW rek. nr. {acct}, correctie van {amt} uitgevoerd",
+			     acct => $k, amt => numfmt($t-$v->{btw}))."\n");
+	    }
+	}
     }
 
     if ( $dbk_acc_id ) {
 	if ( $dbkdcsplit ) {
 	    push(@$ret, [$bsk_date,  $bsk_dbk_id, $bsk_id, $bsk_date, $nr++, $dbk_acc_id,
-			 -$tot, -$dtot, $bsk_desc, undef, undef]);
+			 -$tot, -$dtot, $bsk_desc, undef, undef, undef]);
 	}
 	else {
 	    push(@$ret, [$bsk_date,  $bsk_dbk_id, $bsk_id, $bsk_date, $nr++, $dbk_acc_id,
-			 -$tot, undef, $bsk_desc, undef, undef]);
+			 -$tot, undef, $bsk_desc, undef, undef, undef]);
 	}
     }
 
     unshift(@$ret, [$bsk_date, $bsk_dbk_id, $bsk_id, $bsk_date, 0, undef,
-		    undef, undef, $bsk_desc, undef, undef]);
+		    undef, undef, $bsk_desc, $g_bsr_rel_code, undef, $bsk_ref]);
 
     $ret;
 }

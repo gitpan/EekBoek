@@ -13,8 +13,8 @@ package EB::Booking::IV;
 # Author          : Johan Vromans
 # Created On      : Thu Jul  7 14:50:41 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Tue Oct 24 15:09:13 2006
-# Update Count    : 287
+# Last Modified On: Sat Dec 29 17:23:04 2007
+# Update Count    : 299
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -40,6 +40,12 @@ sub perform {
 
     my $dagboek = $opts->{dagboek};
     my $dagboek_type = $opts->{dagboek_type};
+    my $bsk_ref = $opts->{ref};
+
+    if ( defined $bsk_ref && $bsk_ref =~ /^\d+$/ ) {
+	warn("?".__x("Boekingsreferentie moet tenminste één niet-numeriek teken bevatten: {ref}", ref => $bsk_ref)."\n");
+	return;
+    }
 
     unless ( $dagboek_type == DBKTYPE_INKOOP || $dagboek_type == DBKTYPE_VERKOOP) {
 	warn("?".__x("Ongeldige operatie (IV) voor dagboek type {type}",
@@ -196,10 +202,23 @@ sub perform {
 	    $bsk_nr = $self->bsk_nr($opts);
 	    return unless defined($bsk_nr);
 	    $bsk_id = $dbh->get_sequence("boekstukken_bsk_id_seq");
+	    if ( $bsk_ref and $dbh->do("SELECT count(*)".
+				       " FROM Boekstukken, Boekstukregels".
+				       " WHERE bsk_id = bsr_bsk_id".
+				       " AND upper(bsk_ref) = ?".
+				       " AND upper(bsr_rel_code) = ?".
+				       " AND bsk_bky = ?",
+				       uc($bsk_ref), uc($debcode), $bky)->[0] ) {
+		warn("?".__x("Referentie {ref} bestaat al voor relatie {rel}",
+			     rel => $debcode, ref => $bsk_ref)."\n");
+		return;
+	    }
+
+
 	    $dbh->begin_work;
 	    $dbh->sql_insert("Boekstukken",
-			     [qw(bsk_id bsk_nr bsk_desc bsk_dbk_id bsk_date bsk_bky)],
-			     $bsk_id, $bsk_nr, $gdesc, $dagboek, $date, $bky);
+			     [qw(bsk_id bsk_nr bsk_ref bsk_desc bsk_dbk_id bsk_date bsk_bky)],
+			     $bsk_id, $bsk_nr, $bsk_ref, $gdesc, $dagboek, $date, $bky);
 	}
 
 	# Amount can override BTW id with @X postfix.
@@ -256,14 +275,15 @@ sub perform {
 
 	$dbh->sql_insert("Boekstukregels",
 			 [qw(bsr_nr bsr_date bsr_bsk_id bsr_desc bsr_amount
-			     bsr_btw_id bsr_btw_acc bsr_btw_class bsr_type bsr_acc_id bsr_rel_code)],
+			     bsr_btw_id bsr_btw_acc bsr_btw_class bsr_type bsr_acc_id
+			     bsr_rel_code bsr_dbk_id)],
 			 $nr++, $date, $bsk_id, $desc, $amt,
 			 $btw_id, $btw_acc,
 			 BTWKLASSE($does_btw ? defined($kstomz) : 0, $rel_btw, defined($kstomz) ? $kstomz : $iv),
-			 0, $acct, $debcode);
+			 0, $acct, $debcode, $dagboek);
     }
 
-    my $ret = $self->journalise($bsk_id);
+    my $ret = $self->journalise($bsk_id, $iv, $totaal);
 #    $rr = [ @$ret ];
 #    shift(@$rr);
 #    $rr = [ sort { $a->[5] <=> $b->[5] } @$rr ];
@@ -291,7 +311,9 @@ sub perform {
 
     if ( $fail ) {
 	$dbh->rollback;
-	return "?"._T("De boeking is niet uitgevoerd!")." ".
+	return "?"._T("Boeking ".
+		      join(":", $dbh->lookup($dagboek, qw(Dagboeken dbk_id dbk_desc)), $bsk_nr).
+		      " is niet uitgevoerd!")." ".
 	  __x(" Boekstuk totaal is {act} in plaats van {exp}",
 	      act => numfmt($tot), exp => numfmt($totaal)) . ".";
     }

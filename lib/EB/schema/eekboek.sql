@@ -123,6 +123,7 @@ CREATE TABLE Boekstukken (
     bsk_id       int not null primary key,
     bsk_nr       int not null,	-- serienummer
     bsk_desc     text not null,
+    bsk_ref	 text,		-- referentie
     bsk_dbk_id   varchar(4) references Dagboeken,
     bsk_date     date,
     bsk_bky      VARCHAR(4) references Boekjaren,
@@ -176,6 +177,7 @@ CREATE TABLE Journal (
     jnl_date	date not null,	--boekstukdatum
     jnl_dbk_id	varchar(4) references Dagboeken,
     jnl_bsk_id	int not null references Boekstukken,
+    jnl_bsk_ref text,
     jnl_bsr_date date not null,	--boekstukregeldatum
     jnl_bsr_seq	int not null,
     jnl_acc_id	int references Accounts,
@@ -207,6 +209,6 @@ CREATE TABLE Metadata (
 
 -- Harde waarden, moeten overeenkomen met de code.
 INSERT INTO metadata (adm_scm_majversion, adm_scm_minversion, adm_scm_revision)
-  VALUES (1, 0, 11);
+  VALUES (1, 0, 12);
 
 UPDATE Metadata SET adm_bky = '<<<<'; -- Voorgaand boekjaar

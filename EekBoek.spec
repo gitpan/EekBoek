@@ -3,7 +3,7 @@
 %define unstable 1
 
 %define pkgname EekBoek
-%define pkgversion 1.03.02
+%define pkgversion 1.03.07
 %define lcname eekboek
 
 #%if %{unstable}
@@ -55,6 +55,7 @@ Requires: perl(DBI) >= 1.40
 Requires: %{name}-db
 
 BuildRequires: perl >= 5.8
+BuildRequires: perl(DBI)
 
 Provides: %{pkgname}%{pkgsuffix} = %{version}
 #Provides: %{lcname} = %{version}
@@ -104,7 +105,7 @@ Summary: GUI enhancements for %{pkgname}.
 Group: Applications/Productivity
 AutoReqProv: 0
 Requires: %{name} = %{version}
-Requires: perl-Wx >= 0.27
+Requires: perl-Wx >= 0.74
 
 %description gui
 The wxWidgets extension for %{name}.
@@ -127,6 +128,7 @@ The wxWidgets extension for %{name}.
 
 mv blib/lib/EB/examples .
 ( cd examples;
+  mv ../eekboek-mode.el .;
   zip -q ../blib/lib/EB/schema/sampledb.ebz *.eb schema.dat )
 
 %install
@@ -211,6 +213,8 @@ pod2man blib/script/ebshell > ${RPM_BUILD_ROOT}%{_mandir}/man1/ebshell%{lcpkgsuf
 %post
 
 %changelog
+* Sun Apr 01 2007 Johan Vromans <jvromans@squirrel.nl> - 1.03.03
+- Exclude some Wx files.
 * Sun Nov 05 2006 Johan Vromans <jvromans@squirrel.nl> - 1.03.00
 - Move DB drivers to separate package, and adjust req/prov.
 * Mon Oct 16 2006 Johan Vromans <jvromans@squirrel.nl> - 1.01.02

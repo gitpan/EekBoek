@@ -12,8 +12,8 @@ package EB::Report::Debcrd;
 # Author          : Johan Vromans
 # Created On      : Wed Dec 28 16:08:10 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Sat Apr 15 10:47:16 2006
-# Update Count    : 174
+# Last Modified On: Mon Jan 28 13:05:28 2008
+# Update Count    : 182
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -84,14 +84,13 @@ sub _perform {
 
     $sth = $dbh->sql_exec("SELECT bsr_rel_code, bsr_paid".
 			  " FROM Boekstukregels, Boekstukken".
-			  " WHERE bsr_date >= ? AND bsr_date <= ?".
-			  " AND bsr_paid = bsk_id".
+			  " WHERE bsr_paid = bsk_id".
+#			  " AND bsr_date >= ? AND bsr_date <= ?".
 			  " AND bsk_date < ?".
 			  " AND bsr_type = ?",
-			  @{$rep->{periode}},
+#			  @{$rep->{periode}},
 			  $rep->{per_begin},
-			  $debcrd ? 1 : 2,
-			 );
+			  $debcrd ? DBKTYPE_INKOOP : DBKTYPE_VERKOOP);
 
     while ( my $rr = $sth->fetchrow_arrayref ) {
 	next if $args && $rr->[0] !~ /^$args$/i;
@@ -110,8 +109,9 @@ sub _perform {
 
 	my $a_tot = 0;
 	my $o_tot = 0;
+	my @rp = ();
 
-	$rep->add({ debcrd => $rel, _style=> "h1" });
+	push(@rp, { debcrd => $rel, _style=> "h1" });
 
 	my $sth;
 
@@ -151,7 +151,7 @@ sub _perform {
 		$a_tot += $bsr_amount;
 		$o_tot += $bsr_open;
 
-		$rep->add({ desc   => $bsk_desc,
+		push(@rp, { desc   => $bsk_desc,
 			    date   => datefmt($bsk_date),
 			    amount => numfmt($bsr_amount),
 			    open   => numfmt($bsr_open),
@@ -166,13 +166,13 @@ sub _perform {
 				      " AND bsr_date >= ? AND bsr_date <= ?".
 				      " AND bsr_paid = ?".
 				      " AND bsr_bsk_id = bsk_id AND bsk_dbk_id = dbk_id".
-				      " ORDER BY bsr_date",
+				      " ORDER BY bsr_date, bsk_nr",
 				      $debcrd ? 1 : 2, @{$rep->{periode}}, $bsk_id);
 		while ( my $rr = $sth->fetchrow_arrayref ) {
 		    my ($x_bsr_date, $x_bsr_desc, $x_bsr_amount,
 			$x_dbk_desc, $x_bsk_nr, $x_bsk_bky) = @$rr;
 		    $x_bsr_amount = 0-$x_bsr_amount unless $debcrd;
-		    $rep->add({ desc    => $x_bsr_desc,
+		    push(@rp, { desc    => $x_bsr_desc,
 				date    => datefmt($x_bsr_date),
 				paid    => numfmt(0-$x_bsr_amount),
 				bsknr   => join(":", $x_dbk_desc, $x_bsk_nr),
@@ -195,7 +195,7 @@ sub _perform {
 			      " AND bsr_type = 0".
 			      " AND bsr_nr = 1".
 			      " AND bsr_rel_code = ?".
-			      " ORDER BY bsk_date",
+			      " ORDER BY bsk_date, bsk_nr",
 			      @{$rep->{periode}},
 			      $rel);
 
@@ -215,12 +215,14 @@ sub _perform {
 		$bsr_open -= $rop->[0];
 	    }
 
+	    next if $opts->{openstaand} && $bsr_open == 0;
+
 	    $bsr_amount = 0-$bsr_amount unless $debcrd;
 	    $bsr_open   = 0-$bsr_open   unless $debcrd;
 	    $a_tot += $bsr_amount;
 	    $o_tot += $bsr_open;
 
-	    $rep->add({ desc   => $bsk_desc,
+	    push(@rp, { desc   => $bsk_desc,
 			date   => datefmt($bsk_date),
 			amount => numfmt($bsr_amount),
 			open   => numfmt($bsr_open),
@@ -235,13 +237,13 @@ sub _perform {
 				     " AND bsr_date >= ? AND bsr_date <= ?".
 				     " AND bsr_paid = ?".
 				     " AND bsr_bsk_id = bsk_id AND bsk_dbk_id = dbk_id".
-				     " ORDER BY bsr_date",
+				     " ORDER BY bsr_date, bsk_nr",
 				     $debcrd ? 1 : 2, @{$rep->{periode}}, $bsk_id);
 	    while ( my $rr = $sth->fetchrow_arrayref ) {
 		my ($x_bsr_date, $x_bsr_desc, $x_bsr_amount,
 		    $x_dbk_desc, $x_bsk_nr) = @$rr;
 		$x_bsr_amount = 0-$x_bsr_amount unless $debcrd;
-		$rep->add({ desc    => $x_bsr_desc,
+		push(@rp, { desc    => $x_bsr_desc,
 			    date    => datefmt($x_bsr_date),
 			    paid    => numfmt(0-$x_bsr_amount),
 			    bsknr   => join(":", $x_dbk_desc, $x_bsk_nr),
@@ -250,7 +252,7 @@ sub _perform {
 	    }
 	}
 
-	$rep->add({ debcrd => $rel,
+	push(@rp, { debcrd => $rel,
 		    desc   => _T("Totaal"),
 		    amount => numfmt($a_tot),
 		    open   => numfmt($o_tot),
@@ -259,6 +261,10 @@ sub _perform {
 
 	$a_grand += $a_tot;
 	$o_grand += $o_tot;
+
+	next if $opts->{openstaand} && $o_tot == 0;
+	$rep->add($_) foreach @rp;
+
     }
 
     $rep->add({ debcrd => _T("Totaal"),
