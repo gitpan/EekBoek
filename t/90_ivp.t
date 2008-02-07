@@ -55,7 +55,7 @@ unlink(<*.txt>);
 unlink(<*.html>);
 unlink(<*.csv>);
 
-my @ebcmd = qw(-MEB::Shell -e shell -- -X -f ivp.conf --echo);
+my @ebcmd = qw(-MEB::Main -e run -- -X -f ivp.conf --echo);
 push(@ebcmd, "-D", "database:driver=$dbdriver") if $dbdriver;
 
 unshift(@ebcmd, map { ("-I",

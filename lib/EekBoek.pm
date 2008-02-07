@@ -1,11 +1,14 @@
-package EekBoek;
+#! perl
 
-$PACKAGE = 'EekBoek';
-$VERSION = '1.03.07';
+package EekBoek;
 
 # NOTE: This is a documentation-only module.
 
 use strict;
+
+my $RCS_Id = '$Id$ ';
+our $PACKAGE = 'EekBoek';
+our $VERSION = '1.03.07_01';
 
 =head1 NAME
 
@@ -56,4 +59,4 @@ GNU General Public License or the Artistic License for more details.
 
 1;
 
-# $Id$
+# $Id$ 

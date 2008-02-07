@@ -1,4 +1,7 @@
-1.03.07
+1.03.08
+
+
+1.03.07	06-02-2008 18:12
 
 	* Fix bug waardoor een adm_relatie met datum 31-12 niet werd
           geaccepteerd wanneer er al eerdere boekingen in dat jaar
@@ -10,7 +13,7 @@
 	
 	* Fix auto-migratie bug.
 
-1.03.06	05-02-2008
+1.03.06	05-02-2008 11:57
 
 	* Enkele aanpassingen in het strategy:bkm_multi gebeuren. Omdat
 	  het zoekproces enige tijd in beslag kan nemen (enkele minuten
@@ -91,7 +94,7 @@
 
 	  De migratie is echter ok. Daarna kun je opnieuw opstarten.
 
-1.03.05
+1.03.05	28-10-2007 20:57
 
 	IV Boekingen:  Config optie strategy:iv_vc.
         Bij het boeken in een Inkoop- of Verkoopdagboek wordt BTW
@@ -106,7 +109,7 @@
 	Dit gedrag kan worden afgezet door de strategy
 	optie iv_vc de waarde 0 te geven.
 
-1.03.04
+1.03.04	18-07-2007 19:15
 
 	WAARSCHUWING: Hoewel de database niet is gewijzigd moeten
 	bestaande administraties worden geëxporteerd en weer
@@ -129,7 +132,7 @@
 	Klant-specifieke wijzigingen in de (niet ondersteunde)
 	DaviAccount import module.
 
-1.03.03
+1.03.03	27-06-2007 12:39
 
 	BKM Boekingen: Toon bedrag en relatie indien geen openstaande
 	post kan worden gevonden.
@@ -147,7 +150,7 @@
 
 	Kleine bugfixes.
 
-1.03.02
+1.03.02	04-02-2007 21:29
 
 	Fix probleem met foutieve export van adm_btwperiode in
 	multi-jaar admin (issue 1628783).
@@ -166,7 +169,7 @@
 
 	Fix probleem met UTF-8 data in Latin1 files in export zip.
 
-1.03.01
+1.03.01	27-12-2006 15:48
 
 	*** DATABASE STRUCTUUR IS GEWIJZIGD ***
 	Export de data voor de upgrade! Database migratie werkt alleen
@@ -189,7 +192,7 @@
 
 	Fix probleem met het opruimen van de directories na (rpm) uninstall.
 
-1.03.00
+1.03.00	13-12-2006 21:55
 
 	Expliciete controle of een nieuw boekstuknummer nog vrij is,
 	ter voorkoming van een onvriendelijke "dup key" melding.

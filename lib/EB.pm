@@ -1,10 +1,12 @@
-# EB.pm -- 
+#! perl
+
+# EB.pm -- EekBoek Base module.
 # RCS Info        : $Id$
 # Author          : Johan Vromans
 # Created On      : Fri Sep 16 18:38:45 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Fri Feb  1 16:37:30 2008
-# Update Count    : 210
+# Last Modified On: Thu Feb  7 13:06:23 2008
+# Update Count    : 213
 # Status          : Unknown, Use with caution!
 
 package main;
@@ -17,7 +19,7 @@ package EB;
 use strict;
 use base qw(Exporter);
 
-our $VERSION = $EekBoek::VERSION;
+our $VERSION;
 use EekBoek;
 BEGIN { $VERSION = $EekBoek::VERSION }
 
@@ -45,6 +47,8 @@ BEGIN {
     # The core and GUI use a different EB::Locale module.
     if ( $app ) {
 	require EB::Wx::Locale;
+	# Force UNICODE for Wx.
+	$cfg->newval(qw(locale unicode), 1);
     }
     else {
 	require EB::Locale;

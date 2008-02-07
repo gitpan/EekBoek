@@ -1,7 +1,10 @@
+#! perl
+
 use strict;
 # use lib qw(EekBoekLibrary);
-use EB::Shell;
-shell;
+
+use EB::Main;
+run();
 
 =head1 NAME
 
@@ -9,7 +12,7 @@ EekBoek - Bookkeeping software for small and medium-size businesses
 
 =head1 SYNOPSIS
 
-  perl -MEB::Shell -e shell -- --db=sample
+  perl -MEB::Shell -e shell --
 
 EekBoek is a bookkeeping package for small and medium-size businesses.
 Unlike other accounting software, EekBoek has both a command-line

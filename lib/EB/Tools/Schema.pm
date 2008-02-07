@@ -1,10 +1,11 @@
-my $RCS_Id = '$Id$ ';
+#! perl
 
+# RCS Id          : $Id: Schema.pm,v 1.54 2008/02/07 14:34:32 jv Exp $
 # Author          : Johan Vromans
 # Created On      : Sun Aug 14 18:10:49 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Wed Jul  4 17:10:25 2007
-# Update Count    : 637
+# Last Modified On: Thu Feb  7 15:22:25 2008
+# Update Count    : 640
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -12,23 +13,26 @@ my $RCS_Id = '$Id$ ';
 package main;
 
 our $cfg;
-our $config;
-our $app;
 our $dbh;
 
 package EB::Tools::Schema;
 
 use strict;
+use warnings;
+
+our $VERSION = sprintf "%d.%03d", q$Revision: 1.54 $ =~ /(\d+)/g;
 
 our $sql = 0;			# load schema into SQL files
 my $trace = $cfg->val(__PACKAGE__, "trace", 0);
+
+my $RCS_Id = '$Id: Schema.pm,v 1.54 2008/02/07 14:34:32 jv Exp $ ';
 
 # Package name.
 my $my_package = 'EekBoek';
 # Program name and version.
 my ($my_name, $my_version) = $RCS_Id =~ /: (.+).pl,v ([\d.]+)/;
 # Tack '*' if it is not checked in into RCS.
-$my_version .= '*' if length('$Locker$ ') > 12;
+$my_version .= '*' if length('$Locker:  $ ') > 12;
 
 ################ The Process ################
 

@@ -3,7 +3,7 @@
 %define unstable 1
 
 %define pkgname EekBoek
-%define pkgversion 1.03.07
+%define pkgversion 1.03.07_01
 %define lcname eekboek
 
 #%if %{unstable}
