@@ -27,6 +27,10 @@ SKIP: {
 	my @ds;
 	eval {
 	    @ds = DBI->data_sources("Pg");
+
+	    skip("No access to database", 2)
+	      if $DBI::errstr && $DBI::errstr =~ /FATAL:\s*role .* does not exist/;
+
 	    ok(!$DBI::errstr, "Database Connect");
 	    diag("Connect error:\n\t" . ($DBI::errstr||"")) if $DBI::errstr;
 	};

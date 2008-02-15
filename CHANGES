@@ -1,5 +1,12 @@
 1.03.08
 
+	* Boekingen in een periode waarover BTW aangifte is gedaan
+          kunnen toch worden gewijzigd als deze boeken geen betrekking
+          heeft op de BTW (m.a.w., BTW type Neutraal).
+
+	* Fix problem met #! in ebshell script bij CPAN build.
+
+	* Kleine aanpassingen t.b.v. de GUI.
 
 1.03.07	06-02-2008 18:12
 

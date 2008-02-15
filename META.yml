@@ -1,6 +1,6 @@
 ---
 name: EekBoek
-version: 1.03.07_01
+version: 1.03.08
 author:
   - Johan Vromans (jvromans@squirrel.nl)
 abstract: Elementary Bookkeeping (for the Dutch/European market)
@@ -36,7 +36,7 @@ provides:
     version: 1.025
   EB::Booking::Delete:
     file: lib/EB/Booking/Delete.pm
-    version: 1.012
+    version: 1.013
   EB::Booking::IV:
     file: lib/EB/Booking/IV.pm
     version: 1.053
@@ -50,7 +50,7 @@ provides:
     file: lib/EB/Config.pm
   EB::DB:
     file: lib/EB/DB.pm
-    version: 1.055
+    version: 1.056
   EB::DB::Postgres:
     file: lib/EB/DB/Postgres.pm
     version: 1.024
@@ -66,7 +66,7 @@ provides:
     file: lib/EB/Expression.pm
   EB::Format:
     file: lib/EB/Format.pm
-    version: 1.036
+    version: 1.037
   EB::Globals:
     file: lib/EB/Globals.pm
     version: 1.029
@@ -178,7 +178,7 @@ provides:
     version: 1.003
   EB::Shell:
     file: lib/EB/Shell.pm
-    version: 1.102
+    version: 1.103
   EB::Shell::Base:
     file: lib/EB/Shell/Base.pm
     version: 1.018
@@ -199,13 +199,13 @@ provides:
     version: 1.009
   EB::Tools::Schema:
     file: lib/EB/Tools/Schema.pm
-    version: 1.054
+    version: 1.055
   EB::Utils:
     file: lib/EB/Utils.pm
     version: 1.008
   EekBoek:
     file: lib/EekBoek.pm
-    version: 1.03.07_01
+    version: 1.03.08
 generated_by: Module::Build version 0.28
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.2.html

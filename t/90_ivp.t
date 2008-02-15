@@ -63,6 +63,14 @@ unshift(@ebcmd, map { ("-I",
 		      ) } grep { /^\w\w/ } reverse @INC);
 unshift(@ebcmd, "perl");
 
+SKIP: {
+# Check whether we can contact the database.
+eval {
+    my @ds = DBI->data_sources("Pg");
+    skip("No access to database", 33)
+      if $DBI::errstr && $DBI::errstr =~ /FATAL:\s*role .* does not exist/;
+};
+
 my $fail;
 
 for my $log ( "createdb.log" ) {
@@ -137,6 +145,7 @@ vfy([@ebcmd, qw(-c btwaangifte j)], "btw.html");
 # Verify: CSV generatie.
 vfy([@ebcmd, qw(-c balans --detail=2 --gen-csv)], "balans2.csv");
 
+}	# end SKIP section
 }	# end SKIP section
 
 ################ subroutines ################

@@ -6,9 +6,9 @@ package EekBoek;
 
 use strict;
 
-my $RCS_Id = '$Id$ ';
+my $RCS_Id = '$Id: EekBoek.pm,v 1.56 2008/02/07 12:03:21 jv Exp $ ';
 our $PACKAGE = 'EekBoek';
-our $VERSION = '1.03.07_01';
+our $VERSION = '1.03.08';
 
 =head1 NAME
 
@@ -59,4 +59,4 @@ GNU General Public License or the Artistic License for more details.
 
 1;
 
-# $Id$ 
+# $Id: EekBoek.pm,v 1.56 2008/02/07 12:03:21 jv Exp $ 
