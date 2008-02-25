@@ -12,7 +12,11 @@ EekBoek - Bookkeeping software for small and medium-size businesses
 
 =head1 SYNOPSIS
 
-  perl -MEB::Shell -e shell --
+  perl -MEB::Main -e run --
+
+If properly installed:
+
+  ebshell
 
 EekBoek is a bookkeeping package for small and medium-size businesses.
 Unlike other accounting software, EekBoek has both a command-line
@@ -39,7 +43,7 @@ Web site: L<http://www.eekboek.nl>.
 
 =head1 COPYRIGHT AND DISCLAIMER
 
-This program is Copyright 2005-2006 by Squirrel Consultancy. All
+This program is Copyright 2005-2008 by Squirrel Consultancy. All
 rights reserved.
 
 This program is free software; you can redistribute it and/or modify
@@ -57,4 +61,4 @@ GNU General Public License or the Artistic License for more details.
 
 1;
 
-# $Id$
+# $Id: ebshell,v 1.18 2008/02/18 10:34:50 jv Exp $

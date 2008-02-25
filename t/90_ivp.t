@@ -1,10 +1,13 @@
-#!/usr/bin/perl
-# $Id$  -*-perl-*-
+#! perl
+
+# $Id: 90_ivp.t,v 1.16 2008/02/25 11:53:42 jv Exp $  -*-perl-*-
 
 use strict;
+use warnings;
+
 use Test::More
   $ENV{EB_SKIPDBTESTS} ? (skip_all => "Database tests skipped on request")
-  : (tests => 41);
+  : (tests => 43);
 
 use warnings;
 BEGIN { use_ok('IPC::Run3') }
@@ -32,7 +35,7 @@ else {
 SKIP: {
 
 eval "require $dbddrv";
-skip("DBI $dbdriver driver ($dbddrv) not installed", 37) if $@;
+skip("DBI $dbdriver driver ($dbddrv) not installed", 40) if $@;
 
 chdir("t") if -d "t";
 chdir("ivp") if -d "ivp";
@@ -44,7 +47,7 @@ for ( qw(opening.eb relaties.eb mutaties.eb schema.dat) ) {
     }
     ok(-s $_, $_);
 }
-for ( qw(opening.eb relaties.eb mutaties.eb reports.eb schema.dat ) ) {
+for ( qw(ivp.conf opening.eb relaties.eb mutaties.eb reports.eb schema.dat ) ) {
     die("=== IVP configuratiefout: $_ ===\n") unless -s $_;
 }
 
@@ -61,13 +64,13 @@ push(@ebcmd, "-D", "database:driver=$dbdriver") if $dbdriver;
 unshift(@ebcmd, map { ("-I",
 		       "../../$_"
 		      ) } grep { /^\w\w/ } reverse @INC);
-unshift(@ebcmd, "perl");
+unshift(@ebcmd, $^X);
 
 SKIP: {
 # Check whether we can contact the database.
 eval {
     my @ds = DBI->data_sources("Pg");
-    skip("No access to database", 33)
+    skip("No access to database", 36)
       if $DBI::errstr && $DBI::errstr =~ /FATAL:\s*role .* does not exist/;
 };
 
@@ -131,8 +134,11 @@ vfy([@ebcmd, qw(-c proefensaldibalans --verdicht)], "proef2.txt");
 vfy([@ebcmd, qw(-c grootboek)           ], "grootboek.txt");
 vfy([@ebcmd, qw(-c grootboek --detail=0)], "grootboek0.txt");
 vfy([@ebcmd, qw(-c grootboek --detail=1)], "grootboek1.txt");
-
 vfy([@ebcmd, qw(-c grootboek --detail=2)], "grootboek2.txt");
+
+# Verify: Crediteuren/Debiteuren.
+vfy([@ebcmd, qw(-c crediteuren)         ], "crdrept.txt");
+vfy([@ebcmd, qw(-c debiteuren)          ], "debrept.txt");
 
 # Verify: BTW aangifte.
 vfy([@ebcmd, qw(-c btwaangifte j)], "btw.txt");

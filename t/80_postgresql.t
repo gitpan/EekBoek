@@ -1,6 +1,8 @@
-# $Id$  -*-perl-*-
+# $Id: 80_postgresql.t,v 1.5 2008/02/25 11:50:16 jv Exp $  -*-perl-*-
 
 use strict;
+use warnings;
+
 use Test::More tests => 4;
 
 # Some basic tests.

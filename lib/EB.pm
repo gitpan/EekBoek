@@ -1,12 +1,12 @@
 #! perl
 
 # EB.pm -- EekBoek Base module.
-# RCS Info        : $Id$
+# RCS Info        : $Id: EB.pm,v 1.84 2008/02/25 10:51:42 jv Exp $
 # Author          : Johan Vromans
 # Created On      : Fri Sep 16 18:38:45 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Thu Feb  7 13:06:23 2008
-# Update Count    : 213
+# Last Modified On: Mon Feb 18 13:53:22 2008
+# Update Count    : 217
 # Status          : Unknown, Use with caution!
 
 package main;
@@ -16,12 +16,12 @@ our $cfg;
 
 package EB;
 
+our $VERSION = sprintf "%d.%03d", q$Revision: 1.84 $ =~ /(\d+)/g;
+
 use strict;
 use base qw(Exporter);
 
-our $VERSION;
 use EekBoek;
-BEGIN { $VERSION = $EekBoek::VERSION }
 
 our @EXPORT;
 our @EXPORT_OK;
@@ -41,6 +41,7 @@ sub EB_LIB() { $lib }
 # Some standard modules.
 use EB::Globals;
 use Carp;
+use EB::Assert;
 use Data::Dumper;
 
 BEGIN {
@@ -68,6 +69,7 @@ BEGIN {
 		qw(carp croak),
 		qw(Dumper),
 		qw(findlib),
+		qw(assert affirm),
 	      );
 }
 

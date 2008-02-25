@@ -1,6 +1,6 @@
 ---
 name: EekBoek
-version: 1.03.08
+version: 1.03.09
 author:
   - Johan Vromans (jvromans@squirrel.nl)
 abstract: Elementary Bookkeeping (for the Dutch/European market)
@@ -25,9 +25,13 @@ recommends:
 provides:
   EB:
     file: lib/EB.pm
+    version: 1.084
+  EB::Assert:
+    file: lib/EB/Assert.pm
+    version: 0.20
   EB::Booking:
     file: lib/EB/Booking.pm
-    version: 1.020
+    version: 1.021
   EB::Booking::BKM:
     file: lib/EB/Booking/BKM.pm
     version: 1.065
@@ -42,7 +46,7 @@ provides:
     version: 1.053
   EB::Config:
     file: lib/EB/Config.pm
-    version: 1.013
+    version: 1.014
   EB::Config::IniFiles:
     file: lib/EB/Config/IniFiles.pm
     version: 2.38
@@ -50,10 +54,10 @@ provides:
     file: lib/EB/Config.pm
   EB::DB:
     file: lib/EB/DB.pm
-    version: 1.056
+    version: 1.057
   EB::DB::Postgres:
     file: lib/EB/DB/Postgres.pm
-    version: 1.024
+    version: 1.025
   EB::DB::Sqlite:
     file: lib/EB/DB/Sqlite.pm
     version: 1.008
@@ -72,7 +76,7 @@ provides:
     version: 1.029
   EB::Import:
     file: lib/EB/Import.pm
-    version: 1.009
+    version: 1.010
   EB::Locale:
     file: lib/EB/Locale.pm
     version: 1.010
@@ -90,6 +94,7 @@ provides:
     version: 1.040
   EB::Report::BTWAangifte::Html:
     file: lib/EB/Report/BTWAangifte/Html.pm
+    version: 1.013
   EB::Report::BTWAangifte::Text:
     file: lib/EB/Report/BTWAangifte.pm
   EB::Report::Balres:
@@ -178,10 +183,10 @@ provides:
     version: 1.003
   EB::Shell:
     file: lib/EB/Shell.pm
-    version: 1.103
+    version: 1.104
   EB::Shell::Base:
     file: lib/EB/Shell/Base.pm
-    version: 1.018
+    version: 1.019
   EB::Shell::DeLuxe:
     file: lib/EB/Shell/DeLuxe.pm
     version: 1.018
@@ -199,13 +204,13 @@ provides:
     version: 1.009
   EB::Tools::Schema:
     file: lib/EB/Tools/Schema.pm
-    version: 1.055
+    version: 1.056
   EB::Utils:
     file: lib/EB/Utils.pm
     version: 1.008
   EekBoek:
     file: lib/EekBoek.pm
-    version: 1.03.08
+    version: 1.03.09
 generated_by: Module::Build version 0.28
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.2.html

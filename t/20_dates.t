@@ -1,7 +1,8 @@
-#!/usr/bin/perl -w
-# $Id$
+#! perl
+# $Id: 20_dates.t,v 1.3 2008/02/25 11:50:00 jv Exp $
 
 use strict;
+use warnings;
 
 use EB::Config qw(EekBoek);
 use EB;

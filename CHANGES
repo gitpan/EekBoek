@@ -1,4 +1,33 @@
-1.03.08
+1.03.09
+
+	* Update PPD met 5.10 info.
+
+	* --config (-f) accepteert nu ook de naam van een directory,
+	  en probeert dan eekboek.conf en .eekboek.conf.
+
+	* Commando's 'journal', 'trace' en 'confirm' kennen nu
+          een'--quiet' optie, waardoor de opdrachten stil worden
+          uitgevoerd.
+
+	* Journaalposten worden niet meer gerapporteerd tijdens import
+          en init.
+
+	* Nieuw, actueel, eenvoudiger en beter schema voor de example
+          database.
+
+	* Verified to work with Perl 5.10.0 and DBD::Pg 2.0.0.
+
+	* Fix CPAN testing problems that cause the wrong perl to be used.
+
+	* Fix CPAN testing problems that cause the wrong sample files
+          to be used.
+
+	* Elimineer warnings bij export van administraties die niet
+          alle standaardkoppelingen hebben.
+
+	* Fix issue 1871576.
+
+1.03.08	15-02-2008 21:08
 
 	* Boekingen in een periode waarover BTW aangifte is gedaan
           kunnen toch worden gewijzigd als deze boeken geen betrekking

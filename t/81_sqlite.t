@@ -1,6 +1,8 @@
-# $Id$  -*-perl-*-
+# $Id: 81_sqlite.t,v 1.2 2008/02/25 11:50:28 jv Exp $  -*-perl-*-
 
 use strict;
+use warnings;
+
 use Test::More tests => 4;
 
 # Some basic tests.
@@ -15,7 +17,7 @@ SKIP: {
     skip("DBI SQLite driver (DBD::SQLite) not installed", 3) if $@;
 
     # Check minimal interface version.
-    my $minpg = 1.13;
+    my $minpg = 1.12;
     ok($DBD::SQLite::VERSION >= $minpg,
        "DBD::SQLite version = $DBD::SQLite::VERSION,".
        " should be at least $minpg");
