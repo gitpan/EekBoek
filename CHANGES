@@ -1,4 +1,13 @@
-1.03.09
+1.03.10
+
+	* CPAN testing: Skip PostgreSQL tests if no database access.
+
+	* CPAN testing: Encode reference data to UTF-8 if running in
+          an Unicode environment.
+
+	* Fix issue 1901436.
+
+1.03.09	25-02-2008 13:01
 
 	* Update PPD met 5.10 info.
 
@@ -17,9 +26,10 @@
 
 	* Verified to work with Perl 5.10.0 and DBD::Pg 2.0.0.
 
-	* Fix CPAN testing problems that cause the wrong perl to be used.
+	* CPAN testing: Fix problems that cause the wrong perl to be
+          used.
 
-	* Fix CPAN testing problems that cause the wrong sample files
+	* CPAN testing:Fix problems that cause the wrong sample files
           to be used.
 
 	* Elimineer warnings bij export van administraties die niet

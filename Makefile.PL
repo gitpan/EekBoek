@@ -3,10 +3,11 @@
 # Author          : Johan Vromans
 # Created On      : Fri Sep  2 14:25:11 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Wed Jun 27 11:56:31 2007
-# Update Count    : 90
+# Last Modified On: Wed Feb 27 10:07:31 2008
+# Update Count    : 94
 # Status          : Unknown, Use with caution!
 
+use 5.008;
 use strict;
 
 #use inc::Module::Install;
