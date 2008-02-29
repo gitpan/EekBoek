@@ -8,6 +8,10 @@ Makefile.PL
 QUICKSTART
 README
 TODO
+debian/changelog
+debian/control
+debian/copyright
+debian/rules
 doc/html/bookings/bank.html
 doc/html/bookings/btw.html
 doc/html/bookings/cash.html

@@ -1,6 +1,6 @@
 ---
 name: EekBoek
-version: 1.03.10
+version: 1.03.10_1
 author:
   - Johan Vromans (jvromans@squirrel.nl)
 abstract: Elementary Bookkeeping (for the Dutch/European market)
@@ -25,7 +25,7 @@ recommends:
 provides:
   EB:
     file: lib/EB.pm
-    version: 1.084
+    version: 1.085
   EB::Assert:
     file: lib/EB/Assert.pm
     version: 0.20
@@ -210,7 +210,7 @@ provides:
     version: 1.008
   EekBoek:
     file: lib/EekBoek.pm
-    version: 1.03.10
+    version: 1.03.10_1
 generated_by: Module::Build version 0.28
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.2.html
