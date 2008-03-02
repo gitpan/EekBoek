@@ -3,8 +3,8 @@
 # Author          : Johan Vromans
 # Created On      : Fri Sep  2 14:25:11 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Fri Feb 29 14:08:07 2008
-# Update Count    : 95
+# Last Modified On: Sun Mar  2 15:25:09 2008
+# Update Count    : 96
 # Status          : Unknown, Use with caution!
 
 use 5.008003;
@@ -43,3 +43,5 @@ WriteMakefile(
 
 # Write .spec file.
 WriteSpecfile($data->{distname}, $x->{VERSION});
+# Write Debian control file.
+WriteDebianControl($x->{VERSION});

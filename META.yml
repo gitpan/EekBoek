@@ -1,6 +1,6 @@
 ---
 name: EekBoek
-version: 1.03.10_1
+version: 1.03.10_2
 author:
   - Johan Vromans (jvromans@squirrel.nl)
 abstract: Elementary Bookkeeping (for the Dutch/European market)
@@ -34,7 +34,7 @@ provides:
     version: 1.021
   EB::Booking::BKM:
     file: lib/EB/Booking/BKM.pm
-    version: 1.066
+    version: 1.067
   EB::Booking::Decode:
     file: lib/EB/Booking/Decode.pm
     version: 1.025
@@ -43,7 +43,7 @@ provides:
     version: 1.013
   EB::Booking::IV:
     file: lib/EB/Booking/IV.pm
-    version: 1.053
+    version: 1.054
   EB::Config:
     file: lib/EB/Config.pm
     version: 1.014
@@ -65,7 +65,7 @@ provides:
     file: lib/EB/migrate/001000008001000009.pl
   EB::Export:
     file: lib/EB/Export.pm
-    version: 1.028
+    version: 1.029
   EB::Expression:
     file: lib/EB/Expression.pm
   EB::Format:
@@ -79,7 +79,7 @@ provides:
     version: 1.010
   EB::Locale:
     file: lib/EB/Locale.pm
-    version: 1.010
+    version: 1.011
   EB::Main:
     file: lib/EB/Main.pm
     version: 1.002
@@ -111,7 +111,7 @@ provides:
     version: 1.001
   EB::Report::Debcrd:
     file: lib/EB/Report/Debcrd.pm
-    version: 1.014
+    version: 1.015
   EB::Report::Debcrd::Csv:
     file: lib/EB/Report/Debcrd.pm
   EB::Report::Debcrd::Html:
@@ -123,10 +123,10 @@ provides:
     version: 1.001
   EB::Report::GenBase:
     file: lib/EB/Report/GenBase.pm
-    version: 1.024
+    version: 1.025
   EB::Report::Grootboek:
     file: lib/EB/Report/Grootboek.pm
-    version: 1.032
+    version: 1.033
   EB::Report::Grootboek::Csv:
     file: lib/EB/Report/Grootboek.pm
   EB::Report::Grootboek::Html:
@@ -135,7 +135,7 @@ provides:
     file: lib/EB/Report/Grootboek.pm
   EB::Report::Journal:
     file: lib/EB/Report/Journal.pm
-    version: 1.035
+    version: 1.036
   EB::Report::Journal::Csv:
     file: lib/EB/Report/Journal.pm
   EB::Report::Journal::Html:
@@ -189,7 +189,7 @@ provides:
     version: 1.019
   EB::Shell::DeLuxe:
     file: lib/EB/Shell/DeLuxe.pm
-    version: 1.018
+    version: 1.019
   EB::Shell::Userdefs:
     file: lib/EB/examples/Userdefs.pm
     version: 1.003
@@ -198,7 +198,7 @@ provides:
     version: 1.016
   EB::Tools::Opening:
     file: lib/EB/Tools/Opening.pm
-    version: 1.037
+    version: 1.038
   EB::Tools::SQLEngine:
     file: lib/EB/Tools/SQLEngine.pm
     version: 1.009
@@ -210,7 +210,7 @@ provides:
     version: 1.008
   EekBoek:
     file: lib/EekBoek.pm
-    version: 1.03.10_1
+    version: 1.03.10_2
 generated_by: Module::Build version 0.28
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.2.html
