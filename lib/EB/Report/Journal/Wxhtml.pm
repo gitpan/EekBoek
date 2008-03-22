@@ -1,62 +1,57 @@
 #! perl
 
 # Wxhtml.pm -- WxHtml backend for Journal reports.
-# RCS Info        : $Id: Wxhtml.pm,v 1.1 2008/02/07 13:21:53 jv Exp $
+# RCS Info        : $Id: Wxhtml.pm,v 1.3 2008/03/12 14:38:29 jv Exp $
 # Author          : Johan Vromans
 # Created On      : Thu Feb  7 14:21:31 2008
 # Last Modified By: Johan Vromans
-# Last Modified On: Thu Feb  7 14:21:51 2008
-# Update Count    : 1
+# Last Modified On: Wed Mar 12 15:05:31 2008
+# Update Count    : 8
 # Status          : Unknown, Use with caution!
 
 package EB::Report::Journal::Wxhtml;
 
 use strict;
 use warnings;
-
-our $VERSION = sprintf "%d.%03d", q$Revision: 1.1 $ =~ /(\d+)/g;
-
-use EB;
 use base qw(EB::Report::Reporter::WxHtml);
 
-sub new {
-    my ($class, $opts) = @_;
-    my $self = $class->SUPER::new($opts);
-    return $self;
-}
+our $VERSION = sprintf "%d.%03d", q$Revision: 1.3 $ =~ /(\d+)/g;
 
 sub style {
     my ($self, $row, $cell) = @_;
 
     my $stylesheet = {
-	d2    => {
-	    desc   => { indent => 2      },
-	},
-	h1    => {
-	    _style => { colour => 'red',
-			size   => '+2',
-		      }
-	},
-	h2    => {
+	head    => {
 	    _style => { colour => 'red'  },
-	    desc   => { indent => 1,},
 	},
-	t1    => {
+	chead    => {
+	    _style => { colour => 'red'  },
+	    rel    => { link => "crd://" },
+	},
+	dhead    => {
+	    _style => { colour => 'red'  },
+	    rel    => { link => "deb://" },
+	},
+	total    => {
 	    _style => { colour => 'blue',
-			size   => '+1',
 		      }
 	},
-	t2    => {
-	    _style => { colour => 'blue' },
-	    desc   => { indent => 1      },
+	data    => {
+	    desc => { indent => '+2' },
+	    acct => { link => "gbk://" },
+	    bsk  => { indent => '+2' },
 	},
-	v     => {
-	    _style => { colour => 'red',
-			size   => '+2',
-		      }
+	cdata    => {
+	    desc => { indent => '+2' },
+	    acct => { link => "gbk://" },
+	    bsk  => { indent => '+2' },
+	    rel  => { link => "crd://" },
 	},
-	grand => {
-	    _style => { colour => 'blue' }
+	ddata    => {
+	    desc => { indent => '+2' },
+	    acct => { link => "gbk://" },
+	    bsk  => { indent => '+2' },
+	    rel  => { link => "deb://" },
 	},
     };
 

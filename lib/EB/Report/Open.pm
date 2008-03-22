@@ -10,8 +10,8 @@ package EB::Report::Open;
 # Author          : Johan Vromans
 # Created On      : Fri Sep 30 17:48:16 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Thu Feb  7 14:22:13 2008
-# Update Count    : 200
+# Last Modified On: Wed Mar 12 16:11:36 2008
+# Update Count    : 204
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -19,12 +19,13 @@ package EB::Report::Open;
 use strict;
 use warnings;
 
-our $VERSION = sprintf "%d.%03d", q$Revision: 1.19 $ =~ /(\d+)/g;
+our $VERSION = sprintf "%d.%03d", q$Revision: 1.21 $ =~ /(\d+)/g;
 
 ################ The Process ################
 
 use EB;
 use EB::Format;
+use EB::Report::GenBase;
 
 ################ Subroutines ################
 
@@ -132,7 +133,8 @@ sub perform {
 	}
 
 	my $bsk;
-	my $style = "data";
+	my $style = $dbk_type == DBKTYPE_INKOOP ? "cdata" :
+	  $dbk_type == DBKTYPE_VERKOOP ? "ddata" : "data";
 	if ( $bsk_date lt $rep->{per_begin} ) {
 	    $bsk = join(":", $dbk_desc, $bsk_bky, $bsk_nr);
 	    $style = "prevdata";
@@ -183,14 +185,9 @@ sub perform {
 
 package EB::Report::Open::Text;
 
-use EB;
-use base qw(EB::Report::Reporter::Text);
 use strict;
-
-sub new {
-    my ($class, $opts) = @_;
-    $class->SUPER::new($opts->{STYLE}, $opts->{LAYOUT});
-}
+use warnings;
+use base qw(EB::Report::Reporter::Text);
 
 # Style mods.
 
@@ -217,24 +214,15 @@ sub style {
 
 package EB::Report::Open::Html;
 
-use EB;
-use base qw(EB::Report::Reporter::Html);
 use strict;
-
-sub new {
-    my ($class, $opts) = @_;
-    $class->SUPER::new($opts->{STYLE}, $opts->{LAYOUT});
-}
+use warnings;
+use base qw(EB::Report::Reporter::Html);
 
 package EB::Report::Open::Csv;
 
-use EB;
+use strict;
+use warnings;
 use base qw(EB::Report::Reporter::Csv);
-
-sub new {
-    my ($class, $opts) = @_;
-    $class->SUPER::new($opts->{STYLE}, $opts->{LAYOUT});
-}
 
 1;
 

@@ -1,11 +1,11 @@
 #! perl
 
-# RCS Id          : $Id: BTWAangifte.pm,v 1.40 2008/02/07 13:14:43 jv Exp $
+# RCS Id          : $Id: BTWAangifte.pm,v 1.45 2008/03/10 17:40:53 jv Exp $
 # Author          : Johan Vromans
 # Created On      : Tue Jul 19 19:01:33 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Thu Feb  7 14:14:41 2008
-# Update Count    : 520
+# Last Modified On: Mon Mar 17 17:01:22 2008
+# Update Count    : 630
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -20,7 +20,7 @@ package EB::Report::BTWAangifte;
 use strict;
 use warnings;
 
-our $VERSION = sprintf "%d.%03d", q$Revision: 1.40 $ =~ /(\d+)/g;
+our $VERSION = sprintf "%d.%03d", q$Revision: 1.45 $ =~ /(\d+)/g;
 
 use EB;
 use EB::Format;
@@ -172,6 +172,30 @@ sub perform {
 	delete($opts->{boekjaar});
     }
     # else: we have an explicit --period. Nothing here to do.
+    else {
+	$self->{compat_periode} = "";
+    }
+
+    $opts->{STYLE} = "btwaangifte";
+
+    # my $w = $amount_width + 1;
+    # $self->{fh}->printf("%-5s%-40s%${w}s%${w}s\n",
+
+    $opts->{LAYOUT} =
+      [ { name   => "_colsep",	# neat? or trick?
+	  #sep => "|",
+	  width  => 1 },
+        { name	 => "num",
+	  width	 => 4 },
+	{ name	 => "desc",
+	  width	 => 40 },
+	{ name	 => "col1",
+	  width	 => $amount_width,
+	  align	 => ">" },
+	{ name	 => "col2",
+	  width	 => $amount_width,
+	  align	 => ">" },
+      ];
 
     my $rep = EB::Report::GenBase->backend($self, $opts);
 
@@ -285,10 +309,13 @@ sub collect {
 
     # 1c. Belast met ander, niet-nul tarief
 
-    my $deb_x = 0;
-    my $deb_btw_x = 0;
+    my $deb_a = 0;
+    my $deb_btw_a = 0;
 
-    # 1d. Eigen gebruikt.
+    # 1d. Eigen gebruik.
+
+    my $deb_p = 0;
+    my $deb_btw_p = 0;
 
     # 1e. Belast met 0%/verlegd
 
@@ -338,7 +365,7 @@ sub collect {
     my $rr;
 
     my $tr = $trace ? sub {
-	warn("BTW " . shift() . " @$rr\n");
+	warn("BTW " . shift() . " " . join(" ", map { defined $_ ? $_ : "-" } @$rr). "\n");
     } : sub {};
 
     while ( $rr = $sth->fetchrow_arrayref ) {
@@ -375,10 +402,16 @@ sub collect {
 		    $tr->("0%");
 		    $deb_0 += $amt;
 		}
+		elsif ( $btg_id == BTWTARIEF_PRIV ) {
+		    $tr->("Privé");
+		    $deb_p += $amt;
+		    $deb_btw_p += $btw;
+		}
 		else {
+		    assert($btg_id == BTWTARIEF_ANDERS);
 		    $tr->("Ander");
-		    $deb_x += $amt;
-		    $deb_btw_x += $btw;
+		    $deb_a += $amt;
+		    $deb_btw_a += $btw;
 		}
 	    }
 	    else {
@@ -445,12 +478,18 @@ sub collect {
     $tot += $v;
 
     # 1c. Belast met ander, niet-nul tarief
-    $v = rounddown($deb_btw_x);
-    $data{deb_x} = $v;
-    $ad->($deb_btw_x, $v);
+    $v = rounddown($deb_btw_a);
+    $data{deb_a} = rounddown($deb_a);
+    $data{deb_btw_a} = $v;
+    $ad->($deb_btw_a, $v);
     $tot += $v;
 
     # 1d. Eigen gebruik
+    $v = rounddown($deb_btw_p);
+    $data{deb_p} = rounddown($deb_p);
+    $data{deb_btw_p} = $v;
+    $ad->($deb_btw_p, $v);
+    $tot += $v;
 
     # 1e. Belast met 0%/verlegd
     $data{deb_0} = rounddown($deb_0 + $verlegd);
@@ -490,7 +529,7 @@ sub collect {
 			  $dbh->std_acc("btw_ih"), $dbh->std_acc("btw_il"),
 			  $begin, $end)};
 
-    my $btw_delta = $vb - $crd_btw - $intra_crd_btw;
+    my $btw_i_delta = $vb - $crd_btw - $intra_crd_btw;
     $v = roundup($vb);
     $data{vb} = $v;
     $tot -= $v;
@@ -507,7 +546,25 @@ sub collect {
 	}
     }
 
-    $data{btw_delta} = $btw_delta if $btw_delta;
+    # Check op afgedragen BTW.
+
+    foreach my $acc ( @{$dbh->std_accs} ) {
+	next unless $acc =~ /^btw_v(.)$/;
+	my $t = $1;
+	($vb) = @{$dbh->do("SELECT SUM(jnl_amount)".
+			   " FROM Journal".
+			   " WHERE ( jnl_acc_id = ? )".
+			   " AND jnl_bsr_date >= ? AND jnl_bsr_date <= ?",
+			   $dbh->std_acc($acc), $begin, $end)};
+	next unless defined($vb);
+	$vb = -$vb;
+	if ( $data{"deb_btw_$t"} != ($v = rounddown($vb)) ) {
+	    $data{"btw_v${t}_delta"} = $v - $data{"deb_btw_$t"};
+	    $data{"deb_btw_$t"} = $v;
+	}
+    }
+
+    $data{btw_i_delta} = $btw_i_delta if $btw_i_delta;
     $data{delta} = $delta if $delta;
 
     return \%data;
@@ -516,103 +573,150 @@ sub collect {
 sub report {
     my ($self, $rep, $data) = @_;
 
+    my $outline = sub {
+	my ($column, $desc, $sub, $amt) = @_;
+	$rep->add({ _style => 'd',
+		     num => $column,
+		     desc   => $desc,
+		     defined($sub)
+		     ? ( col1 => $noround
+			 ? numfmt($sub)
+			 : $sub)
+		     : (),
+		     defined($amt)
+		     ? (col2 => $noround
+			? numfmt($amt)
+			: $amt)
+		     : (),
+		   });
+    };
+
     $rep->start(_T("BTW Aangifte"),
-		$self->{compat_periode} ? __x("Periode: {per}",
-					      per => $self->{compat_periode})
-					: __x("Periode: {from} t/m {to}",
-					      from => datefmt_full($rep->{per_begin}),
-					      to   => datefmt_full($rep->{per_end})));
+		$self->{compat_periode}
+		? __x("Periode: {per}", per => $self->{compat_periode})
+		: __x("Periode: {from} t/m {to}",
+		      from => datefmt_full($rep->{per_begin}),
+		      to   => datefmt_full($rep->{per_end})));
 
     # Binnenland
-    $rep->outline('H1', "Binnenland");
+    $rep->add({ _style => 'h1', num  => "Binnenland" });
 
     # 1. Door mij verrichte leveringen/diensten
-    $rep->outline('H2', "1.", "Door mij verrichte leveringen/diensten");
+    $rep->add({ _style => 'h2',
+		num => "1. Door mij verrichte leveringen/diensten",
+	      });
 
     # 1a. Belast met hoog tarief
-    $rep->outline('', "1a", "Belast met hoog tarief", $data->{deb_h}, $data->{deb_btw_h});
+    $outline->("1a", "Belast met hoog tarief",
+		  $data->{deb_h}, $data->{deb_btw_h});
 
     # 1b. Belast met laag tarief
-    $rep->outline('', "1b", "Belast met laag tarief", $data->{deb_l}, $data->{deb_btw_l});
+    $outline->("1b", "Belast met laag tarief",
+		  $data->{deb_l}, $data->{deb_btw_l});
 
     # 1c. Belast met ander, niet-nul tarief
-    $rep->outline('', "1c", "Belast met ander tarief", $data->{deb_x}, $data->{deb_btw_x});
+    $outline->("1c", "Belast met ander tarief",
+		  $data->{deb_a}, $data->{deb_btw_a})
+      if $data->{deb_a} || $data->{deb_btw_a};
 
     # 1d. Eigen gebruik
+    $outline->("1d", "Eigen gebruik",
+    		  $data->{deb_p}, $data->{deb_btw_p})
+      if $data->{deb_p} || $data->{deb_btw_p};
 
     # 1e. Belast met 0%/verlegd
-    $rep->outline('', "1e", "Belast met 0% / verlegd", $data->{deb_0}, undef);
+    $outline->("1e", "Belast met 0% / verlegd",
+		  $data->{deb_0}, undef);
 
     # Buitenland
-    $rep->outline('H1', "Buitenland");
+    $rep->add({ _style => 'h1', num => "Buitenland" });
 
     # 3. Door mij verrichte leveringen
-    $rep->outline('H2', "3.", "Door mij verrichte leveringen");
-
+    $rep->add({ _style => 'h2',
+		num => "3. Door mij verrichte leveringen" });
     # 3a. Buiten de EU
-    $rep->outline('', "3a", "Buiten de EU", $data->{extra_deb}, undef);
+    $outline->("3a", "Buiten de EU", $data->{extra_deb}, undef);
 
     # 3b. Binnen de EU
-    $rep->outline('', "3b", "Binnen de EU", $data->{intra_deb}, undef);
+    $outline->("3b", "Binnen de EU", $data->{intra_deb}, undef);
 
     # 4. Aan mij verrichte leveringen
-    $rep->outline('H2', "4.", "Aan mij verrichte leveringen");
+    $rep->add({ _style => 'h2',
+		num => "4. Aan mij verrichte leveringen" });
 
     # 4a. Van buiten de EU
-    $rep->outline('', "4a", "Van buiten de EU", $data->{extra_crd}, 0);
+    $outline->("4a", "Van buiten de EU",
+		  $data->{extra_crd}, 0);
 
     # 4b. Verwervingen van goederen uit de EU.
-    $rep->outline('', "4b", "Verwervingen van goederen uit de EU",
+    $outline->("4b", "Verwervingen van goederen uit de EU",
 		  $data->{intra_crd}, $data->{intra_crd_btw});
 
     # 5 Berekening totaal
-    $rep->outline('H1', "Berekening");
-    $rep->outline('H2', "5.", "Berekening totaal");
+    $rep->add({ _style => 'h1', num => "Berekening" });
+    $rep->add({ _style => 'h2',
+		num => "5. Berekening totaal" });
 
     # 5a. Subtotaal
-    $rep->outline('', "5a", "Subtotaal", undef, $data->{sub0});
+    $outline->("5a", "Subtotaal", undef, $data->{sub0});
 
     # 5b. Voorbelasting
-    $rep->outline('', "5b", "Voorbelasting", undef, $data->{vb});
+    $outline->("5b", "Voorbelasting", undef, $data->{vb});
 
     # 5c Subtotaal
-    $rep->outline('', "5c", "Subtotaal", undef, $data->{sub1});
+    $outline->("5c", "Subtotaal", undef, $data->{sub1});
 
     if ( $self->{compat_periode} =~ /^\d\d\d\d$/ ) { # aangifte per jaar
 	if ( defined($data->{ko}) ) {
 	    # 5d Subtotaal
-	    $rep->outline('', "5d", "Vermindering kleineondernemersregeling", undef, $data->{ko});
+	    $outline->("5d", "Vermindering kleineondernemersregeling", undef, $data->{ko});
 	}
 	else {
-	    $rep->outline('', "5d", "Geen gegevens voor kleineondernemersregeling", undef, undef);
+	    $outline->("5d", "Geen gegevens voor kleineondernemersregeling", undef, undef);
 	}
     }
 
     # 5g Subtotaal
     if ( $data->{tot} >= 0 ) {
-	$rep->outline('', "5g", "Totaal te betalen", undef, $data->{tot});
+	$outline->("5g", "Totaal te betalen", undef, $data->{tot});
 	if ( $data->{delta} ) {
-	    $rep->outline('', "  ", "Totaal te betalen (onafgerond)", numfmt($data->{sub1}*AMTSCALE+$data->{delta}));
-	    $rep->outline('', "  ", "Afrondingsverschil", numfmt($data->{delta}));
+	    $outline->("", "Totaal te betalen (onafgerond)", numfmt($data->{sub1}*AMTSCALE+$data->{delta}));
+	    $outline->("", "Afrondingsverschil", numfmt($data->{delta}));
 	}
     }
     else {
-	$rep->outline('', "5g", "Totaal terug te vragen", undef, 0-$data->{tot});
+	$outline->("5g", "Totaal terug te vragen", undef, 0-$data->{tot});
 	if ( $data->{delta} ) {
-	    $rep->outline('', "  ", "Totaal terug te vragen (onafgerond)",
+	    $outline->('', "Totaal terug te vragen (onafgerond)",
 			  numfmt(-($data->{sub1}*AMTSCALE+$data->{delta})));
-	    $rep->outline('', "  ", "Afrondingsverschil", numfmt($data->{delta}));
+	    $outline->('', "Afrondingsverschil", numfmt($data->{delta}));
 	}
     }
-    $rep->outline('X', "  ", "Onbekend", undef, numfmt($data->{onbekend})) if $data->{onbekend};
+    $outline->("?", "Onbekend", undef, numfmt($data->{onbekend}))
+	      if $data->{onbekend};
 
     my @msg;
-    if ( $data->{btw_delta} ) {
+    if ( $data->{btw_i_delta} ) {
 	push(@msg,
-	     __x("Er is een verschil van {amount}".
+	     __x("Er is een verschil van {round}{amount}".
 		 " tussen de berekende en werkelijk ingehouden BTW.".
-		 " Voor de aangifte is de werkelijk ingehouden BTW gebruikt.",
-		 amount => numfmt($data->{btw_delta})));
+		 " Voor de aangifte is de werkelijk ingehouden waarde gebruikt.",
+		 round  => $noround ? "" : "(afgerond) ",
+		 amount => numfmt($noround ? $data->{btw_i_delta}
+				 : AMTSCALE*roundup($data->{btw_i_delta}))));
+    }
+
+    foreach my $type ( @{BTWTARIEVEN()} ) {
+	my $t = lc(substr($type, 0, 1));
+	if ( $data->{"btw_v".$t."_delta"} ) {
+	    push(@msg,
+		 __x("Er is een verschil van {round}{amount}".
+		     " tussen de berekende en werkelijk afgedragen BTW {type}.".
+		     " Voor de aangifte is de werkelijk afgedragen waarde gebruikt.",
+		     type   => $type,
+		     round  => $noround ? "" : "(afgerond) ",
+		     amount => numfmt(($noround ? 1 : AMTSCALE) * $data->{"btw_v".$t."_delta"})));
+	}
     }
 
     $rep->finish(@msg);
@@ -668,7 +772,11 @@ sub kleine_ondernemers {
 
     return 0 if $amount < 0;
 
-    # Formule lijkt linds 1995 ongwijzigd, alleen de bedragen veranderen.
+    # Formule lijkt linds 1995 ongwijzigd, alleen de bedragen
+    # veranderen. Sinds 2002 zijn de bedragen ongewijzigd. Alle
+    # officiële documentatie spreeekt over "Als de afdracht van
+    # omzetbelasting beneden de 1.345 per jaar blijft, ...".
+
     my %mmtab = ( 2002 => [ 1345, 1883 ],
 		  2003 => [ 1345, 1883 ],
 		  2004 => [ 1345, 1883 ],
@@ -676,6 +784,8 @@ sub kleine_ondernemers {
 		  2006 => [ 1345, 1883 ],
 		  2007 => [ 1345, 1883 ],
 		);
+
+    $mmtab{$year} ||= [ 1345, 1883 ] if $year >= 2002;
 
     return unless exists $mmtab{$year};
 
@@ -693,65 +803,95 @@ sub kleine_ondernemers {
     return 0;
 }
 
+sub warnings {
+    my $self = shift;
+    return unless @_;
+    my (@msgs) = @_;
+    foreach ( @msgs ) {
+	warn("!".$_."\n");
+    }
+}
+
 package EB::Report::BTWAangifte::Text;
 
 use strict;
-use EB;
-use EB::Format qw($amount_width numfmt);
+use warnings;
+use base qw(EB::Report::Reporter::Text);
 
-use base qw(EB::Report::GenBase);
+# Style mods.
 
-sub new {
-    my ($class, $opts) = @_;
-    my $self = $class->SUPER::new($opts);
-    $self;
-}
+sub style {
+    my ($self, $row, $cell) = @_;
 
-sub outline {
-    my ($self, $ctl, $tag0, $tag1, $sub, $amt) = @_;
-    $ctl = '' if $ctl && $ctl eq 'X';
-    if ( $ctl ) {
-	if ( $ctl eq 'H1' ) {
-	    $self->{fh}->print("\n", $tag0, "\n");
-	}
-	elsif ( $ctl eq 'H2' ) {
-	    $self->{fh}->print("\n", $tag0, " ", $tag1, "\n\n");
-	}
-	else {
-	    die("?".__x("Ongeldige mode '{ctl}' in {pkg}::outline",
-			ctl => $ctl,
-			pkg => __PACKAGE__ ) . "\n");
-	}
-	return;
-    }
+    my $stylesheet = {
+	h1  => {
+	    _style => { skip_before => 1,
+			skip_after => 1 },
+	    num => { colspan => 2 },
+	},
+	h2  => {
+	    _style => { skip_before => 1,
+			skip_after => 1 },
+	    num => { colspan => 2 },
+	},
+	d => {
+	},
+    };
 
-    my $w = $amount_width + 1;
-    $self->{fh}->printf("%-5s%-40s%${w}s%${w}s\n",
-			$tag0, $tag1,
-			defined($sub)
-			? ($noround
-			   ? numfmt($sub)
-			   : $sub)
-			: "",
-			defined($amt)
-			? ($noround
-			   ? numfmt($amt)
-			   : $amt)
-                        : "");
-}
-
-sub start {
-    my ($self, $text, $per) = @_;
-    $self->{fh}->print($text, "\n", $per, "\n",
-		       $dbh->adm("name"), "\n");
+    $cell = "_style" unless defined($cell);
+    return $stylesheet->{$row}->{$cell};
 }
 
 sub finish {
-    my ($self, @notice) = @_;
-    foreach my $notice ( @notice ) {
-	warn("!$notice\n");
+    shift->SUPER::finish;
+    EB::Report::BTWAangifte::warnings(undef, @_);
+}
+
+package EB::Report::BTWAangifte::Html;
+
+use strict;
+use warnings;
+use base qw(EB::Report::Reporter::Html);
+
+# Style mods.
+
+sub style {
+    my ($self, $row, $cell) = @_;
+
+    my $stylesheet = {
+	h1  => {
+	    num => { class => "heading", colspan => 2 },
+	},
+	h2  => {
+	    num => { class => "subheading", colspan => 2 },
+	},
+    };
+
+    $cell = "_style" unless defined($cell);
+    return $stylesheet->{$row}->{$cell};
+}
+
+sub finish {
+    my $self = shift;
+    if ( @_ ) {
+	print { $self->{fh} } ("</table>\n");
+	print { $self->{fh} } ("<p class=\"warning\">\n");
+	print { $self->{fh} } (join("<br>\n", map { $self->html($_) } @_) );
+	print { $self->{fh} } ("</p>\n");
+	print { $self->{fh} } ("<table>\n");
     }
-    $self->{fh}->close;
+    $self->SUPER::finish;
+}
+
+package EB::Report::BTWAangifte::Csv;
+
+use strict;
+use warnings;
+use base qw(EB::Report::Reporter::Csv);
+
+sub finish {
+    shift->SUPER::finish;
+    EB::Report::BTWAangifte::warnings(undef, @_);
 }
 
 1;

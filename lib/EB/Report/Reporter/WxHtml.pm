@@ -1,12 +1,12 @@
 #! perl
 
 # WxHtml.pm -- Reporter backend for WxHtml
-# RCS Info        : $Id: WxHtml.pm,v 1.3 2008/02/07 13:24:01 jv Exp $
+# RCS Info        : $Id: WxHtml.pm,v 1.8 2008/03/16 21:41:53 jv Exp $
 # Author          : Johan Vromans
 # Created On      : Fri Mar  2 21:01:17 2007
 # Last Modified By: Johan Vromans
-# Last Modified On: Thu Feb  7 14:23:59 2008
-# Update Count    : 49
+# Last Modified On: Thu Mar 13 22:46:52 2008
+# Update Count    : 69
 # Status          : Unknown, Use with caution!
 
 # WxHtmlWindow supports HTML, but to a limited extent. In particular,
@@ -24,7 +24,7 @@ package EB::Report::Reporter::WxHtml;
 use strict;
 use warnings;
 
-our $VERSION = sprintf "%d.%03d", q$Revision: 1.3 $ =~ /(\d+)/g;
+our $VERSION = sprintf "%d.%03d", q$Revision: 1.8 $ =~ /(\d+)/g;
 
 use EB;
 
@@ -40,7 +40,7 @@ sub new {
     $o = delete($opts->{output})
       if $opts->{output} && UNIVERSAL::isa($opts->{output}, 'SCALAR');
 
-    my $self = $class->SUPER::new($opts->{STYLE}, $opts->{LAYOUT});
+    my $self = $class->SUPER::new($opts);
     $self->{overall_font_size} = $cfg->val(qw(wxhtml fontsize), "0");;
 
     $self->{_OUT} = $o if $o;
@@ -87,7 +87,14 @@ sub add {
 	%style = %$t;
     }
 
+    my $colspan = 0;
     foreach my $col ( @{$self->{_fields}} ) {
+
+	if ( $colspan > 1 ) {
+	    $colspan--;
+	    next;
+	}
+
 	my $fname = $col->{name};
 	my $value = defined($data->{$fname}) ? $data->{$fname} : "";
 	my $align = $col->{align} eq "<"
@@ -96,12 +103,14 @@ sub add {
 	              ? "right"
 		      : "center";
 	$align = " align=\"$align\"" if $align;
+	my $val = $value eq "" ? "&nbsp;" : $html->($value);
 
 	# Examine style mods.
 	my ($font, $weight, $italic, $indent);
 	if ( $style ) {
 	    if ( my $t = $self->_getstyle($style, $fname) ) {
 		$t = { %style, %$t };
+
 		my $colour = $t->{colour} || $t->{color} || "";
 		$colour = " color=\"$colour\"" if $colour;
 		my $size = defined($t->{size}) ? " size=\"$t->{size}\"" : "";
@@ -112,6 +121,20 @@ sub add {
 		  if $colour || $size;
 		$align = " align=\"$t->{align}\"" if $t->{align};
 		$indent = "&nbsp;" x (2 * $t->{indent}) if $t->{indent};
+		if ( $t->{colspan} && $t->{colspan} > 1 ) {
+		    $colspan = $t->{colspan};
+		    $align .= " colspan=\"" . $colspan . "\"";
+		}
+		if ( $t->{link} && $value ne "" ) {
+		    my $v = "<a href=\"".$t->{link}.$value."?";
+		    if ( $self->{periodex} ) {
+			$v .= "periode=" .
+			  $self->{per_begin} . "-" .
+			  $self->{per_end} . "&";
+		    }
+		    chop($v);
+		    $val = $v."\">$val</a>";
+		}
 	    }
 	}
 	$self->_print("<td$align>",
@@ -119,7 +142,7 @@ sub add {
 			     $weight ? $weight->[0] : (),
 			     $italic ? $italic->[0] : (),
 			     $indent ? $indent : (),
-			     $value eq "" ? "&nbsp;" : $html->($value),
+			     $val,
 			     $italic ? $italic->[1] : (),
 			     $weight ? $weight->[1] : (),
 			     $font ? $font->[1] : (),
@@ -141,7 +164,7 @@ sub header {
        "<head>\n",
        "<title>", $html->($self->{_title1}), "</title>\n",
        "</head>\n",
-       "<body>\n",
+       "<body text='#000000' bgcolor='#ffffff' link='#000000' vlink='#000000' alink='#0000ff'>\n",
        $ofs ? "<font size=\"$ofs\">\n" : (),
        "<p><b>", $html->($self->{_title1}), "</b><br>\n",
        $html->($self->{_title2}), "<br>\n",
@@ -151,19 +174,20 @@ sub header {
        $ofs ? "<font size=\"$ofs\">\n" : (),
        "<table border=\"1\" width=\"100%\">\n");
 
-    $self->_print("<tr>\n");
-    foreach ( @{$self->{_fields}} ) {
-	$self->_print("<th align=\"",
-		      $_->{align} eq "<"
-		      ? "left"
-		      : $_->{align} eq ">"
-		        ? "right"
-		        : "center",
-		      "\">",
-		      "<b>", $html->($_->{title}), "</b></th>\n");
+    if ( grep { $_->{title} =~ /\S/ } @{$self->{_fields}} ) {
+	$self->_print("<tr>\n");
+	foreach ( @{$self->{_fields}} ) {
+	    $self->_print("<th align=\"",
+			  $_->{align} eq "<"
+			  ? "left"
+			  : $_->{align} eq ">"
+			  ? "right"
+			  : "center",
+			  "\">",
+			  "<b>", $html->($_->{title}), "</b></th>\n");
+	}
+	$self->_print("</tr>\n");
     }
-    $self->_print("</tr>\n");
-
 }
 
 ################ Internal methods ################
@@ -183,6 +207,11 @@ sub _close {
 	return;
     }
     $self->{fh}->close;
+}
+
+sub html {
+    my $self = shift;
+    _html(@_);
 }
 
 sub _html {

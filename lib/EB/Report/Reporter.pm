@@ -1,12 +1,12 @@
 #! perl
 
 # Reporter.pm -- 
-# RCS Info        : $Id: Reporter.pm,v 1.11 2008/02/07 13:13:39 jv Exp $
+# RCS Info        : $Id: Reporter.pm,v 1.13 2008/03/06 14:34:13 jv Exp $
 # Author          : Johan Vromans
 # Created On      : Wed Dec 28 13:18:40 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Thu Feb  7 14:13:36 2008
-# Update Count    : 143
+# Last Modified On: Thu Mar  6 15:11:32 2008
+# Update Count    : 148
 # Status          : Unknown, Use with caution!
 
 package main;
@@ -19,13 +19,19 @@ package EB::Report::Reporter;
 use strict;
 use warnings;
 
-our $VERSION = sprintf "%d.%03d", q$Revision: 1.11 $ =~ /(\d+)/g;
+our $VERSION = sprintf "%d.%03d", q$Revision: 1.13 $ =~ /(\d+)/g;
 
 use EB;
 use EB::Format;
 
 sub new {
     my ($class, $style, $config) = @_;
+
+    if ( @_ == 2 ) {
+	$config = $style->{LAYOUT};
+	$style  = $style->{STYLE};
+    }
+
     $class = ref($class) || $class;
     my $self = bless { _fields => [],
 		       _fdata  => {},
@@ -34,6 +40,10 @@ sub new {
 
     foreach my $col ( @$config ) {
 	if ( $col->{name} ) {
+	    if ( $col->{name} eq "_colsep" ) {
+		$self->{_colsep} = $col->{sep} || (" " x $col->{width});
+		next;
+	    }
 	    my $a = { name  => $col->{name},
 		      title => $col->{title} || ucfirst(lc(_T($a->{name}))),
 		      width => $col->{width} || length($a->{title}),

@@ -1,6 +1,6 @@
 ---
 name: EekBoek
-version: 1.03.10_2
+version: 1.03.11
 author:
   - Johan Vromans (jvromans@squirrel.nl)
 abstract: Elementary Bookkeeping (for the Dutch/European market)
@@ -25,7 +25,7 @@ recommends:
 provides:
   EB:
     file: lib/EB.pm
-    version: 1.085
+    version: 1.086
   EB::Assert:
     file: lib/EB/Assert.pm
     version: 0.20
@@ -34,7 +34,7 @@ provides:
     version: 1.021
   EB::Booking::BKM:
     file: lib/EB/Booking/BKM.pm
-    version: 1.067
+    version: 1.069
   EB::Booking::Decode:
     file: lib/EB/Booking/Decode.pm
     version: 1.025
@@ -73,13 +73,13 @@ provides:
     version: 1.037
   EB::Globals:
     file: lib/EB/Globals.pm
-    version: 1.029
+    version: 1.030
   EB::Import:
     file: lib/EB/Import.pm
     version: 1.010
   EB::Locale:
     file: lib/EB/Locale.pm
-    version: 1.011
+    version: 1.012
   EB::Main:
     file: lib/EB/Main.pm
     version: 1.002
@@ -91,12 +91,16 @@ provides:
     version: 1.007
   EB::Report::BTWAangifte:
     file: lib/EB/Report/BTWAangifte.pm
-    version: 1.040
+    version: 1.045
+  EB::Report::BTWAangifte::Csv:
+    file: lib/EB/Report/BTWAangifte.pm
   EB::Report::BTWAangifte::Html:
-    file: lib/EB/Report/BTWAangifte/Html.pm
-    version: 1.013
+    file: lib/EB/Report/BTWAangifte.pm
   EB::Report::BTWAangifte::Text:
     file: lib/EB/Report/BTWAangifte.pm
+  EB::Report::BTWAangifte::Wxhtml:
+    file: lib/EB/Report/BTWAangifte/Wxhtml.pm
+    version: 1.002
   EB::Report::Balres:
     file: lib/EB/Report/Balres.pm
     version: 1.026
@@ -108,10 +112,10 @@ provides:
     file: lib/EB/Report/Balres.pm
   EB::Report::Balres::Wxhtml:
     file: lib/EB/Report/Balres/Wxhtml.pm
-    version: 1.001
+    version: 1.003
   EB::Report::Debcrd:
     file: lib/EB/Report/Debcrd.pm
-    version: 1.015
+    version: 1.016
   EB::Report::Debcrd::Csv:
     file: lib/EB/Report/Debcrd.pm
   EB::Report::Debcrd::Html:
@@ -120,7 +124,7 @@ provides:
     file: lib/EB/Report/Debcrd.pm
   EB::Report::Debcrd::Wxhtml:
     file: lib/EB/Report/Debcrd/Wxhtml.pm
-    version: 1.001
+    version: 1.003
   EB::Report::GenBase:
     file: lib/EB/Report/GenBase.pm
     version: 1.025
@@ -133,9 +137,11 @@ provides:
     file: lib/EB/Report/Grootboek.pm
   EB::Report::Grootboek::Text:
     file: lib/EB/Report/Grootboek.pm
+  EB::Report::Grootboek::Wxhtml:
+    file: lib/EB/Report/Grootboek/Wxhtml.pm
   EB::Report::Journal:
     file: lib/EB/Report/Journal.pm
-    version: 1.036
+    version: 1.038
   EB::Report::Journal::Csv:
     file: lib/EB/Report/Journal.pm
   EB::Report::Journal::Html:
@@ -144,16 +150,18 @@ provides:
     file: lib/EB/Report/Journal.pm
   EB::Report::Journal::Wxhtml:
     file: lib/EB/Report/Journal/Wxhtml.pm
-    version: 1.001
+    version: 1.003
   EB::Report::Open:
     file: lib/EB/Report/Open.pm
-    version: 1.019
+    version: 1.021
   EB::Report::Open::Csv:
     file: lib/EB/Report/Open.pm
   EB::Report::Open::Html:
     file: lib/EB/Report/Open.pm
   EB::Report::Open::Text:
     file: lib/EB/Report/Open.pm
+  EB::Report::Open::Wxhtml:
+    file: lib/EB/Report/Open/Wxhtml.pm
   EB::Report::Proof:
     file: lib/EB/Report/Proof.pm
     version: 1.019
@@ -165,28 +173,28 @@ provides:
     file: lib/EB/Report/Proof.pm
   EB::Report::Proof::Wxhtml:
     file: lib/EB/Report/Proof/Wxhtml.pm
-    version: 1.001
+    version: 1.003
   EB::Report::Reporter:
     file: lib/EB/Report/Reporter.pm
-    version: 1.011
+    version: 1.013
   EB::Report::Reporter::Csv:
     file: lib/EB/Report/Reporter/Csv.pm
-    version: 1.005
+    version: 1.006
   EB::Report::Reporter::Html:
     file: lib/EB/Report/Reporter/Html.pm
-    version: 1.013
+    version: 1.016
   EB::Report::Reporter::Text:
     file: lib/EB/Report/Reporter/Text.pm
-    version: 1.007
+    version: 1.008
   EB::Report::Reporter::WxHtml:
     file: lib/EB/Report/Reporter/WxHtml.pm
-    version: 1.003
+    version: 1.008
   EB::Shell:
     file: lib/EB/Shell.pm
-    version: 1.104
+    version: 1.105
   EB::Shell::Base:
     file: lib/EB/Shell/Base.pm
-    version: 1.019
+    version: 1.021
   EB::Shell::DeLuxe:
     file: lib/EB/Shell/DeLuxe.pm
     version: 1.019
@@ -204,13 +212,13 @@ provides:
     version: 1.009
   EB::Tools::Schema:
     file: lib/EB/Tools/Schema.pm
-    version: 1.056
+    version: 1.057
   EB::Utils:
     file: lib/EB/Utils.pm
     version: 1.008
   EekBoek:
     file: lib/EekBoek.pm
-    version: 1.03.10_2
+    version: 1.03.11
 generated_by: Module::Build version 0.28
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.2.html

@@ -1,4 +1,4 @@
-# $Id: 81_sqlite.t,v 1.2 2008/02/25 11:50:28 jv Exp $  -*-perl-*-
+# $Id: 81_sqlite.t,v 1.3 2008/03/07 10:15:57 jv Exp $  -*-perl-*-
 
 use strict;
 use warnings;

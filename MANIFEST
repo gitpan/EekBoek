@@ -8,7 +8,9 @@ Makefile.PL
 QUICKSTART
 README
 TODO
+contrib/afschr.pl
 debian/changelog
+debian/compat
 debian/control
 debian/copyright
 debian/rules
@@ -116,16 +118,18 @@ lib/EB/Main.pm
 lib/EB/Relation.pm
 lib/EB/Report.pm
 lib/EB/Report/BTWAangifte.pm
-lib/EB/Report/BTWAangifte/Html.pm
+lib/EB/Report/BTWAangifte/Wxhtml.pm
 lib/EB/Report/Balres.pm
 lib/EB/Report/Balres/Wxhtml.pm
 lib/EB/Report/Debcrd.pm
 lib/EB/Report/Debcrd/Wxhtml.pm
 lib/EB/Report/GenBase.pm
 lib/EB/Report/Grootboek.pm
+lib/EB/Report/Grootboek/Wxhtml.pm
 lib/EB/Report/Journal.pm
 lib/EB/Report/Journal/Wxhtml.pm
 lib/EB/Report/Open.pm
+lib/EB/Report/Open/Wxhtml.pm
 lib/EB/Report/Proof.pm
 lib/EB/Report/Proof/Wxhtml.pm
 lib/EB/Report/Reporter.pm
@@ -167,6 +171,7 @@ lib/EB/migrate/001000008001000009.pl
 lib/EB/migrate/001000009001000010.sql
 lib/EB/migrate/001000010001000011.sql
 lib/EB/migrate/001000011001000012.sql
+lib/EB/migrate/001000012001000013.sql
 lib/EB/schema/cleanup.sql
 lib/EB/schema/eekboek.sql
 lib/EB/schema/sampledb.ebz

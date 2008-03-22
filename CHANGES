@@ -1,4 +1,39 @@
-1.03.10
+1.03.11
+
+	* BTW tariefgroepen Privé en Anders.
+
+	  In schema:
+
+	     5  BTW Privé    :tariefgroep=privé :perc=12,00 :exclusief
+	     6  BTW Anders   :tariefgroep=anders :perc=14,50 :exclusief
+
+	  Als deze taeriefgroepen worden opgevoerd dan moeten de
+	  betreffende koppelingen ook worden opgegeven:
+
+             4240  D   BTW Inkoop Anders    :koppeling=btw_ia
+             4250  C   BTW Verkoop Anders   :koppeling=btw_va
+
+	  Etc.
+
+	  BTW 'Privé' komt in de BTW aangifte in groep 1d, BTW
+	  'Anders' komt in groep 1e. Deze groepen worden niet op het
+	  aangifteformulier vermeld als de betreffende tariefgroep
+	  ontbreekt.
+
+	* BTW Aangifte: Uitgebreidere signalering discrepanties in BTW
+          posten.
+
+	* Kleine wijzigingen in de BTW rapportage.
+
+	* EekBoek shell opdrachten zijn nu case-insensitive.
+
+	* contrib/afschr.pl: tooltje om afschrijvingen te berekenen.
+
+	* Fix regressie in debiteuren/crediteuren overzichten.
+
+	* CPAN testing: Skip silently if perl < 5.8.3.
+
+1.03.10	27-02-2008 11:55
 
 	* CPAN testing: Skip PostgreSQL tests if no database access.
 
