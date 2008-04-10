@@ -4,8 +4,8 @@ my $RCS_Id = '$Id: skel.pl,v 1.7 1998-02-06 11:41:12+01 jv Exp $ ';
 # Author          : Johan Vromans
 # Created On      : Tue Sep 15 15:59:04 1998
 # Last Modified By: Johan Vromans
-# Last Modified On: Tue Mar 11 14:01:08 2008
-# Update Count    : 150
+# Last Modified On: Fri Mar 28 19:21:27 2008
+# Update Count    : 157
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -129,17 +129,17 @@ if ( !defined($eb) || !$eb ) {
 if ( !defined($eb) || $eb ) {
     my $fmt = "        std 31-12 %-34s %9.2f %4d";
     foreach ( sort {$a->[0] <=> $b->[0] or $a->[3] cmp $b->[3] } @data ) {
-	my ($year, $a, $v, $desc, $bal, $res) = @$_;
+	my ($year, $af, $v, $desc, $date, $amt, $rest, $n, $bal, $res) = @$_;
 	next unless defined($bal) && defined($res);
 	$desc = "\"Afschrijving $desc\"";
 	printf STDOUT ("# Afschrijving %4d %s, balanswaarde = %.2f -> %.2f\n".
 		       "memoriaal 31-12 %s \\\n".
 		       "$fmt \\\n".
 		       "$fmt\n\n",
-		       $year, $_->[3], $v+$a, $v,
+		       $year, $_->[3], $v+$af, $v,
 		       $desc,
-		       $desc, -$a, $bal,
-		       $desc, $a, $res);
+		       $desc, $af, $bal,
+		       $desc, -$af, $res);
     }
 }
 
@@ -180,6 +180,7 @@ sub app_usage($) {
 Usage: $0 [options] [file ...]
     --eb   --eekboek	only EekBoek bookings
     --noeb --noeekboek	no EekBoek bookings
+    --order-year --oy [YEAR] order by (this) year
     -help		this message
     -ident		show identification
 EndOfUsage
@@ -198,6 +199,5 @@ $year, $desc, $date, sprintf("%.2f",$amt), $n, sprintf("%.2f",$rest), sprintf("%
 
 __END__
 # Aanschaf	Bedrag	Restw  #jr	Bal   Res   Omschrijving
-2007-02-12	1457.75     0   5       1111  6810  Computer V
-2007-10-06	32197	 3500   5       1121  6820  Auto 53-XD-SR
-
+2007-02-12	 1225.00    0   5       1111  6810  Computer V
+2007-10-06	27285.93 3500   5       1121  6820  Auto 53-XD-SR

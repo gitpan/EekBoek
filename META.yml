@@ -1,6 +1,6 @@
 ---
 name: EekBoek
-version: 1.03.11
+version: 1.03.12
 author:
   - Johan Vromans (jvromans@squirrel.nl)
 abstract: Elementary Bookkeeping (for the Dutch/European market)
@@ -34,7 +34,7 @@ provides:
     version: 1.021
   EB::Booking::BKM:
     file: lib/EB/Booking/BKM.pm
-    version: 1.069
+    version: 1.070
   EB::Booking::Decode:
     file: lib/EB/Booking/Decode.pm
     version: 1.025
@@ -54,7 +54,7 @@ provides:
     file: lib/EB/Config.pm
   EB::DB:
     file: lib/EB/DB.pm
-    version: 1.057
+    version: 1.058
   EB::DB::Postgres:
     file: lib/EB/DB/Postgres.pm
     version: 1.025
@@ -91,7 +91,7 @@ provides:
     version: 1.007
   EB::Report::BTWAangifte:
     file: lib/EB/Report/BTWAangifte.pm
-    version: 1.045
+    version: 1.046
   EB::Report::BTWAangifte::Csv:
     file: lib/EB/Report/BTWAangifte.pm
   EB::Report::BTWAangifte::Html:
@@ -100,7 +100,7 @@ provides:
     file: lib/EB/Report/BTWAangifte.pm
   EB::Report::BTWAangifte::Wxhtml:
     file: lib/EB/Report/BTWAangifte/Wxhtml.pm
-    version: 1.002
+    version: 1.003
   EB::Report::Balres:
     file: lib/EB/Report/Balres.pm
     version: 1.026
@@ -176,7 +176,7 @@ provides:
     version: 1.003
   EB::Report::Reporter:
     file: lib/EB/Report/Reporter.pm
-    version: 1.013
+    version: 1.014
   EB::Report::Reporter::Csv:
     file: lib/EB/Report/Reporter/Csv.pm
     version: 1.006
@@ -206,7 +206,7 @@ provides:
     version: 1.016
   EB::Tools::Opening:
     file: lib/EB/Tools/Opening.pm
-    version: 1.038
+    version: 1.039
   EB::Tools::SQLEngine:
     file: lib/EB/Tools/SQLEngine.pm
     version: 1.009
@@ -218,7 +218,7 @@ provides:
     version: 1.008
   EekBoek:
     file: lib/EekBoek.pm
-    version: 1.03.11
+    version: 1.03.12
 generated_by: Module::Build version 0.28
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.2.html

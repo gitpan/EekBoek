@@ -1,6 +1,6 @@
 #! perl
 
-# RCS Id          : $Id: BTWAangifte.pm,v 1.45 2008/03/10 17:40:53 jv Exp $
+# RCS Id          : $Id: BTWAangifte.pm,v 1.46 2008/04/09 21:01:51 jv Exp $
 # Author          : Johan Vromans
 # Created On      : Tue Jul 19 19:01:33 2005
 # Last Modified By: Johan Vromans
@@ -20,7 +20,7 @@ package EB::Report::BTWAangifte;
 use strict;
 use warnings;
 
-our $VERSION = sprintf "%d.%03d", q$Revision: 1.45 $ =~ /(\d+)/g;
+our $VERSION = sprintf "%d.%03d", q$Revision: 1.46 $ =~ /(\d+)/g;
 
 use EB;
 use EB::Format;

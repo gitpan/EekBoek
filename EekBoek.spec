@@ -1,26 +1,9 @@
 # -*- rpm-spec -*-
 
-%define unstable 1
-
 %define pkgname EekBoek
-%define pkgversion 1.03.11
+%define pkgversion 1.03.12
 %define lcname eekboek
-
-#%if %{unstable}
-#%define pkgsuffix -Unstable
-#%define lcpkgsuffix -unstable
-#%else
-#%define pkgsuffix %{nil}
-#%define lcpkgsuffix %{nil}
-#%endif
-
-%if %{unstable}
 %define pkgsuffix -unstable
-%define lcpkgsuffix %{nil}
-%else
-%define pkgsuffix %{nil}
-%define lcpkgsuffix %{nil}
-%endif
 
 %define lcpkg  %{lcname}%{lcpkgsuffix}
 

@@ -1,4 +1,13 @@
-1.03.11
+1.03.12
+
+	* BKM deb/crd boeking gebruikt altijd de standaardrekeningen
+          voor deb/crd i.p.v. de aan het dagboek gekoppelde rekening.
+
+	* Kleine wijzigingen in de BTW rapportage.
+
+	* Debian kit is now also 'unstable'.
+
+1.03.11	22-032008 17:07
 
 	* BTW tariefgroepen Privé en Anders.
 
