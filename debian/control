@@ -16,11 +16,11 @@ Description: Elementary Bookkeeping (for the Dutch/European market)
 
 Package: eekboek-unstable-db-postgresql
 Architecture: all
-Depends: eekboek (= 1.03.12), libdbd-pg-perl (>= 1.41)
+Depends: eekboek (= 1.03.13), libdbd-pg-perl (>= 1.41)
 Description: PostgreSQL database driver for EekBoek.
 
 Package: eekboek-unstable-db-sqlite
 Architecture: all
-Depends: eekboek (= 1.03.12), libdbd-sqlite3-perl (>= 1.13)
+Depends: eekboek (= 1.03.13), libdbd-sqlite3-perl (>= 1.13)
 Provides: eekboek-db
 Description: SQLite database driver for EekBoek.

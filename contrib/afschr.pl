@@ -4,8 +4,8 @@ my $RCS_Id = '$Id: skel.pl,v 1.7 1998-02-06 11:41:12+01 jv Exp $ ';
 # Author          : Johan Vromans
 # Created On      : Tue Sep 15 15:59:04 1998
 # Last Modified By: Johan Vromans
-# Last Modified On: Fri Mar 28 19:21:27 2008
-# Update Count    : 157
+# Last Modified On: Sun Apr 13 15:46:14 2008
+# Update Count    : 169
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -28,6 +28,7 @@ use Getopt::Long 2.13;
 sub app_options();
 
 my $eb;				# EekBoek boekingen
+my $gr;				# only group totals
 my $oy;
 
 app_options();
@@ -40,14 +41,22 @@ use Time::Local;
 
 sub min { $_[0] < $_[1] ? $_[1] : $_[0] }
 
-my @data = ();
+my @data;
+my @grdata;
+my %grdesc;
 my $ythis = 1900 + (localtime())[6];
 
-while ( <DATA> ) {
+while ( <> ) {
 
     # Skip comments and empty lines.
     next if /^#/;
     next unless /\S/;
+
+    # Detect group identifiers
+    if (/^(\d+)\s+(\d+)\s*=\s*(\S.*?)\s*$/) {
+       $grdesc{"${1}:${2}"} = $3;
+       next;
+    }
 
     # Split up.
     my ( $date, $amt, $rest, $n, @desc ) = split;
@@ -89,6 +98,7 @@ while ( <DATA> ) {
 
 	# Sla op.
 	push (@data, [$year, $decr, min($rest,$val), @aux]);
+	push_group (\@grdata, \%grdesc, [$year, $decr, min($rest,$val), @aux]);
 
 	# Naar volgend jaar.
 	$year++;
@@ -97,6 +107,12 @@ while ( <DATA> ) {
 }
 
 my ($year, $af, $v, $desc, $date, $amt, $rest, $n, $bal, $res);
+
+if ( $gr ) {
+    @data = @grdata;
+    $~ = 'GROUP';
+    $^ = 'GROUP_TOP';
+}
 
 if ( !defined($eb) || !$eb ) {
     my $this = "";
@@ -157,10 +173,11 @@ sub app_options() {
     return unless @ARGV > 0;
 
     if ( !GetOptions(
-		     'eb|eekboek!' => \$eb,
+		     'eb|eekboek!'     => \$eb,
+		     'groups'          => \$gr,
 		     'oy|order-year:i' => \$oy,
-		     'ident'	=> \$ident,
-		     'help|?'	=> \$help,
+		     'ident'	       => \$ident,
+		     'help|?'	       => \$help,
 		    ) or $help )
     {
 	app_usage(2);
@@ -181,10 +198,26 @@ Usage: $0 [options] [file ...]
     --eb   --eekboek	only EekBoek bookings
     --noeb --noeekboek	no EekBoek bookings
     --order-year --oy [YEAR] order by (this) year
+    --group             order per group
     -help		this message
     -ident		show identification
 EndOfUsage
     exit $exit if $exit != 0;
+}
+
+sub push_group {
+    my ($grdata, $grdesc, $elem) = @_;
+    my ($year, $af, $v, $desc, $date, $amt, $rest, $n, $bal, $res) = @$elem;
+    foreach (@$grdata) {
+        if ($$_[0] == $year and $$_[8] == $bal and $$_[9] == $res) {
+            $$_[1] += $af;
+            $$_[2] += $v;
+            return;
+        }
+    }
+    my $d = $$grdesc{"${bal}:${res}"};
+    $$elem[3] = $d ? $d : "Group-${bal}-${res}";
+    push(@$grdata, $elem);
 }
 
 format STDOUT_TOP =
@@ -197,7 +230,12 @@ format STDOUT =
 $year, $desc, $date, sprintf("%.2f",$amt), $n, sprintf("%.2f",$rest), sprintf("%.2f",$v+$af), sprintf("%.2f",$af), sprintf("%.2f",$v)
 .
 
-__END__
-# Aanschaf	Bedrag	Restw  #jr	Bal   Res   Omschrijving
-2007-02-12	 1225.00    0   5       1111  6810  Computer V
-2007-10-06	27285.93 3500   5       1121  6820  Auto 53-XD-SR
+format GROUP_TOP =
+@>>>  @<<<<<<<<<<<<<<<<<<<  @>>>>>>>  @>>>>>>>  @>>>>>>>
+"Jaar", "Omchrijving", "Begin", "Afschr.", "Eind"
+----  --------------------  --------  --------  --------
+.
+format GROUP =
+@>>>  @<<<<<<<<<<<<<<<<<<<  @>>>>>>>  @>>>>>>>  @>>>>>>>
+$year, $desc, sprintf("%.2f",$v+$af), sprintf("%.2f",$af), sprintf("%.2f",$v)
+.

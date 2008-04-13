@@ -1,6 +1,6 @@
 ---
 name: EekBoek
-version: 1.03.12
+version: 1.03.13
 author:
   - Johan Vromans (jvromans@squirrel.nl)
 abstract: Elementary Bookkeeping (for the Dutch/European market)
@@ -91,7 +91,7 @@ provides:
     version: 1.007
   EB::Report::BTWAangifte:
     file: lib/EB/Report/BTWAangifte.pm
-    version: 1.046
+    version: 1.047
   EB::Report::BTWAangifte::Csv:
     file: lib/EB/Report/BTWAangifte.pm
   EB::Report::BTWAangifte::Html:
@@ -127,7 +127,7 @@ provides:
     version: 1.003
   EB::Report::GenBase:
     file: lib/EB/Report/GenBase.pm
-    version: 1.025
+    version: 1.026
   EB::Report::Grootboek:
     file: lib/EB/Report/Grootboek.pm
     version: 1.033
@@ -218,7 +218,7 @@ provides:
     version: 1.008
   EekBoek:
     file: lib/EekBoek.pm
-    version: 1.03.12
+    version: 1.03.13
 generated_by: Module::Build version 0.28
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.2.html
