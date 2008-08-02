@@ -11,11 +11,7 @@ TODO
 contrib/afschr.pl
 contrib/afschr-gewoon.dat
 contrib/afschr-group.dat
-debian/changelog
-debian/compat
-debian/control
-debian/copyright
-debian/rules
+contrib/example.pl
 doc/html/bookings/bank.html
 doc/html/bookings/btw.html
 doc/html/bookings/cash.html
@@ -111,6 +107,7 @@ lib/EB/DB.pm
 lib/EB/DB/Postgres.pm
 lib/EB/DB/Sqlite.pm
 lib/EB/Export.pm
+lib/EB/Export/XAF.pm
 lib/EB/Expression.pm
 lib/EB/Format.pm
 lib/EB/Globals.pm

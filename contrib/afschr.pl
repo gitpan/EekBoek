@@ -4,8 +4,8 @@ my $RCS_Id = '$Id: skel.pl,v 1.7 1998-02-06 11:41:12+01 jv Exp $ ';
 # Author          : Johan Vromans
 # Created On      : Tue Sep 15 15:59:04 1998
 # Last Modified By: Johan Vromans
-# Last Modified On: Sun Apr 13 15:46:14 2008
-# Update Count    : 169
+# Last Modified On: Sat May 10 19:03:19 2008
+# Update Count    : 215
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -29,7 +29,9 @@ sub app_options();
 
 my $eb;				# EekBoek boekingen
 my $gr;				# only group totals
-my $oy;
+my $oy;				# order by year
+my $html;			# produce HTML
+my $adm;			# admin name
 
 app_options();
 
@@ -69,7 +71,13 @@ while ( <> ) {
     my $desc = "@desc";
     my @aux = ($desc, $date, $amt, $rest, $n, $bal, $res);
 
-    my ( $year, $month, $day ) = $date =~ /^(\d\d\d\d)-?(\d\d)-?(\d\d)/;
+    my ( $year, $month, $day );
+    if ( $date =~ /^(\d\d\d\d)-?(\d\d)-?(\d\d)$/ ) {
+	( $year, $month, $day ) = ( $1, $2, $3);
+    }
+    elsif ( $date =~ /^(\d\d\d\d)$/ ) {
+	( $year, $month, $day ) = ( $1, 1, 1 );
+    }
 
     # Beginwaarde.
     my $val = $amt;
@@ -118,6 +126,7 @@ if ( !defined($eb) || !$eb ) {
     my $this = "";
 
     if ( defined($oy) ) {
+	do_template(join("", <DATA>)) if $html;
 	foreach ( sort { $a->[0] <=> $b->[0] or $a->[3] cmp $b->[3] } @data ) {
 	    ($year, $af, $v, $desc, $date, $amt, $rest, $n, $bal, $res) = @$_;
 	    if ( $this ne $year ) {
@@ -125,19 +134,15 @@ if ( !defined($eb) || !$eb ) {
 		$- = 0;
 	    }
 	    next if $oy && $year != $oy;
-	    $date =~ /(\d\d\d\d)-?(\d\d)-?(\d\d)/ and $date = "$3-$2-$1";
-	    write;
+	    do_write();
 	}
-    }
-    else {
-	foreach ( sort { $a->[3] cmp $b->[3] or $a->[0] <=> $b->[0] } @data ) {
-	    ($year, $af, $v, $desc, $date, $amt, $rest, $n, $bal, $res) = @$_;
-	    if ( $this ne $desc ) {
-		$this = $desc;
-		$- = 0;
-	    }
-	    $date =~ /(\d\d\d\d)-?(\d\d)-?(\d\d)/ and $date = "$3-$2-$1";
-	    write;
+	if ( $html ) {
+	    do_template(<<EOD);
+</table>
+<p class="footer">Overzicht aangemaakt op [% bky %]-12-31 door <a href="http://www.eekboek.nl">EekBoek</a></p>
+</body>
+</html>
+EOD
 	}
     }
 }
@@ -173,9 +178,11 @@ sub app_options() {
     return unless @ARGV > 0;
 
     if ( !GetOptions(
+		     'adm=s'           => \$adm,
 		     'eb|eekboek!'     => \$eb,
 		     'groups'          => \$gr,
 		     'oy|order-year:i' => \$oy,
+		     'html'            => \$html,
 		     'ident'	       => \$ident,
 		     'help|?'	       => \$help,
 		    ) or $help )
@@ -184,6 +191,12 @@ sub app_options() {
     }
     app_ident if $ident;
     $oy = 0 if defined($oy) && $oy <= 1900;
+    if ( $html ) {
+	die("--html requires --oy=YYYY\n") if $oy <= 1900;
+	die("--html requires --adm=XXX\n") unless $adm;
+	die("--html cannot (yet) be used with --groups\n") if $gr;
+	$eb = 0;
+    }
 }
 
 sub app_ident {
@@ -199,10 +212,73 @@ Usage: $0 [options] [file ...]
     --noeb --noeekboek	no EekBoek bookings
     --order-year --oy [YEAR] order by (this) year
     --group             order per group
-    -help		this message
-    -ident		show identification
+    --html		produce HTML (requires --oy and --adm)
+    --adm=NAME		admin name
+    --help		this message
+    --ident		show identification
 EndOfUsage
     exit $exit if $exit != 0;
+}
+
+sub html {
+    my $t = shift;
+    $t =~ s/&/&amp;/g;
+    $t =~ s/>/&gt;/g;
+    $t =~ s/</&lt;/g;
+    $t =~ s/"/&quot;/g;
+    $t;
+}
+
+sub numfmt {
+    my $t = sprintf("%.2f", shift);
+    $t =~ s/\./,/;
+    $t;
+}
+
+sub do_template {
+    my ($t) = @_;
+
+    my %ctrl =
+      ( title	   => "Afschrijfstaat",
+	bky	   => $oy,
+	adm	   => html($adm),
+      );
+    my $pat = "(";
+    foreach ( grep { ! /^_/ } keys(%ctrl) ) {
+	$pat .= quotemeta($_) . "|";
+    }
+    chop($pat);
+    $pat .= ")";
+
+    $pat = qr/\[\%\s+$pat\s+\%\]/;
+
+    $t =~ s/$pat/$ctrl{$1}/ge;
+    print($t);
+}
+
+sub do_write {
+    if ( $date =~ /(\d\d\d\d)-?(\d\d)-?(\d\d)/ ) {
+	$date = "$3-$2-$1";
+    }
+    else {
+	$date = $html ? "Boekwaarde $date" : "Boekw $date";
+    }
+    if ( !$html ) {
+	write;
+	return;
+    }
+    print <<EOD;
+<tr>
+<td class="c_desc">@{[html($desc)]}</th>
+<td class="c_aans">$date</th>
+<td class="c_val">@{[numfmt($amt)]}</th>
+<td class="c_n">$n</th>
+<td class="c_rest">@{[numfmt($rest)]}</th>
+<td class="c_begn">@{[numfmt($v+$af)]}</th>
+<td class="c_afs">@{[numfmt($af)]}</th>
+<td class="c_eind">@{[numfmt($v)]}</th>
+</tr>
+EOD
 }
 
 sub push_group {
@@ -239,3 +315,134 @@ format GROUP =
 @>>>  @<<<<<<<<<<<<<<<<<<<  @>>>>>>>  @>>>>>>>  @>>>>>>>
 $year, $desc, sprintf("%.2f",$v+$af), sprintf("%.2f",$af), sprintf("%.2f",$v)
 .
+__END__
+<html>
+<head>
+<title>[% title %]</title>
+<style type="text/css">
+body {
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-size: 12px;
+}
+
+.title {
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-size: 100%;
+    font-weight: bold;
+    margin-top: 0pt;
+    margin-bottom: 0pt;
+}
+
+.subtitle {
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-size: 100%;
+    font-weight: bold;
+    margin-top: 0pt;
+}
+
+.footer {
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-size: 80%;
+    font-weight: normal;
+}
+
+body {
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    line-height: 150%;
+    color: #000000;
+    table-width: 100%;
+}
+
+table {
+    border: thin solid #000000;
+    border-collapse: collapse;
+}
+table td {
+    border-left:  thin solid #000000;
+    border-right: thin solid #000000;
+}
+table th {
+    border-left:  thin solid #000000;
+    border-right: thin solid #000000;
+    border-bottom: thin solid #000000;
+}
+
+th { vertical-align: top }
+tr { vertical-align: top }
+
+.c_acct, .h_acct {
+    padding-left: 10pt;
+    padding-right: 10pt;
+    text-align: left;
+}
+
+.c_desc, .h_desc {
+    padding-left: 10pt;
+    padding-right: 10pt;
+    text-align: left;
+}
+
+.c_aans, .h_aans {
+    padding-left: 10pt;
+    padding-right: 10pt;
+    text-align: left;
+}
+
+.c_val, .h_val {
+    padding-left: 10pt;
+    padding-right: 10pt;
+    text-align: right;
+}
+
+.c_n, .h_n {
+    padding-left: 10pt;
+    padding-right: 10pt;
+    text-align: right;
+}
+
+.c_rest, .h_rest {
+    padding-left: 10pt;
+    padding-right: 10pt;
+    text-align: right;
+}
+
+.c_begn, .h_begn {
+    padding-left: 10pt;
+    padding-right: 10pt;
+    text-align: right;
+}
+
+.c_afs, .h_afs {
+    padding-left: 10pt;
+    padding-right: 10pt;
+    text-align: right;
+}
+
+.c_eind, .h_eind {
+    padding-left: 10pt;
+    padding-right: 10pt;
+    text-align: right;
+}
+</style>
+</head>
+<body>
+<p class="title">[% title %]</p>
+<p class="subtitle">Periode: [% bky %]-01-01 t/m [% bky %]-12-31<br>
+[% adm %]</p>
+<table class="main">
+<tr class="head">
+<th class="h_desc">&nbsp;</th>
+<th class="h_aans" style="text-align:center" colspan="2">Aanschaf</th>
+<th class="h_n" style="text-align:center" colspan="2">Afschrijving</th>
+<th class="h_begn" style="text-align:center" colspan="3">Periode</th>
+</tr>
+<tr class="head">
+<th class="h_desc">Omschrijving</th>
+<th class="h_aans">Datum</th>
+<th class="h_val">Waarde</th>
+<th class="h_n">Jr</th>
+<th class="h_rest">Restant</th>
+<th class="h_begn">Begin</th>
+<th class="h_afs">Afschr.</th>
+<th class="h_eind">Eind</th>
+</tr>

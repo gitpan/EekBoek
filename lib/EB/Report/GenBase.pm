@@ -1,11 +1,11 @@
 #! perl
 
-# RCS Info        : $Id: GenBase.pm,v 1.26 2008/04/10 18:58:10 jv Exp $
+# RCS Info        : $Id: GenBase.pm,v 1.28 2008/04/29 17:18:31 jv Exp $
 # Author          : Johan Vromans
 # Created On      : Sat Oct  8 16:40:43 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Thu Apr 10 20:57:21 2008
-# Update Count    : 150
+# Last Modified On: Tue Apr 29 19:18:21 2008
+# Update Count    : 153
 # Status          : Unknown, Use with caution!
 
 package main;
@@ -18,7 +18,7 @@ package EB::Report::GenBase;
 use strict;
 use EB;
 
-our $VERSION = sprintf "%d.%03d", q$Revision: 1.26 $ =~ /(\d+)/g;
+our $VERSION = sprintf "%d.%03d", q$Revision: 1.28 $ =~ /(\d+)/g;
 
 use IO::File;
 use EB::Format;
@@ -177,6 +177,7 @@ sub backend {
     $be->{_cssdir} = $cfg->val(qw(html cssdir), undef);
     $be->{_cssdir} =~ s;/*$;/; if defined $be->{_cssdir};
     $be->{_style} = $opts->{style} if $opts->{style};
+    $be->{_title0} = $opts->{title} if $opts->{title};
 
     # Return instance.
     $be;
@@ -217,7 +218,7 @@ sub backend_options {
     foreach ( qw(html csv text) ) {
 	push(@opts, $_) if $be{$_};
     }
-    push(@opts, "style=s") if $be{html};
+    push(@opts, "style=s", "title|titel=s") if $be{html};
 
     # Explicit --gen-XXX for all backends.
     push(@opts, map { +"gen-$_"} keys %be);

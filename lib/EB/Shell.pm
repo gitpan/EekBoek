@@ -10,7 +10,7 @@ package EB::Shell;
 use strict;
 use warnings;
 
-our $VERSION = sprintf "%d.%03d", q$Revision: 1.105 $ =~ /(\d+)/g;
+our $VERSION = sprintf "%d.%03d", q$Revision: 1.108 $ =~ /(\d+)/g;
 
 use EB;
 
@@ -707,7 +707,7 @@ sub _do_btwaangifte {
 	       ], $opts)
       or goto &_help_btwaangifte;
 
-    if ( lc($args[-1]) eq "definitief" ) {
+    if ( @args && lc($args[-1]) eq "definitief" ) {
 	$opts->{close} = 1;
 	pop(@args);
     }
@@ -967,26 +967,42 @@ sub do_export {
 	       [ 'dir=s',
 		 'file|output=s',
 		 'boekjaar=s',
+		 'xaf=s',
 		 'single',
 		 'explicit',
 		 'totals!',
 	       ], $opts)
       or goto &help_export;
 
-    if ( defined($opts->{dir}) && defined($opts->{file}) ) {
-	warn("?"._T("Opties --dir en --file sluiten elkaar uit")."\n");
+    my $t = 0;
+    $t++ if defined($opts->{dir});
+    $t++ if defined($opts->{file});
+    $t++ if defined($opts->{xaf});
+    if ( $t > 1 ) {
+	warn("?"._T("Opties --dir, --file en --xaf sluiten elkaar uit")."\n");
 	return;
     }
-    if ( !defined($opts->{dir}) && !defined($opts->{file}) ) {
-	warn("?"._T("Specifieer --dir of --file")."\n");
+    if ( $t != 1 ) {
+	warn("?"._T("Specifieer --dir, --file of --xaf")."\n");
 	return;
     }
 
     return unless argcnt(@args, 0);
     check_open(1);
 
-    require EB::Export;
-    EB::Export->export($opts);
+    if ( $opts->{xaf} ) {
+	if ( findlib "Export/XAF.pm" ) {
+	    require EB::Export::XAF;
+	    EB::Export::XAF->export($opts);
+	}
+	else {
+	    warn("?"._T("Export naar XML Auditfile Financieel is niet beschikbaar")."\n");
+	}
+    }
+    else {
+	require EB::Export;
+	EB::Export->export($opts);
+    }
 
     return;
 }
@@ -1000,11 +1016,14 @@ Exporteert de complete administratie.
 Opties:
 
   --file=<bestand>          Selecteer uitvoerbestand
-  --dir=<directory>           Selecteer uitvoerdirectory
-  --boekjaar=<code>           Selecteer boekjaar
+  --dir=<directory>         Selecteer uitvoerdirectory
+  --xaf=<bestand>           Export XML Auditfile Financieel
+  --boekjaar=<code>         Selecteer boekjaar
 
-Er moet of een --file of een --dir optie worden opgegeven.
-Zonder --boekjaar selectie wordt de gehele administratie geëxporteerd.
+Er moet een --file, --dir of een --xaf optie worden opgegeven.
+De XAF export exporteert altijd één enkel boekjaar. Voor de andere
+exports wordt zonder --boekjaar selectie de gehele administratie
+geëxporteerd.
 Eventueel bestaande files worden overschreven.
 EOS
 }
