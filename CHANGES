@@ -1,4 +1,15 @@
-1.03.90
+1.03.92
+
+	* Kleine verbeteringen XAF export.
+	  Fix --boekjaar voor --xaf export.
+
+	* Verwijder --boekjaar optie voor gewone export.
+
+1.03.91	2008-08-02 15:06 (CPAN only)
+
+	* Bugfix headerinderdrukking van de BTW-aangifte.
+
+1.03.90 2008-07-19 18:58
 
 	* Alle rapporten in HTML kunnen een expliciete titel
           meekrijgen:

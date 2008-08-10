@@ -1,6 +1,6 @@
 ---
 name: EekBoek
-version: 1.03.91
+version: 1.03.92
 author:
   - Johan Vromans (jvromans@squirrel.nl)
 abstract: Elementary Bookkeeping (for the Dutch/European market)
@@ -68,7 +68,7 @@ provides:
     version: 1.029
   EB::Export::XAF:
     file: lib/EB/Export/XAF.pm
-    version: 1.001
+    version: 1.002
   EB::Expression:
     file: lib/EB/Expression.pm
   EB::Format:
@@ -194,7 +194,7 @@ provides:
     version: 1.008
   EB::Shell:
     file: lib/EB/Shell.pm
-    version: 1.108
+    version: 1.109
   EB::Shell::Base:
     file: lib/EB/Shell/Base.pm
     version: 1.021
@@ -221,7 +221,7 @@ provides:
     version: 1.008
   EekBoek:
     file: lib/EekBoek.pm
-    version: 1.03.91
+    version: 1.03.92
 generated_by: Module::Build version 0.28
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.2.html
