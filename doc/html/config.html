@@ -4,7 +4,10 @@
  <head>
   <title>EekBoek</title>
     <link rel="stylesheet" href="css/site.css" type="text/css">
-      <meta name="robots" content="all">
+      <meta name="keywords" content="boekhouden, mkb, midden- en kleinbedrijf, financiën,
+                open source, boekhoudsoftware, boekhoud software,
+		boekhoudpakket, boekhoud pakket">
+  <meta name="robots" content="all">
  </head>
 
  <body bgcolor="#FFFFFF"
@@ -140,19 +143,32 @@ verwerken indien ze aanwezig zijn:</p>
 </ol>
 
 <p>De gegevens uit de specifieke bestanden hebben voorrang boven die uit
-meer generieke bestanden.<p>
+meer generieke bestanden.</p>
 
 <p>De EekBoek shell <code>ebshell</code> kan bovendien op de command
 line een <a href="ebshell/clo.html#config">configuratie-optie</a>
-worden meegegeven. Met deze optie wordt een extra configuratiebestand
-aangewezen dat weer voorrang heeft boven alle andere. Ook is het
-mogelijk om met de command line optie <code>-X</code> de EekBoek shell
-te instrueren alle standaard-configuratiebestanden over te slaan. Dit
-is uiteraard alleen zinvol in combinatie met <code>--config</code>.</p>
+<code>--config</code> worden meegegeven. Met deze optie wordt een
+niet-standaard configuratiebestand aangewezen dat in de plaats van het
+administratie-specifieke bestand komt. Tevens is het mogelijk om met
+de command line optie <code>-X</code> de EekBoek shell te instrueren
+alle standaard-configuratiebestanden te negeren. Dit is uiteraard
+alleen zinvol in combinatie met <code>--config</code>.</p>
 
 <p>Configuratie-variabelen kunnen ook worden gezet op de command line
 bij het opstarten van EekBoek. Zie hiervoor <a
 href="ebshell/clo.html">Command line opties.</a></p>
+
+<p>De configuratiebestanden zijn verdeeld in secties, die elk een of
+meer variabelen kunnen bevatten. Bijvoorbeeld</p>
+
+<blockquote class="code">[Database]
+name = demoadmin
+</blockquote>
+
+<p>In dit kleine voorbeeldje is er sprake van een sectie,
+&lsquo;Database&rsquo;, met een variabele &lsquo;name&rsquo; met de
+waarde &lsquo;demoadmin&rsquo;. Voor meer details, zie b.v. <a
+href="http://en.wikipedia.org/wiki/Initialization_file">WikiPedia</a>.</p>
 
 <p>De waarde van configuratie-variabelen kan worden opgevraagd met de
 EekBoek shell. Als de <em>eerste</em> optie op de command line
@@ -167,29 +183,12 @@ dus geen normale verwerking opgestart.</em>
 mogelijk een sectie te selecteren voor een reeks van variabelen met de
 optie <code>--section=<var>sectie</var></code>.
 
-<p>De configuratiebestanden zijn verdeeld in secties, die elk een of
-meer variabelen kunnen bevatten. Bijvoorbeeld</p>
-
-<blockquote class="code">[Database]
-name = demoadmin
-</blockquote>
-
-<p>In dit kleine voorbeeldje is er sprake van een sectie,
-&lsquo;Database&rsquo;, met een variabele &lsquo;name&rsquo; met de
-waarde &lsquo;demoadmin&rsquo;. Voor meer details, zie b.v. <a
-href="http://en.wikipedia.org/wiki/Initialization_file">WikiPedia</a>.</p>
-
 <p><em>Omdat in de configuratiebestanden onder meer de
 internationalisatie-gegevens kunnen worden bepaald, kunnen deze
 bestanden zelf geen gebruik maken van internationalisatie. De
 gebruikte namen van secties en variabelen in de configuratiebestanden
-zijn daarom voor alle talen vast, en enigszins taal-neutraal (lees:
-engels-achtig).</em></p>
-
-<p>Verschillende configuratiegegevens hebben een fallback naar
-environment variabelen. Het gebruik van environment variabelen voor
-configuratiegegevens wordt echter afgeraden en zal wellicht in een
-toekomstige versie komen te vervallen.</p>
+zijn daarom voor alle talen hetzelfde, en enigszins taal-neutraal
+(lees: engels-achtig).</em></p>
 
 <p><a name="locale"></a><b>Sectie "Locale"</b></p>
 
@@ -204,11 +203,10 @@ toekomstige versie komen te vervallen.</p>
 	de tekensetaanduiding <code>utf8</code> is, zal EekBoek alle
 	invoer en uitvoer in Unicode verzorgen. In alle andere
 	gevallen vindt in- en uitvoer in ISO-8859-1 (Latin1) plaats.
-	<br>Fallback: <code>EB_LANG</code>.
 	<br>Default: <code>nl_NL.utf8</code> voor MS Windows systemen,
 	anders <code>nl_NL</code>.
 	<br><em>Taalinstelling is alleen effectief in de
-	internationale versie van EekBoek, en niet in de standaardversie.
+	internationale versie van EekBoek, en niet in de standaardversie.</em>
     </td>
   </tr>
   <tr valign="top">
@@ -236,21 +234,64 @@ toekomstige versie komen te vervallen.</p>
   </tr>
 </table>
 
+<p><a name="company"></a><b>Sectie "Company"</b></p>
+
+<table border="1" width="100%" cellpadding="5">
+  <tr valign="top">
+    <td><a name="cpy_name"></a><code>name</code></td>
+    <td>De naam van de onderneming.
+    </td>
+  </tr>
+  <tr valign="top">
+    <td><a name="cpy_id"></a><code>id</code></td>
+    <td>Administratienummer van de onderneming.
+    </td>
+  </tr>
+  <tr valign="top">
+    <td><a name="cpy_address"></a><code>address</code></td>
+    <td>Adres.
+    </td>
+  </tr>
+  <tr valign="top">
+    <td><a name="cpy_zip"></a><code>postalcode</code></td>
+    <td>Postcode.
+    </td>
+  </tr>
+  <tr valign="top">
+    <td><a name="cpy_city"></a><code>city</code></td>
+    <td>Woonplaats.
+    </td>
+  </tr>
+  <tr valign="top">
+    <td><a name="cpy_taxreg"></a><code>taxreg</code></td>
+    <td>Het fiscale nummer van de onderneming.
+    </td>
+  </tr>
+</table>
+
+<p><a name="prefs"></a><b>Sectie "Preferences"</b></p>
+
+<table border="1" width="100%" cellpadding="5">
+  <tr valign="top">
+    <td><a name="prefs_journal"></a><code>journal</code></td>
+    <td>Door deze variable een waarde ongelijk nul te geven wordt na
+	elke boeking automatisch de betreffende journaalpost getoond.
+    </td>
+  </tr>
+</table>
+
 <p><a name="database"></a><b>Sectie "Database"</b></p>
 
 <table border="1" width="100%" cellpadding="5">
   <tr valign="top">
     <td><a name="database_name"></a><code>name</code></td>
     <td>De naam van de te gebruiken database.<br>
-	De command line optie <code>--dataset</code> (zie hierboven)
-	prevaleert over het zetten van deze configuratievariabele.
 	Let op! De werkelijke naam wordt voorzien van
 	een voorvoegsel, om de EekBoek
 	databases te kunnen onderscheiden van de overige databases.
 	Deze configuratievariabele, indien opgevraagd, zal altijd de
 	naam weergeven <em>zonder</em> dit voorvoegsel. Zie ook
 	<code>fullname</code> hieronder.
-	<br>Fallback: <code>EB_DB_NAME</code>.
     </td>
   </tr>
   <tr valign="top">
@@ -275,13 +316,11 @@ toekomstige versie komen te vervallen.</p>
     <td>De naam van de database-gebruiker.<br>
 	Indien deze configuratievariabele niet is gezet, wordt de
 	loginnaam gebruikt.
-	<br>Fallback: <code>EB_DB_NAME</code>.
     </td>
   </tr>
   <tr valign="top">
     <td><a name="database_password"></a><code>password</code></td>
     <td>De toegangscode van de database-gebruiker, indien nodig.
-	<br>Fallback: <code>EB_DB_PASSWORD</code>.
     </td>
   </tr>
   <tr valign="top">
@@ -289,7 +328,6 @@ toekomstige versie komen te vervallen.</p>
     <td>De naam van het systeem waarop de database draait.<br>
 	Indien deze configuratievariabele niet is gezet wordt de
 	database verondersteld op het lokale systeem te draaien.
-	<br>Fallback: <code>EB_DB_HOST</code>.
     </td>
   </tr>
   <tr valign="top">
@@ -297,7 +335,6 @@ toekomstige versie komen te vervallen.</p>
     <td>De poort waarlangs de database is te benaderen.<br>
 	Indien deze configuratievariabele niet is gezet wordt een
 	database-specifieke standaardwaarde genomen.
-	<br>Fallback: <code>EB_DB_PORT</code>.
     </td>
   </tr>
 </table>
@@ -366,7 +403,7 @@ toekomstige versie komen te vervallen.</p>
   </tr>
 </table>
 
-<p><a name="text"></a><b>Sectie "Format"</b></p>
+<p><a name="format"></a><b>Sectie "Format"</b></p>
 
 <table border="1" width="100%" cellpadding="5">
   <tr valign="top">
@@ -405,7 +442,7 @@ toekomstige versie komen te vervallen.</p>
   </tr>
 </table>
 
-<p><a name="csv"></a><b>Sectie "Html"</b></p>
+<p><a name="html"></a><b>Sectie "Html"</b></p>
 
 <table border="1" width="100%" cellpadding="5">
   <tr valign="top">
@@ -413,7 +450,7 @@ toekomstige versie komen te vervallen.</p>
     <td>De directory waar de HTML stylesheets zijn te vinden.
 	<br>De uiteindelijk toegepaste stylesheet hangt af van deze
 	setting, en de aan de rapport-opdracht meegegeven style optie.
-	<p><table border="1" width="100%" cellpadding="3">
+	<table border="1" width="100%" cellpadding="3">
 	  <tr valign="top">
 	  <td>Style</td><td>Cssdir</td><td>Resultaat</td>
 	  </tr>
@@ -467,7 +504,6 @@ ongewenste problemen leiden.</em></p>
 	de gegenereerde rapporten worden vergeleken met
 	standaardversies en het onwenselijk is als steeds de
 	rapportage-datum zou wijzigen.
-	<br>Fallback: <code>EB_SQL_NOW</code>.
     </td>
   </tr>
 </table>
@@ -501,7 +537,7 @@ ongewenste problemen leiden.</em></p>
 Deze site is gemaakt met de 
 <a href='http://www.squirrel.nl/people/jvromans/tt2site/'>TT2Site
 Site Builder</a>.<br />
-config.html laatste aanpassing 28 oktober 2007, 21:15:58
+config.html laatste aanpassing 24 augustus 2008, 18:26:52
 </p>
 
     </td>

@@ -1,17 +1,17 @@
 
 body {
     font-family: Verdana, Arial, Helvetica, sans-serif;
-    font-size: 12px;
+    font-size: 100%;
 }
 
 .info {
     font-family: Verdana, Arial, Helvetica, sans-serif;
-    font-size: 10px;
+    font-size: 80%;
 }
 
 .title {
     font-family: Verdana, Arial, Helvetica, sans-serif;
-    font-size: 24px;
+    font-size: 200%;
     line-height: 30px;
     font-weight: bold;
     color: #000000;
@@ -22,8 +22,8 @@ body {
 
 a.menu {
         font-family: Verdana, Arial, Helvetica, sans-serif;
-    font-size: 12px;
-    line-height: 14px;
+    font-size: 80%;
+    line-height: 18px;
     text-decoration: none;
     color: #0000FF;
     white-space:nowrap;
@@ -55,8 +55,8 @@ a.menu:hover {
 
 a.menuselect {
         font-family: Verdana, Arial, Helvetica, sans-serif;
-    font-size: 12px;
-    line-height: 14px;
+    font-size: 80%;
+    line-height: 18px;
     text-decoration: none;
     color: #0000FF;
     white-space:nowrap;

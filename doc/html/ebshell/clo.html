@@ -4,7 +4,10 @@
  <head>
   <title>EekBoek</title>
     <link rel="stylesheet" href="../css/site.css" type="text/css">
-      <meta name="robots" content="all">
+      <meta name="keywords" content="boekhouden, mkb, midden- en kleinbedrijf, financiën,
+                open source, boekhoudsoftware, boekhoud software,
+		boekhoudpakket, boekhoud pakket">
+  <meta name="robots" content="all">
  </head>
 
  <body bgcolor="#FFFFFF"
@@ -121,37 +124,21 @@
 
 <table border="1" width="100%" cellpadding="5">
   <tr valign="top">
-    <td><code>-f <var>cfg</var><br>--config=<var>cfg</var></code></td>
-    <td>Specificeert een extra configuratiebestand. Zie <a href="../config.html">Configuratiebestanden</a>.
+    <td><code>--boekjaar=<var>code</var></code></td>
+    <td>Selecteer een boekjaar uit een administratie die meerdere
+	boekjaren omvat.
     </td>
   </tr>
   <tr valign="top">
-    <td><code>-X</code></td>
-    <td>De standaard-configuratiebestanden worden niet gelezen. Dit is
-	uiteraard alleen zinvol in combinatie met
-	<code>--config</code>. Zie <a
-	href="../config.html">Configuratiebestanden</a>.
-    </td>
-  </tr>
-  <tr valign="top">
-    <td><code>-P<br>--printcfg</code></td>
-    <td>De rest van de opdrachtregel wordt 
-	ge&iuml;nterpreteerd als namen van configuratie-variabelen
-	en de bijbehorenden waardes worden uitgeprint. Zie <a
-	href="../config.html">Configuratiebestanden</a>.
-	<br><em>Deze optie moet als eerste op de commandoregel voorkomen.</em>
-    </td>
-  </tr>
-  <tr valign="top">
-    <td><code>-D
-	<var>var</var><code>=</code><var>waarde</var><br>--define&nbsp;<var>var</var><code>=</code><var>waarde</var></code></td>
-    <td>Definieer configuratievariabelen. &lsquo;<var>var</var>&rsquo;
-	is van de vorm &lsquo;<var>sectie</var><code>:</code><var>naam</var>&rsquo;
+    <td><code>--init</code></td>
+    <td>Initialiseer een nieuwe administratie uitgaande van de <a href="../intro/working.html#best4">vier
+	bestanden</a> die zich in de huidige directory bevinden.
+	<br>Zie de EekBoek opdracht <a href="../inex.html#import">import</a> voor details.
     </td>
   </tr>
   <tr valign="top">
     <td><code>-c<br>--command</code></td>
-    <td>De rest van de opdrachtregel wordt als een ebshell opdracht
+    <td>De rest van de opdrachtregel wordt als een EekBoek shell opdracht
 	ge&iuml;nterpreteerd.
     </td>
   </tr>
@@ -162,25 +149,23 @@
     </td>
   </tr>
   <tr valign="top">
-    <td><code>--dataset=<var>name</var></code></td>
-    <td>De opgegeven database wordt gebruikt in plaats van de
-	standaard database. Zie <a
-	href="../config.html#database">Configuratiebestanden,
-	sectie Database</a>.
+    <td><code>--export <var>export-parameters</var></code></td>
+    <td>Exporteer een administratie.
+	<br>Zie de EekBoek opdracht <a href="../inex.html#export">export</a> voor details.
     </td>
   </tr>
   <tr valign="top">
-    <td><code>--journaal</code></td>
-    <td>Na elke boeking wordt automatisch de bijbehorende
-	journaalregel getoond.
+    <td><code>--import <var>import-parameters</var></code></td>
+    <td>Importeer een administratie.
+	<br>Zie de EekBoek opdracht <a href="../inex.html#import">import</a> voor details.
+	<br>Deze opdracht impliceert <code>--createdb</code>.
     </td>
   </tr>
-  <tr valign="top">
-    <td><code>--boekjaar=<var>code</var></code></td>
-    <td>Selecteer een boekjaar uit een administratie die meerdere
-	boekjaren omvat.
-    </td>
-  </tr>
+</table>
+
+<h4>De volgende opdrachten zijn alleen voor experts.</h4>
+
+<table border="1" width="100%" cellpadding="5">
   <tr valign="top">
     <td><code>--createdb</code></td>
     <td>Cre&euml;er een lege database. Indien de database al bestaat
@@ -188,6 +173,27 @@
 	database aangemaakt.
 	<br>Deze opdracht is alleen zinvol in combinatie met de
 	opdracht <code>--schema</code>, zie hieronder.
+    </td>
+  </tr>
+  <tr valign="top">
+    <td><code>-D
+	<var>var</var>=<var>waarde</var><br>--define&nbsp;<var>var</var>=<var>waarde</var></code></td>
+    <td>Definieer configuratievariabelen. <var>var</var>
+	heeft de vorm <var>sectie</var><code>:</code><var>naam</var>
+    </td>
+  </tr>
+  <tr valign="top">
+    <td><code>-f <var>cfg</var><br>--config=<var>cfg</var></code></td>
+    <td>Specificeert een extra configuratiebestand. Zie <a href="../config.html">Configuratiebestanden</a>.
+    </td>
+  </tr>
+  <tr valign="top">
+    <td><code>-P<br>--printcfg</code></td>
+    <td>De rest van de opdrachtregel wordt 
+	ge&iuml;nterpreteerd als namen van configuratie-variabelen
+	en de bijbehorenden waardes worden uitgeprint. Zie <a
+	href="../config.html">Configuratiebestanden</a>.
+	<br><em>Deze optie moet als eerste op de commandoregel voorkomen.</em>
     </td>
   </tr>
   <tr valign="top">
@@ -208,16 +214,11 @@
     </td>
   </tr>
   <tr valign="top">
-    <td><code>--import <var>import-parameters</var></code></td>
-    <td>Importeer een administratie.
-	<br>Zie de EekBoek opdracht <a href="inex.html#import">import</a> voor details.
-	<br>Deze opdracht impliceert <code>--createdb</code>.
-    </td>
-  </tr>
-  <tr valign="top">
-    <td><code>--export <var>export-parameters</var></code></td>
-    <td>Exporteer een administratie.
-	<br>Zie de EekBoek opdracht <a href="inex.html#export">export</a> voor details.
+    <td><code>-X</code></td>
+    <td>De standaard-configuratiebestanden worden niet gelezen. Dit is
+	uiteraard alleen zinvol in combinatie met
+	<code>--config</code>. Zie <a
+	href="../config.html">Configuratiebestanden</a>.
     </td>
   </tr>
 </table>
@@ -251,7 +252,7 @@
 Deze site is gemaakt met de 
 <a href='http://www.squirrel.nl/people/jvromans/tt2site/'>TT2Site
 Site Builder</a>.<br />
-ebshell/clo.html laatste aanpassing 02 juni 2006, 11:31:43
+ebshell/clo.html laatste aanpassing 24 augustus 2008, 18:26:52
 </p>
 
     </td>

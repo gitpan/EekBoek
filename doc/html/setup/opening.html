@@ -4,7 +4,10 @@
  <head>
   <title>EekBoek</title>
     <link rel="stylesheet" href="../css/site.css" type="text/css">
-      <meta name="robots" content="all">
+      <meta name="keywords" content="boekhouden, mkb, midden- en kleinbedrijf, financiën,
+                open source, boekhoudsoftware, boekhoud software,
+		boekhoudpakket, boekhoud pakket">
+  <meta name="robots" content="all">
  </head>
 
  <body bgcolor="#FFFFFF"
@@ -140,12 +143,11 @@ opgenomen in het bestand <code>opening.eb</code>.</p>
 </ul>
 
 <p>De EekBoek opdrachten die te maken hebben met het openen van de
-administratie beginnen alle met het voorvoegsel
-&lsquo;<code>adm_</code>&rsquo;.</p>
+administratie beginnen alle met het voorvoegsel <code>adm_</code>.</p>
 
-<a name="#amdgg"></a><h3>Het invoeren van administratie-specifieke gegevens</h3>
+<a name="amdgg"></a><h3>Het invoeren van administratie-specifieke gegevens</h3>
 
-<blockquote class="code">adm_naam "EekBoek Demo Administratie 2004"</blockquote>
+<blockquote class="code">adm_naam "EekBoek Demo Administratie 2007"</blockquote>
 
 <p>Met deze opdracht wordt de naam van de te openen administratie
 opgegeven.<br>Deze opdracht is verplicht.</p>
@@ -156,17 +158,17 @@ opgegeven.<br>Deze opdracht is verplicht.</p>
 moet worden gedaan. Mogelijke waarden zijn "jaar", "kwartaal" of
 "maand".<br>Deze opdracht is verplicht.</p>
 
-<blockquote class="code">adm_begindatum 2004</blockquote>
+<blockquote class="code">adm_begindatum 2007</blockquote>
 
 <p>Met deze opdracht wordt de begindatum opgegeven. Het boekjaar loopt
-dan van 1 januari tot en met 31 december van het opgegeven jaar.<br>Deze opdracht
-is verplicht.</p>
+dan van 1 januari tot en met 31 december van het opgegeven jaar.
+<br>Deze opdracht is verplicht.</p>
 
-<blockquote class="code">adm_boekjaarcode 2004</blockquote>
+<blockquote class="code">adm_boekjaarcode 2007</blockquote>
 
 <p>Met deze opdracht wordt een code (verkorte aanduiding van maximaal
 4 tekens) voor het boekjaar opgegeven. Aan de hand van deze code kan
-later het boekjaar worden geselecteerd.<p>
+later het boekjaar worden geselecteerd.</p>
 
 <p>Deze opdracht is niet verplicht. Indien geen code is opgegeven dan
 wordt het jaartal gebruikt.</p>
@@ -174,15 +176,15 @@ wordt het jaartal gebruikt.</p>
 <a name="opbal"></a><h3>Het invoeren van de openingsbalans</h3>
 
 <p>De openingsbalans wordt ingevoerd met de opdracht
-&lsquo;<code>adm_balanstotaal</code>&rsquo;, indien nodig gevolgd door twee of
-meermaal &lsquo;<code>adm_balans</code>&rsquo;.</p>
+<code>adm_balanstotaal</code>, indien nodig gevolgd door twee of
+meermaal <code>adm_balans</code>.</p>
 
 <blockquote class="code">adm_balanstotaal 15854,77</blockquote>
 
 <p>Het totaal van de openingsbalans.</p>
 
-<blockquote class="code">adm_balans  230 1344,37
-adm_balans  231 1304.81
+<blockquote class="code">adm_balans 1100 1344,37
+adm_balans 1101 1304,81
 ...</blockquote>
 
 <p>Elke opdracht geeft het openingssaldo van de betreffende
@@ -196,7 +198,7 @@ te bepalen. Voor een boekhouder geldt dat een negatief bedrag op een
 hoort, terwijl het rekenkundig gebruikelijk is een negatief getal van
 het saldo af te trekken. Hetzelfde geldt uiteraard voor negatieve
 bedragen op creditrekeningen, die door een boekhouder als debet
-worden beschouwd.<p>
+worden beschouwd.</p>
 
 <p>Bijvoorbeeld:</p>
 
@@ -219,15 +221,16 @@ accepteren.</p>
 
 <p>Indien er nog onbetaalde fakturen uit het voorgaande boekjaar
 staan, dan moeten die nu worden ingevoerd met een of meer
-&lsquo;<code>adm_relatie</code>&rsquo; opdrachten.</p>
+<code>adm_relatie</code> opdrachten.</p>
 
-<blockquote class="code">adm_relatie inkoop:2003:67 2003-12-31 KESTER "Printwerk" 48.79</blockquote>
+<blockquote class="code">adm_relatie inkoop:2006:67 2003-12-31 KESTER "Printwerk" 48,79</blockquote>
 
-<p>De &lsquo;<code>adm_relatie</code>&rsquo; opdracht kent de volgende
+<p>De <code>adm_relatie</code> opdracht kent de volgende
 onderdelen:</p>
+
 <ul>
   <li>Het boekstuknummer, in volledige vorm:
-      &lsquo;<code><var>Dagboek</var>:<var>Boekjaar</var>:<var>Volgnummer</var></code>&rsquo;.
+      <code><var>Dagboek</var>:<var>Boekjaar</var>:<var>Volgnummer</var></code>.
       <br>Hier kan dus hetzelfde nummer worden opgegeven als in het
       oorpronkelijke, voorafgaande boekjaar is gebruikt.
       <br><strong>Belangrijk:</strong> Indien het oorspronkelijke dagboek
@@ -241,7 +244,7 @@ onderdelen:</p>
   <li>De relatie-code voor de betreffende debiteur/crediteur.
       <br><strong>Belangrijk:</strong> Deze code moet bekend zijn,
       zodat het nodig kan zijn eerst de opdracht
-      &lsquo;<a href="../debcrd.html"><code>relatie</code></a>&rsquo; te gebruiken om de relatie te
+      <a href="relaties.html"><code>relatie</code></a> te gebruiken om de relatie te
       defini&euml;ren.</li>
   <li>Het bedrag van de openstaande post.</li>
 </ul>
@@ -258,7 +261,7 @@ laatste opdracht gegeven om de administratie te openen:</p>
 
 <p>Het bestand <code>opening.eb</code> is nu klaar voor gebruik.</p>
 
-<p><strong>Let op!</strong>Openingsopdrachten kunnen ook interactief
+<p><strong>Let op!</strong> Openingsopdrachten kunnen ook interactief
 in de EekBoek shell worden ingegeven. Daarbij is van belang dat
 <strong>alle</strong> <code>adm_</code> opdrachten voor de opening in
 <strong>dezelfde</strong> shell worden ingegeven. Het programma mag
@@ -295,7 +298,7 @@ dus niet meerdere malen worden gestart met telkens een deel van de
 Deze site is gemaakt met de 
 <a href='http://www.squirrel.nl/people/jvromans/tt2site/'>TT2Site
 Site Builder</a>.<br />
-setup/opening.html laatste aanpassing 27 januari 2008, 21:05:58
+setup/opening.html laatste aanpassing 24 augustus 2008, 18:43:41
 </p>
 
     </td>

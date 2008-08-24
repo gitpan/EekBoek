@@ -4,7 +4,10 @@
  <head>
   <title>EekBoek</title>
     <link rel="stylesheet" href="../css/site.css" type="text/css">
-      <meta name="robots" content="all">
+      <meta name="keywords" content="boekhouden, mkb, midden- en kleinbedrijf, financiën,
+                open source, boekhoudsoftware, boekhoud software,
+		boekhoudpakket, boekhoud pakket">
+  <meta name="robots" content="all">
  </head>
 
  <body bgcolor="#FFFFFF"
@@ -39,7 +42,11 @@
   <tr valign="middle">
 
     <td class="info"></td>
-    <td><a href="../ebshell/index.html" class="menu">De EekBoek shell</a>
+    <td><a href="../setup/index.html" class="menu">Opzetten administratie</a>
+</td>
+	<td> &#xbb; </td>
+    <td class="info"></td>
+    <td><a href="../setup/mutaties.html" class="menu">Mutaties</a>
 </td>
 	
   </tr>
@@ -83,18 +90,24 @@
     <td align="left">
       <a href="../intro/index.html" class="menu">Inleiding</a>
 <br>
-<a href="../ebshell/index.html" class="menuselect">De EekBoek shell</a>
-<br>
-&nbsp;-&nbsp;<a href="../ebshell/commands.html" class="menu">Opdrachten</a>
-<br>
-&nbsp;-&nbsp;<a href="../ebshell/clo.html" class="menu">Opties</a>
-<br>
-&nbsp;-&nbsp;<a href="../ebshell/files.html" class="menu">Bestanden</a>
-<br>
+<a href="../ebshell/index.html" class="menu">De EekBoek shell</a>
 <br>
 <a href="../config.html" class="menu">Configuratie</a>
 <br>
-<a href="../setup/index.html" class="menu">Opzetten administratie</a>
+<a href="../setup/index.html" class="menuselect">Opzetten administratie</a>
+<br>
+&nbsp;-&nbsp;<a href="../setup/config.html" class="menu">Opzetten werkomgeving</a>
+<br>
+&nbsp;-&nbsp;<a href="../setup/schema.html" class="menu">Administratiegegevens</a>
+<br>
+&nbsp;-&nbsp;<a href="../setup/relaties.html" class="menu">Relaties</a>
+<br>
+&nbsp;-&nbsp;<a href="../setup/opening.html" class="menu">Opening</a>
+<br>
+&nbsp;-&nbsp;<a href="../setup/mutaties.html" class="menuselect">Mutaties</a>
+<br>
+&nbsp;-&nbsp;<a href="../setup/init.html" class="menu">Aanmaken administratie</a>
+<br>
 <br>
 <a href="../bookings/index.html" class="menu">Boekingen</a>
 <br>
@@ -111,14 +124,13 @@
 
     </td>
     <td>
-      
+      <h3>Bestand <code>mutaties.eb</code> - De mutaties (boekingen)</h3>
 
-<h3>Environment variabelen</h3>
-
-<p><strong>Het gebruik van deze environment variabelen is achterhaald en
-sterk afgeraden. Hun functie is overgenomen door de <a
-href="../config.html">Configuratie bestanden</a>.</strong></p>
-
+<p>Dit bestand bevat de mutaties (boekingen) die moeten worden
+uitgevoerd. Voor een nieuwe administratie zal dit bestand leeg zijn.
+Het moet echter wel worden aangemaakt. Dat kan door er b.v. een enkele
+commentaarregel in te plaatsen:
+<blockquote class="code"># Mutaties</blockquote>
 
     </td>
   </tr>
@@ -149,7 +161,7 @@ href="../config.html">Configuratie bestanden</a>.</strong></p>
 Deze site is gemaakt met de 
 <a href='http://www.squirrel.nl/people/jvromans/tt2site/'>TT2Site
 Site Builder</a>.<br />
-ebshell/env.html laatste aanpassing 22 januari 2006, 17:58:20
+setup/mutaties.html laatste aanpassing 27 januari 2008, 21:08:17
 </p>
 
     </td>

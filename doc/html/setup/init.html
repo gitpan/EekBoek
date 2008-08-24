@@ -4,7 +4,10 @@
  <head>
   <title>EekBoek</title>
     <link rel="stylesheet" href="../css/site.css" type="text/css">
-      <meta name="robots" content="all">
+      <meta name="keywords" content="boekhouden, mkb, midden- en kleinbedrijf, financiën,
+                open source, boekhoudsoftware, boekhoud software,
+		boekhoudpakket, boekhoud pakket">
+  <meta name="robots" content="all">
  </head>
 
  <body bgcolor="#FFFFFF"
@@ -40,6 +43,10 @@
 
     <td class="info"></td>
     <td><a href="../setup/index.html" class="menu">Opzetten administratie</a>
+</td>
+	<td> &#xbb; </td>
+    <td class="info"></td>
+    <td><a href="../setup/init.html" class="menu">Aanmaken administratie</a>
 </td>
 	
   </tr>
@@ -99,7 +106,7 @@
 <br>
 &nbsp;-&nbsp;<a href="../setup/mutaties.html" class="menu">Mutaties</a>
 <br>
-&nbsp;-&nbsp;<a href="../setup/init.html" class="menu">Aanmaken administratie</a>
+&nbsp;-&nbsp;<a href="../setup/init.html" class="menuselect">Aanmaken administratie</a>
 <br>
 <br>
 <a href="../bookings/index.html" class="menu">Boekingen</a>
@@ -117,34 +124,18 @@
 
     </td>
     <td>
-      
+      <h3>Het aanmaken van de administratie</h3>
 
-<h2>Het aanmaken van de database</h2>
+<p>Als alle benodigde bestanden klaar zijn, kan de administratie
+worden aangemaakt. Dit geschiedt met de volgende systeemopdracht:
+<blockquote class="code">ebshell --init</blockquote>
 
-<p>Elke administratie wordt opgeslagen in een eigen database. De
-eerste stap in het opzetten van een administratie is daarom het
-aanmaken van de database.</p>
 
-<p>Het aanmaken van een database met bijvoorbeeld de naam
-'<code>test</code>' kan met de volgende EekBoek shell opdracht:</p>
-
-<blockquote class="code">ebshell --createdb --db=test -c</blockquote>
-
-<p>Deze opdracht zal een nieuwe database aanmaken. Indien de database al
-bestaat wordt deze geheel leeggemaakt en hergebruikt. Wanneer u de
-naam van de database heeft vastgelegd in een configuratiebestand hoeft
-u deze niet op de opdrachtregel mee te geven.</p>
-
-<p>Zie de beschrijving van de <a
-href="../config.html">Configuratiefiles</a> voor het vastleggen van de
-naam van de database en andere instellingen.</p>
-
-<p>EekBoek databases dragen namen die in werkelijkheid alle beginnen
-met het voorvoegsel '<code>eekboek_</code>', dit om ze te kunnen
-onderscheiden van andere, niet-EekBoek databases die op het systeem
-aanwezig kunnen zijn. De software draagt zelf zorg voor het aanbrengen
-van het voorvoegsel.</p>
-
+<p>Het is mogelijk dat er fouten worden gedetecteerd in de opdrachten
+die in de bestanden zijn vastgelegd. Handelt u deze een voor een af.
+Het is mogelijk dat foutmeldingen het gevolg zijn van eerdere fouten,
+zodat met het corrigeren van een enkel probleem een groot aantal
+foutmeldingen verdwijnen.</p>
 
     </td>
   </tr>
@@ -175,7 +166,7 @@ van het voorvoegsel.</p>
 Deze site is gemaakt met de 
 <a href='http://www.squirrel.nl/people/jvromans/tt2site/'>TT2Site
 Site Builder</a>.<br />
-setup/createdb.html laatste aanpassing 09 februari 2006, 17:54:32
+setup/init.html laatste aanpassing 24 augustus 2008, 16:28:15
 </p>
 
     </td>

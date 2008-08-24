@@ -4,7 +4,10 @@
  <head>
   <title>EekBoek</title>
     <link rel="stylesheet" href="../css/site.css" type="text/css">
-      <meta name="robots" content="all">
+      <meta name="keywords" content="boekhouden, mkb, midden- en kleinbedrijf, financiën,
+                open source, boekhoudsoftware, boekhoud software,
+		boekhoudpakket, boekhoud pakket">
+  <meta name="robots" content="all">
  </head>
 
  <body bgcolor="#FFFFFF"
@@ -197,9 +200,15 @@ deze grootboekrekening uitgevoerde boekingen.</p>
 	<br>Indien geen stylesheet wordt opgegeven wordt een
 	stylesheet genoemd naar de rapportage gebruikt. Bijvoorbeeld,
 	voor een balans rapportage wordt stylesheet
-	'<code>css/balans.css</code>' gebruikt. Met de optie
+	<code>css/balans.css</code> gebruikt. Met de optie
 	<code>--style=other</code> zou de gebruikte stylesheet worden:
-	'<code>css/other.css</code>'
+	<code>css/other.css</code>
+    </td>
+  </tr>
+  <tr valign="top">
+    <td><code>--title=<var>text</var></code></td>
+    <td>Voor HTML uitvoer: specificeert de titel van het document.
+	Deze wordt opgenomen in de HTML <code>&lt;title&gt;</code>.
     </td>
   </tr>
 
@@ -211,18 +220,18 @@ gerapporteerd.</p>
 <h3>Uitvoer</h3>
 
 <blockquote class="code">                             Openstaande posten
-Periode: t/m 2004-05-16
-EekBoek Demo Administratie 2004                  EekBoek 0.30, 2006-01-14
+Periode: t/m 2007-05-16
+EekBoek Demo Administratie 2007                      EekBoek, 2007-12-31
 
 Relatie     Datum       Omschrijving             Bedrag  Boekstuk
 -------------------------------------------------------------------------
-ACME        2004-04-18  Perl Cursus rest         595,00  Verkoop:3
-ACME        2004-05-14  Consultancy              714,00  Verkoop:4
+ACME        2007-04-18  Perl Cursus rest         595,00  Verkoop:3
+ACME        2007-05-14  Consultancy              714,00  Verkoop:4
                         Totaal ACME             1309,00
                                               ---------
                         Totaal Debiteuren       1309,00
 
-XS4ALL      2004-05-10  ADSL                      22,80  Inkoop:7
+XS4ALL      2007-05-10  ADSL                      22,80  Inkoop:9
                         Totaal XS4ALL             22,80
                                               ---------
                         Totaal Crediteuren        22,80
@@ -283,7 +292,7 @@ regel, en getotaliseerd per relatie en per debiteuren/crediteuren.</p>
 Deze site is gemaakt met de 
 <a href='http://www.squirrel.nl/people/jvromans/tt2site/'>TT2Site
 Site Builder</a>.<br />
-reports/unpaid.html laatste aanpassing 14 januari 2006, 22:00:49
+reports/unpaid.html laatste aanpassing 24 augustus 2008, 18:26:52
 </p>
 
     </td>

@@ -1,4 +1,8 @@
-1.03.92
+1.03.93
+
+	* Revisie en actualisatie on-line documentatie.
+
+1.03.92 2008-08-10 21:18
 
 	* Kleine verbeteringen XAF export.
 	  Fix --boekjaar voor --xaf export.

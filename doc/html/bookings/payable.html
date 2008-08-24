@@ -4,7 +4,10 @@
  <head>
   <title>EekBoek</title>
     <link rel="stylesheet" href="../css/site.css" type="text/css">
-      <meta name="robots" content="all">
+      <meta name="keywords" content="boekhouden, mkb, midden- en kleinbedrijf, financiën,
+                open source, boekhoudsoftware, boekhoud software,
+		boekhoudpakket, boekhoud pakket">
+  <meta name="robots" content="all">
  </head>
 
  <body bgcolor="#FFFFFF"
@@ -122,24 +125,25 @@
       <h2>Inkoopfakturen</h2>
 
 <p>Inkoopfakturen worden geboekt in een dagboek van het type Inkoop.
-Zo'n dagboek heet typisch 'Inkoop' of 'Inkopen', maar de keuze van de
-naam is vrij. Ook mogen er meerdere inkoopdagboeken tegelijk zijn.</p>
+Zo'n dagboek heet typisch &ldquo;Inkoop&rdquo; of
+&ldquo;Inkopen&rdquo;, maar de keuze van de naam is vrij. Ook mogen er
+meerdere inkoopdagboeken tegelijk zijn.</p>
 
 <p>De naam van de boekingsopdracht is gelijk aan die van het dagboek. We
-nemen hier als voorbeeld het dagboek 'Inkopen'.</p>
+nemen hier als voorbeeld het dagboek &ldquo;Inkoop&rdquo;.</p>
 
 <p>Zoals alle boekingen bestaat ook de inkoopboeking uit twee delen:
 de <dfn>boekstukkop</dfn> en een of meer <dfn>boekstukregels</dfn>.</p>
 
 <p>Syntaxvoorbeeld van een boekstukkop:</p>
 
-<blockquote class="code">inkopen:24 14-09-2005 Kantoorartikelen OFFCENTR</blockquote>
+<blockquote class="code">inkoop:24 14-09-2007 Kantoorartikelen OFFCENTR</blockquote>
 
 <p>De onderdelen:</p>
 
 <table border="1" width="100%" cellpadding="5">
   <tr valign="top">
-    <td><code>inkopen:24</code></td>
+    <td><code>inkoop:24</code></td>
     <td>Het boekstuknummer. Dit bestaat uit de naam van het dagboek
 	en het (vrij te kiezen) boekstuknummer, gescheiden door een
 	dubbele punt '<code>:</code>'.
@@ -149,7 +153,7 @@ de <dfn>boekstukkop</dfn> en een of meer <dfn>boekstukregels</dfn>.</p>
     </td>
   </tr>
   <tr valign="top">
-    <td><code>24-09-2005</code></td>
+    <td><code>14-09-2007</code></td>
     <td>De boekingsdatum in <a href="../date.html">een van de ondersteunde vormen</a>.</td>
   </tr>
   <tr valign="top">
@@ -168,7 +172,7 @@ de <dfn>boekstukkop</dfn> en een of meer <dfn>boekstukregels</dfn>.</p>
 
 <p>Syntaxvoorbeeld van een boekingsregel:</p>
 
-<blockquote class="code">Papier 29,95 4930</blockquote>
+<blockquote class="code">Papier 29,95 6950</blockquote>
 
 <p>De onderdelen:</p>
 
@@ -192,7 +196,7 @@ de <dfn>boekstukkop</dfn> en een of meer <dfn>boekstukregels</dfn>.</p>
     </td>
   </tr>
   <tr valign="top">
-    <td><code>4930</code></td>
+    <td><code>6950</code></td>
     <td>De grootboekrekening waarop dit bedrag moet worden
 	geboekt. Deze rekening behoort een kostenrekening te zijn.</td>
   </tr>
@@ -212,85 +216,89 @@ meerdere regels mogen worden ingegeven.</p>
 
 
 <p>Tot slot is het mogelijk het boekstuktotaal te verifiëren door aan
-de boekingsopdracht de optie '<code>--totaal=<var>bedrag</var></code>'
+de boekingsopdracht de optie <code>--totaal=<var>bedrag</var></code>
 toe te voegen.</p>
 
 <p>Een voorbeeld (de opdracht is over meerdere regels gespreid voor de
 duidelijkheid):</p>
 
-<blockquote class="code">inkopen:24 14-09-2005 Kantoorartikelen OFFCENTR --totaal=54,25 \
-  Papier   29,95   4930 \
-  Leerboek 24,30@L 4930</blockquote>
+<blockquote class="code">inkoop:24 14-09-2007 Kantoorartikelen OFFCENTR --totaal=54,25 \
+  Papier   29,95   6950 \
+  Leerboek 24,30@L 6930</blockquote>
 
 <p>In dit voorbeeld worden twee boekstukregels verwerkt in dagboek
-Inkopen. Op het leerboek is het lage BTW tarief van toepassing, dit is
-opgegeven door middel van de toevoeging '<code>@L</code>'.</p>
+Inkoop. Op het leerboek is het lage BTW tarief van toepassing, dit is
+opgegeven door middel van de toevoeging <code>@L</code>.</p>
 
 <p>Een wat meer complex voorbeeld. KPN stuurt een telefoonrekening van
 131,68. Het bedrag exclusief BTW is 110,73. Van dit bedrag is 0,48
 BTW-vrij. Dit resulteert in de volgende boeking:</p>
 
-<blockquote class="code">Inkopen:22 31-08-2005 KPN --totaal=131,68 \
-  "Telefoon BTW hoog" 110,73-0,48@H- 4900 \
-  "Telefoon BTW vrij" 0,48@0 4900</blockquote>
+<blockquote class="code">Inkoop:22 31-08-2007 KPN --totaal=131,68 \
+  "Telefoon BTW hoog" 110,73-0,48@H- 6900 \
+  "Telefoon BTW vrij" 0,48@0 6900</blockquote>
 
 <p>In de eerste boekstukregel wordt de 0,48 afgetrokken van 110,73, en
-<em>dat geheel</em> wordt geboekt tegen BTW tariefcode H-, dit is hoog
-tarief waarbij het bedrag <em>exclusief</em> de BTW wordt
-opgegeven.</p>
+<em>dat geheel</em> wordt geboekt tegen BTW tariefcode
+<code>H-</code>, dit is hoog tarief waarbij het bedrag
+<em>exclusief</em> de BTW wordt opgegeven.</p>
 
 <p>In de tweede boekstukregel wordt de 0,48 opgevoerd zonder BTW
-(toevoeging '<code>@0</code>').</p>
+(toevoeging <code>@0</code>).</p>
 
 <h3>Afrondingsverschillen in de BTW berekening</h3>
 
-<p>Neem de volgende faktuur.
+<p>Neem de volgende faktuur.</p>
 
-<blockquote class="code">inkopen 03-03-2007 "Twee dingetjes" LCIER --totaal=11,06 \
-        "Ding 1"             0,69@-   6900  \
-        "Ding 2"             8,60@-   6900</blockquote>
+<blockquote class="code">inkoop 03-03-2007 "Twee dingetjes" LCIER --totaal=11,06 \
+        "Ding 1"             0,69@-   6920  \
+        "Ding 2"             8,60@-   6920</blockquote>
 
 <p>De BTW over 0,69 bedraagt 0,13, en de BTW over 8,60 bedraagt 1,63.
 Het boekstuktotaal wordt daarmee 11,05, wat niet overeenkomt met de
-opgegeven 11,06.
+opgegeven 11,06.</p>
 <p>In dit geval heeft de leverancier de BTW namelijk niet berekend per
 faktuurregel, maar over het totaal. De BTW over 9,29 bedraagt 1,77 wat
-het boekstuktotaal op 11,06 brengt.
+het boekstuktotaal op 11,06 brengt.</p>
 <p>EekBoek zal, na vaststelling dat het boekstuktotaal niet klopt, een
 herberekening van de BTW uitvoeren, ditmaal over het totaal van de
 faktuurregels. Klopt het boekstuktotaal dan wel dan wordt een melding
 afgedrukt en een correctieboeking aangemaakt. De journaalpost voor
-bovenstaande boeking wordt dan:
+bovenstaande boeking wordt dan:</p>
 
 <blockquote class="code">Boekstuk/Grootboek Rek  Debet  Credit Boekstuk/regel
 ---------------------------------------------------------------
-Inkopen:83                            Twee dingetjes
+Inkoop:83                             Twee dingetjes
   BTW Inkoop Hoog  4220   1,63          BTW Ding 2
   BTW Inkoop Hoog  4220   0,13          BTW Ding 1
   BTW Inkoop Hoog  4220   0,01          BTW Afr. Twee dingetjes
-  Kosten           6900   8,60          Ding 2
-  Kosten           6900   0,69          Ding 1
+  Kosten           6920   8,60          Ding 2
+  Kosten           6920   0,69          Ding 1
   Crediteuren      4100         11,06   Twee dingetjes
 ---------------------------------------------------------------
 Totaal Boekstuk 143      11,06  11,06</blockquote>
-<p>Het is ook mogelijk dat de correctie de andere kant op werkt, bijvoorbeeld:
+
+<p>Het is ook mogelijk dat de correctie de andere kant op werkt,
+bijvoorbeeld:</p>
+
 <blockquote class="code">Boekstuk/Grootboek Rek  Debet  Credit Boekstuk/regel
 ---------------------------------------------------------------
-Inkopen:84                            Twee dingetjes
+Inkoop:84                             Twee dingetjes
   BTW Inkoop Hoog  4220   1,63          BTW Ding 2
   BTW Inkoop Hoog  4220   0,13          BTW Ding 1
-  Kosten           6900   8,60          Ding 2
-  Kosten           6900   0,69          Ding 1
+  Kosten           6920   8,60          Ding 2
+  Kosten           6920   0,69          Ding 1
   BTW Inkoop Hoog  4220          0,01   BTW Afr. Twee dingetjes
   Crediteuren      4100         11,05   Twee dingetjes
 ---------------------------------------------------------------
 Totaal Boekstuk 144      11,06  11,06</blockquote>
+
 <p>In dit geval wijkt het boekstuktotaal, 11,05, af van het
 gerapporteerde totaal, 11,06. Het werkelijke boekstuktotaal is het
 bedrag dat uiteindelijk wordt geboekt op de tegenrekening, in dit
-geval dus de 11,05 die wordt geboekt op rekening 4100.
+geval dus de 11,05 die wordt geboekt op rekening 4100.</p>
 
-<p>Zie ook <a href="btw.html#Afr">BTW-afrondingen</a>.
+<p>Zie ook <a href="btw.html#Afr">BTW-afrondingen</a>.</p>
 
 
 
@@ -323,7 +331,7 @@ geval dus de 11,05 die wordt geboekt op rekening 4100.
 Deze site is gemaakt met de 
 <a href='http://www.squirrel.nl/people/jvromans/tt2site/'>TT2Site
 Site Builder</a>.<br />
-bookings/payable.html laatste aanpassing 28 oktober 2007, 21:55:01
+bookings/payable.html laatste aanpassing 24 augustus 2008, 16:52:44
 </p>
 
     </td>

@@ -4,7 +4,10 @@
  <head>
   <title>EekBoek</title>
     <link rel="stylesheet" href="../css/site.css" type="text/css">
-      <meta name="robots" content="all">
+      <meta name="keywords" content="boekhouden, mkb, midden- en kleinbedrijf, financiën,
+                open source, boekhoudsoftware, boekhoud software,
+		boekhoudpakket, boekhoud pakket">
+  <meta name="robots" content="all">
  </head>
 
  <body bgcolor="#FFFFFF"
@@ -137,9 +140,12 @@ directory cre&euml;ert u dan een configuratiebestand met de naam
 
 <blockquote class="code">[database]
 name = mijndb
+driver = postgresql
 </blockquote>
 
-waarbij <var>mijndb</var> de gewenste naam van de database is.</p>
+<p>waarbij <var>mijndb</var> de gewenste naam van de database
+is.<br>Indien u met de SQLite database wilt werken, dient u als driver
+<code>sqlite</code> op te geven.</p>
 
 <p>In deze directory dient u de volgende vier bestanden aan te maken:
 <ul>
@@ -152,6 +158,39 @@ waarbij <var>mijndb</var> de gewenste naam van de database is.</p>
 </ul>
 <p>De volgende secties van de documentatie beschrijven wat er in deze
 bestanden moet komen.</p>
+
+<a name="sampledb"></a><h4>De voorbeeldadministratie</h4>
+
+<p>Wanneer u de verschillende aspecten van EekBoek wilt uitproberen
+kan dat gemakkelijk aan de hand van een eenvoudig op te zetten
+voorbeeldadministratie.</p>
+
+<p>U dient daartoe, nadat u het bovenstaande bestandje
+<code>.eekboek.conf</code> heeft aangemaakt, de volgende
+systeemopdracht uitvoeren:</p>
+
+<blockquote class="code">ebshell --createsampledb</blockquote>
+
+<p>De voorbeeldadministratie is nu gereed voor gebruik. Deze
+administratie heeft als boekjaar 2007. Wilt u boekingen toevoegen dan
+dient u deze daarom ook in 2007 te dateren.</p>
+
+<p>De bestanden van de voorbeeldadministratie kunt u hier inzien:</p>
+
+<ul>
+<li><a href="../intro/schema.dat"><code>schema.dat</code></a> - de administratiegegevens;
+<li><a href="../intro/relaties.eb"><code>relaties.eb</code></a> - de relaties (debiteuren en
+    crediteuren);
+<li><a href="../intro/opening.eb"><code>opening.eb</code></a> - de openingsbalans;
+<li><a href="../intro/mutaties.eb"><code>mutaties.eb</code></a> - de
+    mutaties.
+</ul>
+
+<p>U kunt een kopie van deze bestanden in uw huidige directory
+plaatsen door direct na het aanmaken van de voorbeeldadministratie de
+volgende systeemopdracht uit te voeren:</p>
+
+<blockquote class="code">ebshell --export --dir=.</blockquote>
 
     </td>
   </tr>
@@ -182,7 +221,7 @@ bestanden moet komen.</p>
 Deze site is gemaakt met de 
 <a href='http://www.squirrel.nl/people/jvromans/tt2site/'>TT2Site
 Site Builder</a>.<br />
-setup/config.html laatste aanpassing 27 januari 2008, 20:52:28
+setup/config.html laatste aanpassing 24 augustus 2008, 18:26:52
 </p>
 
     </td>

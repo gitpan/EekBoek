@@ -4,7 +4,10 @@
  <head>
   <title>EekBoek</title>
     <link rel="stylesheet" href="../css/site.css" type="text/css">
-      <meta name="robots" content="all">
+      <meta name="keywords" content="boekhouden, mkb, midden- en kleinbedrijf, financiën,
+                open source, boekhoudsoftware, boekhoud software,
+		boekhoudpakket, boekhoud pakket">
+  <meta name="robots" content="all">
  </head>
 
  <body bgcolor="#FFFFFF"
@@ -242,9 +245,15 @@ deze grootboekrekening uitgevoerde boekingen.</p>
 	<br>Indien geen stylesheet wordt opgegeven wordt een
 	stylesheet genoemd naar de rapportage gebruikt. Bijvoorbeeld,
 	voor een balans rapportage wordt stylesheet
-	'<code>css/balans.css</code>' gebruikt. Met de optie
+	<code>css/balans.css</code> gebruikt. Met de optie
 	<code>--style=other</code> zou de gebruikte stylesheet worden:
-	'<code>css/other.css</code>'
+	<code>css/other.css</code>
+    </td>
+  </tr>
+  <tr valign="top">
+    <td><code>--title=<var>text</var></code></td>
+    <td>Voor HTML uitvoer: specificeert de titel van het document.
+	Deze wordt opgenomen in de HTML <code>&lt;title&gt;</code>.
     </td>
   </tr>
 
@@ -256,13 +265,13 @@ aangemaakt over het lopende boekjaar.</p>
 <h2>Uitvoer (rapportage op grootboekrekening)</h2>
 
 <blockquote class="code">                                Balans
-Periode: t/m 2004-12-31
-EekBoek Demo Administratie 2004                    EekBoek, 2004-12-31
+Periode: t/m 2007-12-31
+EekBoek Demo Administratie 2007                    EekBoek, 2007-12-31
 
 RekNr   Grootboekrekening                             Debet     Credit
 ----------------------------------------------------------------------
-230     Inventaris en inrichting                    1344,37
-231     Afschrijving inventaris & inrichting                   1716,07
+1100    Inventaris en inrichting                    1344,37
+1101    Afschrijving inventaris &amp; inrichting                   1716,07
         ...
         << Winst >>                                            7079,82
 ----------------------------------------------------------------------
@@ -292,17 +301,17 @@ programma-versie met de rapportagedatum.</p>
 <h2>Uitvoer (verdichte rapportage)</h2>
 
 <blockquote class="code">                                Balans
-Periode: t/m 2004-12-31
-EekBoek Demo Administratie 2004                    EekBoek, 2004-12-31
+Periode: t/m 2007-12-31
+EekBoek Demo Administratie 2007                    EekBoek, 2007-12-31
 
 RekNr   Verdichting/Grootboekrekening                 Debet     Credit
 ----------------------------------------------------------------------
 1       Vaste Activa
-12       Materi&euml;le vaste activa
-230       Inventaris en inrichting                  1344,37
-231       Afschrijving inventaris & inrichting                 1716,07
+11       Materi&euml;le vaste activa
+1100      Inventaris en inrichting                  1344,37
+1101      Afschrijving inventaris &amp; inrichting                 1716,07
           ...
-12       Totaal Materi&euml;le vaste activa               503,18
+11       Totaal Materi&euml;le vaste activa               503,18
 
 1       Totaal Vaste Activa                          503,18
         ...
@@ -366,7 +375,7 @@ programma-versie met de rapportagedatum.</p>
 Deze site is gemaakt met de 
 <a href='http://www.squirrel.nl/people/jvromans/tt2site/'>TT2Site
 Site Builder</a>.<br />
-reports/balans.html laatste aanpassing 25 mei 2006, 21:31:12
+reports/balans.html laatste aanpassing 24 augustus 2008, 18:26:52
 </p>
 
     </td>

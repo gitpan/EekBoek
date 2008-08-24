@@ -4,7 +4,10 @@
  <head>
   <title>EekBoek</title>
     <link rel="stylesheet" href="../css/site.css" type="text/css">
-      <meta name="robots" content="all">
+      <meta name="keywords" content="boekhouden, mkb, midden- en kleinbedrijf, financiën,
+                open source, boekhoudsoftware, boekhoud software,
+		boekhoudpakket, boekhoud pakket">
+  <meta name="robots" content="all">
  </head>
 
  <body bgcolor="#FFFFFF"
@@ -122,8 +125,8 @@
       <h2>Giro- en Bankafschriften</h2>
 
 <p>Deze afschriften worden geboekt in een dagboek van het type Bank.
-Zo'n dagboek heet typisch &lsquo;Postgiro&rsquo; of
-&lsquo;Rabobank&rsquo;. De keuze van de naam is vrij, en er mogen
+Zo'n dagboek heet typisch &ldquo;Postgiro&rdquo; of
+&ldquo;Rabobank&rdquo;. De keuze van de naam is vrij, en er mogen
 meerdere bankdagboeken tegelijk zijn. </p>
 
 <p>Aan elk bank-dagboek is een grootboekrekening gekoppeld (zie <a
@@ -132,16 +135,16 @@ grootboekrekening komt overeen met het saldo op de bank- of
 giro-rekening.</p>
 
 <p>De naam van de boekingsopdracht is gelijk aan die van het dagboek.
-We nemen hier als voorbeeld het dagboek &lsquo;Postgiro&rsquo;.</p>
+We nemen hier als voorbeeld het dagboek &ldquo;Postbank&rdquo;.</p>
 
 <p>Tijdens het boeken kunnnen een aantal verificaties plaatsvinden.
 <br>Het <em>boekstuktotaal</em> kan worden geverifieerd door aan de
 boekingsopdracht de optie
-&lsquo;<code>--totaal=<var>bedrag</var></code>&rsquo; toe te voegen.
+<code>--totaal=<var>bedrag</var></code> toe te voegen.
 Het <em>eindsaldo</em> na boeking kan worden geverifieerd met de optie
-&lsquo;<code>--saldo=<var>bedrag</var></code>&rsquo;. Een
+<code>--saldo=<var>bedrag</var></code>. Een
 <em>beginsaldo</em> kan worden opgegeven met de optie
-&lsquo;<code>--beginsaldo=<var>bedrag</var></code>&rsquo;. Als dit
+<code>--beginsaldo=<var>bedrag</var></code>. Als dit
 niet is opgegeven wordt het eindsaldo van het eraan
 voorafgaande boekstuk genomen, indien deze reeds in de administratie
 aanwezig is. Het beginstaldo van de eerste boeking is uiteraard het op
@@ -159,20 +162,21 @@ boekstukken altijd expliciet een boekstuknummer op te geven.</p>
 
 <p>Zoals alle boekingen bestaat ook de verkoopboeking uit twee delen:
 de <dfn>boekstukkop</dfn> en een of meer <dfn>boekstukregels</dfn>. Er
-zijn drie soorten boekstukregels: betaling aan crediteur (crd),
-betaling van debiteur (deb), en vrije betaling (std). Het totaal van
-alle boekstukregels vormt het boekstuktotaal, dit wordt geboekt op de
-aan het betreffende dagboek gekoppelde grootboekrekening.</p>
+zijn drie soorten boekstukregels: betaling aan crediteur
+(<code>crd</code>), betaling van debiteur (<code>deb</code>), en vrije
+betaling (<code>std</code>). Het totaal van alle boekstukregels vormt
+het boekstuktotaal, dit wordt geboekt op de aan het betreffende
+dagboek gekoppelde grootboekrekening.</p>
 
 <p>Syntaxvoorbeeld van een boekstukkop:</p>
 
-<blockquote class="code">postgiro:16 19-09-2005 "KPN, ACME"</blockquote>
+<blockquote class="code">postbank:16 19-09-2007 "KPN, ACME"</blockquote>
 
 <p>De onderdelen:</p>
 
 <table border="1" width="100%" cellpadding="5">
   <tr valign="top">
-    <td><code>postgiro:16</code></td>
+    <td><code>postbank:16</code></td>
     <td>Het boekstuknummer. Dit bestaat uit de naam van het dagboek
 	en een vrij te kiezen volgnummer, gescheiden door een
 	dubbele punt &lsquo;<code>:</code>&rsquo;.
@@ -184,7 +188,7 @@ aan het betreffende dagboek gekoppelde grootboekrekening.</p>
     </td>
   </tr>
   <tr valign="top">
-    <td><code>11-09-2005</code></td>
+    <td><code>11-09-2007</code></td>
     <td>De boekingsdatum in <a href="../date.html">een van de ondersteunde vormen</a>.</td>
   </tr>
   <tr valign="top">
@@ -198,7 +202,7 @@ aan het betreffende dagboek gekoppelde grootboekrekening.</p>
 
 <p>Syntaxvoorbeeld van een boekingsregel &ldquo;betaling aan crediteur&rdquo;:</p>
 
-<blockquote class="code">crd 04-09-2005 KPN -131,68</blockquote>
+<blockquote class="code">crd 04-09-2007 KPN -131,68</blockquote>
 
 <p>De onderdelen:</p>
 
@@ -209,7 +213,7 @@ aan het betreffende dagboek gekoppelde grootboekrekening.</p>
     </td>
   </tr>
   <tr valign="top">
-    <td><code>04-09-2005</code></td>
+    <td><code>04-09-2007</code></td>
     <td>De boekingsdatum voor deze boekstukregel.
 	<br>Deze mag worden weggelaten, in welk geval de boekingsdatum
 	van het boekstuk wordt gebruikt.
@@ -237,7 +241,7 @@ aan het betreffende dagboek gekoppelde grootboekrekening.</p>
 
 <p>Syntaxvoorbeeld van een boekingsregel &ldquo;betaling van debiteur&rdquo;:</p>
 
-<blockquote class="code">deb 06-09-2005 ACME 369,82</blockquote>
+<blockquote class="code">deb 06-09-2007 ACME 369,82</blockquote>
 
 <p>De onderdelen:</p>
 
@@ -248,7 +252,7 @@ aan het betreffende dagboek gekoppelde grootboekrekening.</p>
     </td>
   </tr>
   <tr valign="top">
-    <td><code>06-09-2005</code></td>
+    <td><code>06-09-2007</code></td>
     <td>De boekingsdatum voor deze boekstukregel.
 	<br>Deze mag worden weggelaten, in welk geval de boekingsdatum
 	van het boekstuk wordt gebruikt.
@@ -275,7 +279,7 @@ aan het betreffende dagboek gekoppelde grootboekrekening.</p>
 
 <p>Syntaxvoorbeeld van een vrije boekingsregel:</p>
 
-<blockquote class="code">std 07-09-2005 Girotel -3,50 4980</blockquote>
+<blockquote class="code">std 07-09-2007 Girotel -3,50 4980</blockquote>
 
 <p>De onderdelen:</p>
 
@@ -286,7 +290,7 @@ aan het betreffende dagboek gekoppelde grootboekrekening.</p>
     </td>
   </tr>
   <tr valign="top">
-    <td><code>07-09-2005</code></td>
+    <td><code>07-09-2007</code></td>
     <td>De boekingsdatum voor deze boekstukregel.
 	<br>Deze mag worden weggelaten, in welk geval de boekingsdatum
 	van het boekstuk wordt gebruikt.
@@ -310,7 +314,7 @@ aan het betreffende dagboek gekoppelde grootboekrekening.</p>
     </td>
   </tr>
   <tr valign="top">
-    <td><code>4980</code></td>
+    <td><code>6980</code></td>
     <td>De grootboekrekening waarop dit bedrag dient te worden geboekt.
     </td>
   </tr>
@@ -353,10 +357,10 @@ boekstuk in mindering gebracht.</p>
 
 <p>Om een boekstuk uit het huidige boekjaar aan te geven, kan worden
 volstaan met de boekstuknummeraanduiding
-&lsquo;<code><var>Dagboek</var>:<var>Volgnummer</var></code>&rsquo;; voor een
+<code><var>Dagboek</var>:<var>Volgnummer</var></code>; voor een
 boekstuk uit een ander boekjaar moet de boekjaarcode ook worden
 meegegeven:
-&lsquo;<code><var>Dagboek</var>:<var>Boekjaarcode</var>:<var>Volgnummer</var>&rsquo;</code>.
+<code><var>Dagboek</var>:<var>Boekjaarcode</var>:<var>Volgnummer</var></code>.
 </p>
 
 
@@ -392,7 +396,7 @@ meegegeven:
 Deze site is gemaakt met de 
 <a href='http://www.squirrel.nl/people/jvromans/tt2site/'>TT2Site
 Site Builder</a>.<br />
-bookings/bank.html laatste aanpassing 01 december 2007, 22:49:27
+bookings/bank.html laatste aanpassing 24 augustus 2008, 17:01:19
 </p>
 
     </td>

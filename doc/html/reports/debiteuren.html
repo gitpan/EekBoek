@@ -4,7 +4,10 @@
  <head>
   <title>EekBoek</title>
     <link rel="stylesheet" href="../css/site.css" type="text/css">
-      <meta name="robots" content="all">
+      <meta name="keywords" content="boekhouden, mkb, midden- en kleinbedrijf, financiën,
+                open source, boekhoudsoftware, boekhoud software,
+		boekhoudpakket, boekhoud pakket">
+  <meta name="robots" content="all">
  </head>
 
  <body bgcolor="#FFFFFF"
@@ -185,9 +188,15 @@ verkoopboekingen als de betalingen.</p>
 	<br>Indien geen stylesheet wordt opgegeven wordt een
 	stylesheet genoemd naar de rapportage gebruikt. Bijvoorbeeld,
 	voor een balans rapportage wordt stylesheet
-	'<code>css/balans.css</code>' gebruikt. Met de optie
+	<code>css/balans.css</code> gebruikt. Met de optie
 	<code>--style=other</code> zou de gebruikte stylesheet worden:
-	'<code>css/other.css</code>'
+	<code>css/other.css</code>
+    </td>
+  </tr>
+  <tr valign="top">
+    <td><code>--title=<var>text</var></code></td>
+    <td>Voor HTML uitvoer: specificeert de titel van het document.
+	Deze wordt opgenomen in de HTML <code>&lt;title&gt;</code>.
     </td>
   </tr>
 
@@ -205,23 +214,23 @@ debiteuren aangemaakt over het lopende boekjaar.</p>
 <h2>Uitvoer</h2>
 
 <blockquote class="code">                                 Debiteurenadministratie
-Periode: 2004-01-01 t/m 2004-12-31
-EekBoek Demo Administratie 2004                                  EekBoek 0.30, 2006-01-13
+Periode: 2007-01-01 t/m 2007-12-31
+EekBoek Demo Administratie 2007                                       EekBoek, 2007-12-31
 
 Debiteur  Datum       Omschrijving               Bedrag  Openstaand   Betaald  Boekstuk
 -----------------------------------------------------------------------------------------
 ACME
-          2004-02-18  Perl Cursus 1e bet.       3570,00        0,00            Verkoop:1
-          2004-03-18    *Perl Cursus 1e bet.                          3570,00  Postbank:7
+          2007-02-18  Perl Cursus 1e bet.       3570,00        0,00            Verkoop:1
+          2007-03-18    *Perl Cursus 1e bet.                          3570,00  Postbank:3
           ...
-          2004-07-16  Consultancy                714,00        0,00            Verkoop:5
-          2004-08-10    *Consultancy                                   714,00  Postbank:17
+          2007-07-16  Ondersteuning              714,00        0,00            Verkoop:5
+          2007-08-10    *Ondersteuning                                 714,00  Postbank:8
                                               ---------  ----------
 ACME                  Totaal                    9163,00        0,00
 
 ORA
-          2004-08-19  Produktie boek            1000,00        0,00            Verkoop:6
-          2004-08-19    *Produktie boek                               1000,00  Postbank:18
+          2007-08-19  Pocket Reference          1000,00        0,00            Verkoop:6
+          2007-08-19    *Pocket Reference                             1000,00  Postbank:8
                                               ---------  ----------
 ORA                   Totaal                    1000,00        0,00
 -----------------------------------------------------------------------------------------
@@ -286,7 +295,7 @@ Totalen worden getoond per debiteur en voor alle debiteuren.
 Deze site is gemaakt met de 
 <a href='http://www.squirrel.nl/people/jvromans/tt2site/'>TT2Site
 Site Builder</a>.<br />
-reports/debiteuren.html laatste aanpassing 14 januari 2006, 23:34:35
+reports/debiteuren.html laatste aanpassing 24 augustus 2008, 18:26:52
 </p>
 
     </td>

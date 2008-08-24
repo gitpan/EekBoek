@@ -4,7 +4,10 @@
  <head>
   <title>EekBoek</title>
     <link rel="stylesheet" href="../css/site.css" type="text/css">
-      <meta name="robots" content="all">
+      <meta name="keywords" content="boekhouden, mkb, midden- en kleinbedrijf, financiën,
+                open source, boekhoudsoftware, boekhoud software,
+		boekhoudpakket, boekhoud pakket">
+  <meta name="robots" content="all">
  </head>
 
  <body bgcolor="#FFFFFF"
@@ -133,7 +136,7 @@
 
 <h2>Het Grootboekoverzicht</h2>
 
-Het Grootboekoverzicht geeft evenals het <a
+<p>Het Grootboekoverzicht geeft evenals het <a
 href="journaal.html">Journaal</a> een overzicht van alle uitgevoerde
 boekingen. In tegenstelling tot het Journaal zijn in het geval van het
 Grootboekoverzicht de boekingen geordend op grootboeknummer.</p>
@@ -206,9 +209,15 @@ de rapportage aanvangt.
 	<br>Indien geen stylesheet wordt opgegeven wordt een
 	stylesheet genoemd naar de rapportage gebruikt. Bijvoorbeeld,
 	voor een balans rapportage wordt stylesheet
-	'<code>css/balans.css</code>' gebruikt. Met de optie
+	<code>css/balans.css</code> gebruikt. Met de optie
 	<code>--style=other</code> zou de gebruikte stylesheet worden:
-	'<code>css/other.css</code>'
+	<code>css/other.css</code>
+    </td>
+  </tr>
+  <tr valign="top">
+    <td><code>--title=<var>text</var></code></td>
+    <td>Voor HTML uitvoer: specificeert de titel van het document.
+	Deze wordt opgenomen in de HTML <code>&lt;title&gt;</code>.
     </td>
   </tr>
 
@@ -226,17 +235,17 @@ grootboekrekeningen aangemaakt over het lopende boekjaar.</p>
 <h3>Uitvoer</h3>
 
 <blockquote class="code">                                         Grootboek
-Periode: 2004-01-01 t/m 2004-12-31
-EekBoek Demo Administratie 2004                                          EekBoek, 2004-12-31
+Periode: 2007-01-01 t/m 2007-12-31
+EekBoek Demo Administratie 2007                                          EekBoek, 2007-12-31
 
  GrBk  Grootboek/Boekstuk                   Datum      Debet     Credit  BoekstukNr  Relatie
 --------------------------------------------------------------------------------------------
-  231  Afschrijving inventaris &
+ 1101  Afschrijving inventaris &amp;
        inrichting
         Beginsaldo                                      0,00    1304,81
-         Afschrijving                  2004-12-31       0,00     411,26  Memoriaal:1
+         Afschrijving                  2007-12-31       0,00     411,26  Memoriaal:1
         Totaal mutaties                                          411,26
-  231  Totaal Afschrijving inventaris                           1716,07
+ 1101  Totaal Afschrijving inventaris                           1716,07
 
        ...
 
@@ -314,7 +323,7 @@ Voor elke grootboekrekening worden de volgende regels aangemaakt:
 Deze site is gemaakt met de 
 <a href='http://www.squirrel.nl/people/jvromans/tt2site/'>TT2Site
 Site Builder</a>.<br />
-reports/grootboek.html laatste aanpassing 14 augustus 2006, 13:15:42
+reports/grootboek.html laatste aanpassing 24 augustus 2008, 18:26:52
 </p>
 
     </td>

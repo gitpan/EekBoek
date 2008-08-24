@@ -4,7 +4,10 @@
  <head>
   <title>EekBoek</title>
     <link rel="stylesheet" href="../css/site.css" type="text/css">
-      <meta name="robots" content="all">
+      <meta name="keywords" content="boekhouden, mkb, midden- en kleinbedrijf, financiën,
+                open source, boekhoudsoftware, boekhoud software,
+		boekhoudpakket, boekhoud pakket">
+  <meta name="robots" content="all">
  </head>
 
  <body bgcolor="#FFFFFF"
@@ -137,7 +140,7 @@ schema. In het schema worden de volgende gegevens gedefinieerd:</p>
   <li><a href="#btw">De BTW tariefgroepen</a>.</li>
 </ul>
 
-<p>Algemene syntaxregels voor het schema-bestand:<p>
+<p>Algemene syntaxregels voor het schema-bestand:</p>
 <ul>
   <li>Lege regels en regels die beginnen met een hekje
       &lsquo;<code>#</code>&rsquo; worden niet ge&iuml;nterpreteerd.</li>
@@ -176,8 +179,8 @@ informatie wordt besproken bij de resultaatrekeningen.</p>
 het onderdeel &ldquo;resultaatrekeningen&rdquo; in het schema-bestand.</p>
 
 <blockquote class="code">Resultaatrekeningen
-  5  Bedrijfsopbrengsten
-     53  Overige bedrijfsopbrengst</blockquote>
+  8  Bedrijfsopbrengsten
+     85  Omzet Projekten</blockquote>
 
 <p>Tussen het rekeningnummer en de omschrijving wordt door middel van
 de code &lsquo;<code>K</code>&rsquo;, &lsquo;<code>O</code>&rsquo; of
@@ -193,15 +196,21 @@ wijze grootboekrekeningen worden aangegeven als rekeningen met een
 speciale betekenis, de zogenaamde <dfn>koppelingen</dfn> (trefwoord
 &lsquo;<code>koppeling</code>&rsquo;).</p>
 
-<blockquote class="code">  8680  O   Omzet naar kosten BTW hoog     :btw=hoog
-  8690  K   Doorbelaste omzet naar kosten</blockquote>
+<blockquote class="code">  8500  O   Omzet projekten              :btw=hoog</blockquote>
 
 <a name="btwcodes"></a>
-<p>Er zijn drie BTW tariefgroepen die kunnen worden opgegeven:</p>
+<p>Er zijn vijf BTW tariefgroepen die kunnen worden opgegeven:</p>
 
 <blockquote class="code">:btw=nul
 :btw=hoog
-:btw=laag</blockquote>
+:btw=laag
+:btw=priv&eacute;
+:btw=anders</blockquote>
+
+<p>Ook is het mogelijk een van de in het onderdeel <a href="#btw">BTW
+tarieven</a> gedefinieerde BTW codes op te geven:</p>
+
+<blockquote class="code">:btw=4</blockquote>
 
 <p>Wanneer geen van bovenstaande aanduidingen is opgegeven, wordt het
 BTW 0% tarief toegepast bij boekingen op deze resultaatrekening.</p>
@@ -209,10 +218,10 @@ BTW 0% tarief toegepast bij boekingen op deze resultaatrekening.</p>
 <p>Let op: Er is een significant verschil tussen &lsquo;BTW 0%&rsquo;
 en &lsquo;geen BTW&rsquo;. Hoewel in beide gevallen het BTW bedrag nul
 is, telt een boeking met &lsquo;BTW 0%&rsquo; mee voor de BTW aangifte
-(omzetboekingen met 0% BTW worden opgegeven bij onderdeel &ldquo;<a
-href="../reports/btw.html#btw1e">Belast met 0% / verlegd</a>&rdquo;),
+(omzetboekingen met 0% BTW worden opgegeven bij onderdeel <a
+href="../reports/btw.html#btw1e">Belast met 0% / verlegd</a>),
 terwijl een boeking met &lsquo;geen BTW&rsquo; niet meetelt voor de
-BTW aangifte..</p>
+BTW aangifte.</p>
 
 <p>Naast het BTW tarief kan ook worden aangegeven of bij boekingen op
 deze rekening het bedrag standaard inclusief of exclusief wordt
@@ -228,8 +237,8 @@ opgegeven:</p>
 <p>Elke balansrekening wordt als volgt opgegeven in het
 schema-bestand:</p>
 
-<blockquote class="code">   110   D   Aanloopkosten
-   111   C   Afschrijving aanloopkosten</blockquote>
+<blockquote class="code">   1100  D   Inventaris en inrichting
+   2100  C   Afschrijving aanloopkosten</blockquote>
 
 <p>In plaats van de kostem/omzet/neutraal-aanduiding zoals bij de
 resultaatrekeningen wordt bij de balansrekeningen de aanduidingen
@@ -248,7 +257,7 @@ worden beschouwd:</p>
 <p>Koppelingen worden op dezelfde wijze aangeduid. Bijvoorbeeld, de
 standaardrekening voor inkoopboekingen:</p>
 
-<blockquote class="code">  1600  C   Crediteuren                    :koppeling=crd</blockquote>
+<blockquote class="code">  4100  C   Crediteuren                    :koppeling=crd</blockquote>
 
 <p>Voor een volledig overzicht van alle mogelijke koppelingen, zie <a
 href="../stdacc.html">Koppelingen</a>.
@@ -271,8 +280,8 @@ Memoriaal mag een tegenrekening worden opgegeven.</p>
 <p>Een illustratief voorbeeld:</p>
 
 <blockquote class="code">Dagboeken
-   K  Kas            :type=kas        :rekening=1000
-   P  Postbank       :type=bank       :rekening=1120  :dc
+   K  Kas            :type=kas        :rekening=2300
+   P  Postbank       :type=bank       :rekening=2320  :dc
    I  Inkoop         :type=inkoop
    V  Verkoop        :type=verkoop
    M  Memoriaal      :type=memoriaal</blockquote>
@@ -287,9 +296,11 @@ creditboekingen afzonderlijk worden getotaliseerd.</p>
 tarieven&rdquo;. Dit onderdeel moet enkel worden opgegeven wanneer een
 BTW administratie wordt gevoerd.</p>
 
-<p>Er zijn drie tariefgroepen: &ldquo;hoog&rdquo;, &ldquo;laag&rdquo;
-en &ldquo;nul&rdquo;. De tariefgroep bepaalt het rekeningnummer waarop
-de betreffende boeking plaatsvindt. Binnen elke tariefgroep zijn
+<p>Er zijn vijf tariefgroepen: &ldquo;nul&rdquo;, &ldquo;hoog&rdquo;,
+&ldquo;laag&rdquo;, &ldquo;priv&eacute;&rdquo; en
+&ldquo;anders&rdquo;. De tariefgroep bepaalt het rekeningnummer waarop
+de betreffende boeking plaatsvindt, en de rubriek in de BTW aangifte
+waar deze boeking zal worden opgegeven. Binnen elke tariefgroep zijn
 meerdere tarieven mogelijk, hoewel dit in de praktijk niet snel zal
 voorkomen.</p>
 
@@ -347,7 +358,7 @@ kan worden gebruikt om in te voeren.</p>
 Deze site is gemaakt met de 
 <a href='http://www.squirrel.nl/people/jvromans/tt2site/'>TT2Site
 Site Builder</a>.<br />
-setup/schema.html laatste aanpassing 27 januari 2008, 21:16:10
+setup/schema.html laatste aanpassing 24 augustus 2008, 18:26:52
 </p>
 
     </td>

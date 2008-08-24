@@ -4,7 +4,10 @@
  <head>
   <title>EekBoek</title>
     <link rel="stylesheet" href="../css/site.css" type="text/css">
-      <meta name="robots" content="all">
+      <meta name="keywords" content="boekhouden, mkb, midden- en kleinbedrijf, financiën,
+                open source, boekhoudsoftware, boekhoud software,
+		boekhoudpakket, boekhoud pakket">
+  <meta name="robots" content="all">
  </head>
 
  <body bgcolor="#FFFFFF"
@@ -185,9 +188,15 @@ inkoopboekingen als de betalingen.</p>
 	<br>Indien geen stylesheet wordt opgegeven wordt een
 	stylesheet genoemd naar de rapportage gebruikt. Bijvoorbeeld,
 	voor een balans rapportage wordt stylesheet
-	'<code>css/balans.css</code>' gebruikt. Met de optie
+	<code>css/balans.css</code> gebruikt. Met de optie
 	<code>--style=other</code> zou de gebruikte stylesheet worden:
-	'<code>css/other.css</code>'
+	<code>css/other.css</code>
+    </td>
+  </tr>
+  <tr valign="top">
+    <td><code>--title=<var>text</var></code></td>
+    <td>Voor HTML uitvoer: specificeert de titel van het document.
+	Deze wordt opgenomen in de HTML <code>&lt;title&gt;</code>.
     </td>
   </tr>
 
@@ -205,21 +214,21 @@ crediteuren aangemaakt over het lopende boekjaar.</p>
 <h2>Uitvoer</h2>
 
 <blockquote class="code">                                 Crediteurenadministratie
-Periode: 2004-01-01 t/m 2004-12-31
-EekBoek Demo Administratie 2004                                  EekBoek 0.30, 2006-01-13
+Periode: 2007-01-01 t/m 2007-12-31
+EekBoek Demo Administratie 2007                                       EekBoek, 2007-12-31
 
 Crediteur Datum       Omschrijving               Bedrag  Openstaand   Betaald  Boekstuk
 -----------------------------------------------------------------------------------------
 KPN
-          2004-01-15  ADSL + Telefoon            104,65        0,00            Inkoop:2
-          2004-01-31    *ADSL + Telefoon                               104,65  Postbank:3
+          2007-01-15  ADSL + Telefoon            104,65        0,00            Inkoop:2
+          2007-01-31    *ADSL + Telefoon                               104,65  Postbank:1
           ...
                                              ----------  ----------
 KPN                   Totaal                     631,44        0,00
 
 XS4ALL
-          2004-01-05  ADSL                        22,80        0,00            Inkoop:1
-          2004-01-19    *ADSL                                           22,80  Postbank:2
+          2007-01-05  ADSL                        22,80        0,00            Inkoop:1
+          2007-01-19    *ADSL                                           22,80  Postbank:1
           ...
                                              ----------  ----------
 XS4ALL                Totaal                     296,40        0,00
@@ -285,7 +294,7 @@ Totalen worden getoond per crediteur en voor alle crediteuren.
 Deze site is gemaakt met de 
 <a href='http://www.squirrel.nl/people/jvromans/tt2site/'>TT2Site
 Site Builder</a>.<br />
-reports/crediteuren.html laatste aanpassing 14 januari 2006, 23:34:35
+reports/crediteuren.html laatste aanpassing 24 augustus 2008, 18:26:52
 </p>
 
     </td>

@@ -1,6 +1,6 @@
 ---
 name: EekBoek
-version: 1.03.92
+version: 1.03.93
 author:
   - Johan Vromans (jvromans@squirrel.nl)
 abstract: Elementary Bookkeeping (for the Dutch/European market)
@@ -118,7 +118,7 @@ provides:
     version: 1.003
   EB::Report::Debcrd:
     file: lib/EB/Report/Debcrd.pm
-    version: 1.016
+    version: 1.017
   EB::Report::Debcrd::Csv:
     file: lib/EB/Report/Debcrd.pm
   EB::Report::Debcrd::Html:
@@ -221,7 +221,7 @@ provides:
     version: 1.008
   EekBoek:
     file: lib/EekBoek.pm
-    version: 1.03.92
+    version: 1.03.93
 generated_by: Module::Build version 0.28
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.2.html

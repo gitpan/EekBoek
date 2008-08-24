@@ -4,7 +4,10 @@
  <head>
   <title>EekBoek</title>
     <link rel="stylesheet" href="../css/site.css" type="text/css">
-      <meta name="robots" content="all">
+      <meta name="keywords" content="boekhouden, mkb, midden- en kleinbedrijf, financiën,
+                open source, boekhoudsoftware, boekhoud software,
+		boekhoudpakket, boekhoud pakket">
+  <meta name="robots" content="all">
  </head>
 
  <body bgcolor="#FFFFFF"
@@ -133,9 +136,10 @@
 
 <h2>De Verlies/Winst Rekening</h2>
 
-<p>De "Verlies/Winst Rekening", "Resultatenrekening" of
-"Exploitatierekening" is een staat van opbrengsten en kosten (of baten
-en lasten), over de hele periode van het boekjaar.<p>
+<p>De &ldquo;Verlies/Winst Rekening&rdquo;,
+&ldquo;Resultatenrekening&rdquo; of &ldquo;Exploitatierekening&rdquo;
+is een staat van opbrengsten en kosten (of baten en lasten), over de
+hele periode van het boekjaar.<p>
 
 
 
@@ -213,9 +217,15 @@ begin van de rapportage-periode.</p>
 	<br>Indien geen stylesheet wordt opgegeven wordt een
 	stylesheet genoemd naar de rapportage gebruikt. Bijvoorbeeld,
 	voor een balans rapportage wordt stylesheet
-	'<code>css/balans.css</code>' gebruikt. Met de optie
+	<code>css/balans.css</code> gebruikt. Met de optie
 	<code>--style=other</code> zou de gebruikte stylesheet worden:
-	'<code>css/other.css</code>'
+	<code>css/other.css</code>
+    </td>
+  </tr>
+  <tr valign="top">
+    <td><code>--title=<var>text</var></code></td>
+    <td>Voor HTML uitvoer: specificeert de titel van het document.
+	Deze wordt opgenomen in de HTML <code>&lt;title&gt;</code>.
     </td>
   </tr>
 
@@ -227,17 +237,17 @@ aangemaakt over het lopende boekjaar.</p>
 <h2>Uitvoer (rapportage op grootboekrekening)</h2>
 
 <blockquote class="code">                            Verlies/Winst
-Periode: 2004-01-01 t/m 2004-12-31
-EekBoek Demo Administratie 2004                    EekBoek, 2004-12-31
+Periode: 2007-01-01 t/m 2007-12-31
+EekBoek Demo Administratie 2007                    EekBoek, 2007-12-31
 
 RekNr   Grootboekrekening                             Debet     Credit
 ----------------------------------------------------------------------
         ...
-4900    Telefoon- en faxkosten                       530,62
+6900    Telefoon- en faxkosten                       510,29
         ...
-8000    Omzet advisering BTW hoog                              1200,00
+8100    Omzet advisering                                       1200,00
         ...
-        << Winst >>                                 7079,82
+        << Winst >>                                 7079,81
 ----------------------------------------------------------------------
         TOTAAL Resultaten                           8700,00    8700,00
 </blockquote>
@@ -265,21 +275,26 @@ programma-versie met de rapportagedatum.</p>
 <h2>Uitvoer (verdichte rapportage)</h2>
 
 <blockquote class="code">                            Verlies/Winst
-Periode: 2004-01-01 t/m 2004-12-31
-EekBoek Demo Administratie 2004                    EekBoek, 2004-12-31
+Periode: 2007-01-01 t/m 2007-12-31
+EekBoek Demo Administratie 2007                    EekBoek, 2007-12-31
 
 RekNr   Verdichting/Grootboekrekening                 Debet     Credit
 ----------------------------------------------------------------------
-5       Bedrijfsopbrengsten
-51       Netto omzet
-8000      Omzet advisering BTW hoog                            1200,00
-8200      Omzet editing                                        1000,00
-8300      Omzet cursussen                                      6500,00
-51       Totaal Netto omzet                                    8700,00
+6       Kosten
+68       Afschrijvingen
+6800      Afschr. kosten inv. &amp; inr.                 411,26
+6810      Afschr. kosten computers                   396,82
+68       Totaal Afschrijvingen                       808,08
 
-5       Totaal Bedrijfsopbrengsten                             8700,00
+69       Algemene kosten
+6900      Telefoon- en faxkosten                     510,29
+6905      Internetkosten                             269,42
+6980      Bankkosten                                  32,40
+69       Totaal Algemene kosten                      812,11
+
+6       Totaal Kosten                               1620,19
         ...
-        << Winst >>                                 7079,82
+        << Winst >>                                 7079,81
 ----------------------------------------------------------------------
         TOTAAL Resultaten                           8700,00    8700,00
 </blockquote>
@@ -339,7 +354,7 @@ programma-versie met de rapportagedatum.</p>
 Deze site is gemaakt met de 
 <a href='http://www.squirrel.nl/people/jvromans/tt2site/'>TT2Site
 Site Builder</a>.<br />
-reports/result.html laatste aanpassing 14 januari 2006, 23:34:35
+reports/result.html laatste aanpassing 24 augustus 2008, 18:26:52
 </p>
 
     </td>

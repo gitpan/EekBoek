@@ -44,6 +44,10 @@
     <td class="info"></td>
     <td><a href="../setup/index.html" class="menu">Opzetten administratie</a>
 </td>
+	<td> &#xbb; </td>
+    <td class="info"></td>
+    <td><a href="../setup/relaties.html" class="menu">Relaties</a>
+</td>
 	
   </tr>
 </table>
@@ -96,7 +100,7 @@
 <br>
 &nbsp;-&nbsp;<a href="../setup/schema.html" class="menu">Administratiegegevens</a>
 <br>
-&nbsp;-&nbsp;<a href="../setup/relaties.html" class="menu">Relaties</a>
+&nbsp;-&nbsp;<a href="../setup/relaties.html" class="menuselect">Relaties</a>
 <br>
 &nbsp;-&nbsp;<a href="../setup/opening.html" class="menu">Opening</a>
 <br>
@@ -122,23 +126,67 @@
     <td>
       
 
-<h2>Opzetten van een administratie</h2>
+<h2>Bestand <code>relaties.eb</code> - Debiteuren en Crediteuren</h2>
 
-<p>Het opzetten van een administratie omvat de volgende stappen:</p>
-<ol>
-  <li><a href="config.html">Het opzetten van de werkomgeving</a>;</li>
-  <li>Het aanmaken van de bestanden
-      <a href="schema.html">schema.dat</a> (Administratiegegevens),
-      <a href="relaties.html">relaties.eb</a> (Debiteuren en crediteuren),
-      <a href="opening.html">opening.eb</a> (Openingsbalans) en
-      <a href="mutaties.html">mutaties.eb</a> (Boekingen);</li> 
-  <li><a href="init.html">Het aanmaken van de administratie</a>.</li>
-</ol>
+<p>Debiteuren en crediteuren vormen de relaties binnen het EekBoek
+pakket. Alle inkoop- en verkoop-, alsmede de meeste bankboekingen
+hebben te maken met relaties.</p>
 
-<p>Wanneer u de verschillende aspecten van EekBoek wilt uitproberen
-kan dat gemakkelijk aan de hand van een eenvoudig op te zetten
-voorbeeldadministratie. Aanwijzingen daarvoor treft u aan onder <a
-href="config.html">Opzetten werkomgeving</a>.</p>
+<p>In EekBoek heeft elke relatie een unieke code, de relatie-code. Dit
+is een serie van ten hoogste 10 tekens. Meest gebruikelijk is een
+acroniem.
+
+<p>Aan elke relatie zijn de volgende gegevens gekoppeld:</p>
+<ul>
+  <li>De volledige naam van de relatie;</li>
+  <li>Het dagboek waarin de boekingen met betrekking tot deze relatie
+      moeten plaatsvinden.
+  <br>De aard van het dagboek (Inkoop/Verkoop) bepaalt of deze relatie
+      een Crediteur or een Debiteur is;</li>
+  <li>De grootboekrekening waarop de boekingen met betrekking tot deze relatie
+      standaard plaatsvinden.
+      <br>Boekingen kunnen uiteraard ook op andere rekeningen
+      worden uitgevoerd, de standaardrekening wordt gebruikt indien
+      geen andere rekening is opgegeven;</li>
+  <li>De BTW status van deze relatie.
+      <br>De BTW status kan zijn Normaal (standaard), Verlegd, Intra
+      (intra-communautair, binnen de EU) of Extra (extra-communautair,
+      buiten de EU)</li>
+</ul>
+
+<p>Het bestand <code>relaties.eb</code> wordt gevuld met
+"relatie"-opdrachten als volgt:</p>
+
+<blockquote class="code">relatie --dagboek=inkoop KPN "KPN Telecom BV" 6900</blockquote>
+
+<p>In dit voorbeeld wordt een crediteur (dagboek = Inkoop) aangemaakt
+met code "KPN" en omschrijving "KPN Telecom BV". De
+standaard-grootboekrekening voor deze crediteur is 6900.</p>
+
+<p>De BTW status kan worden opgegeven door aan de opdracht de optie
+"<code>--btw=<var>status</var></code> mee te geven, waarin
+<var>status</var> een van de waarden <code>normaal</code>,
+<code>intra</code>, <code>extra</code> of <code>verlegd</code> heeft.
+
+<p><strong>Waarschuwing:</strong> BTW status <code>verlegd</code>
+wordt nog niet ondersteund. <br><strong>Waarschuwing:</strong> BTW
+status <code>intra</code>wordt slechts gedeeltelijk ondersteund.
+Gebruik op eigen risico.</p>
+
+<p>Meerdere relaties kunnen in een enkele opdracht worden aangemaakt:</p>
+
+<blockquote class="code">relatie --dagboek=inkoop \
+  KPN    "KPN Telecom BV BV" 4900 \
+  XS4ALL "XS4All Internet Services BV" 4905 \
+  TPG    "Posterijen" 4910</blockquote>
+
+<p>Let op het gebruik van de <code>\</code> tekens om de opdracht te
+verlengen over meerdere regels.</p>
+
+<p>Relaties kunnen later in een bestaande administratie worden
+toegevoegd door "relatie"-opdrachten aan de EekBoek shell te
+geven.</p>
+
 
     </td>
   </tr>
@@ -169,7 +217,7 @@ href="config.html">Opzetten werkomgeving</a>.</p>
 Deze site is gemaakt met de 
 <a href='http://www.squirrel.nl/people/jvromans/tt2site/'>TT2Site
 Site Builder</a>.<br />
-setup/index.html laatste aanpassing 24 augustus 2008, 18:26:52
+setup/relaties.html laatste aanpassing 24 augustus 2008, 18:26:52
 </p>
 
     </td>

@@ -4,7 +4,10 @@
  <head>
   <title>EekBoek</title>
     <link rel="stylesheet" href="../css/site.css" type="text/css">
-      <meta name="robots" content="all">
+      <meta name="keywords" content="boekhouden, mkb, midden- en kleinbedrijf, financiën,
+                open source, boekhoudsoftware, boekhoud software,
+		boekhoudpakket, boekhoud pakket">
+  <meta name="robots" content="all">
  </head>
 
  <body bgcolor="#FFFFFF"
@@ -115,7 +118,7 @@
 
 <h2>De EekBoek Shell</h2>
 
-<p>De EekBoek Shell '<code>ebshell</code>' is een tekst-interface voor
+<p>De EekBoek Shell <code>ebshell</code> is een tekst-interface voor
 het EekBoek systeem.</p>
 
 <p>De shell kan op drie manieren worden gebruikt: interactief,
@@ -123,7 +126,7 @@ single-line en batch.</p>
 
 <p>In single-line mode wordt een enkele opdracht direct op de
 opstartregel meegegeven, voorafgegaan door de aanduiding
-'<code>-c</code>':</p>
+<code>-c</code>:</p>
 
 <blockquote class="code">ebshell -c btwaangifte januari</blockquote>
 
@@ -135,9 +138,9 @@ bestand als standaardinvoer wordt meegegeven:</p>
 <p>Het gehele bestand wordt gelezen en alle opdrachten uitgevoerd.</p>
 
 <p>In batch mode geldt dat lege regels, en regels die met een
-'<code>#</code>'-teken beginnen worden genegeerd. Verder mogen
+<code>#</code>-teken beginnen worden genegeerd. Verder mogen
 opdrachten over meerdere regels worden gespreid door het plaatsen van
-een '<code>\</code>'-teken aan het eind van de regel,
+een <code>\</code>-teken aan het eind van de regel,
 bijvoorbeeld:</p>
 
 <blockquote class="code">postbank:12 12-03-2004 "Diverse boekingen" \
@@ -146,12 +149,14 @@ bijvoorbeeld:</p>
 
 <p>Als de shell niet op een van bovengenoemde manieren wordt
 opgestart, dan draait hij interactief en zal opdrachten lezen vanaf de
-terminal. Elke ingelezen regel vormt een opdracht. Het inlezen vindt
-plaats door middel van de perl module
-<code>Term::ReadLine::Gnu</code>. Zie de <a href="http://search.cpan.org/~hayashi/Term-ReadLine-Gnu-1.15/Gnu.pm">documentatie van deze module</a>
-voor alle mogelijkheden. Uitgevoerde opdrachten worden tot in bepaalde
-mate bewaard en kunnen later worden teruggehaald door middel van de
-pijltje-omhoog toets.</p>
+terminal. Elke ingelezen regel vormt een opdracht.
+
+Het inlezen van opdrachten vindt indien mogelijk plaats door middel
+van de perl module <code>Term::ReadLine::Gnu</code>. Zie de <a
+href="http://search.cpan.org/dist/Term-ReadLine-Gnu">documentatie
+van deze module</a> voor alle mogelijkheden. Uitgevoerde opdrachten
+worden tot in bepaalde mate bewaard en kunnen later worden
+teruggehaald door middel van de pijltje-omhoog toets.</p>
 
 <p>De shell interpreteert de invoer als een serie argumenten
 gescheiden door spaties of andere whitespace. Indien een argument
@@ -185,18 +190,18 @@ wordt verwacht, zal het indrukken van de TAB toets proberen de relatie
 code op te zoeken en af te maken, Zijn er meerdere mogelijkheden dan
 worden deze getoond:</p>
 
-<blockquote class="code">eekboek> inkopen:24 16-08-2005 XS<font color="red">[TAB]</font>
-inkopen:24 16-08-2005 XS4ALL <font color="red"><blink>_</blink></font></blockquote>
+<blockquote class="code">eekboek> inkopen:24 16-08-2007 XS<font color="red">[TAB]</font>
+inkopen:24 16-08-2007 XS4ALL <font color="red"><blink>_</blink></font></blockquote>
 
 <p>In boekingsopdrachten, op plaatsen waar een grootboekrekening wordt
 verwacht, zal het indrukken van de TAB toets proberen dit nummer op te
 zoeken en af te maken, Zijn er meerdere mogelijkheden dan worden deze
 getoond, samen met de beschrijving van de grootboekrekening:</p>
 
-<blockquote class="code">eekboek> inkopen:24 16-08-2005 XS4ALL Kosten 490<font color="red">[TAB]</font>
-     4900  Telefoon- en faxkosten
-     4905  Internetkosten
-inkopen:24 16-08-2005 XS4ALL Kosten 490<font color="red"><blink>_</blink></font></blockquote>
+<blockquote class="code">eekboek> inkopen:24 16-08-2007 XS4ALL Kosten 690<font color="red">[TAB]</font>
+     6900  Telefoon- en faxkosten
+     6905  Internetkosten
+inkopen:24 16-08-2007 XS4ALL Kosten 490<font color="red"><blink>_</blink></font></blockquote>
 
 <h3>Emacs ondersteuning</h3>
 
@@ -205,7 +210,7 @@ directory een major mode voor GNU Emacs: <code>eekboek-mode.el</code>.
 
 <h3>Excuus</h3>
 
-<p>De EB-shell maakt gebruik van enkele standaard <a
+<p>De EekBoek shell maakt gebruik van enkele standaard <a
 href="http://www.cpan.org">CPAN</a> modules. Hierdoor kan het
 voorkomen dat er soms Engelse meldingen tussen de Nederlandse teksten
 door verschrijnen. Dit zal op termijn worden aangepast.</p>
@@ -239,7 +244,7 @@ door verschrijnen. Dit zal op termijn worden aangepast.</p>
 Deze site is gemaakt met de 
 <a href='http://www.squirrel.nl/people/jvromans/tt2site/'>TT2Site
 Site Builder</a>.<br />
-ebshell/index.html laatste aanpassing 01 april 2007, 15:57:54
+ebshell/index.html laatste aanpassing 24 augustus 2008, 18:26:52
 </p>
 
     </td>

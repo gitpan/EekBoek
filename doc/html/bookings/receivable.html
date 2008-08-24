@@ -4,7 +4,10 @@
  <head>
   <title>EekBoek</title>
     <link rel="stylesheet" href="../css/site.css" type="text/css">
-      <meta name="robots" content="all">
+      <meta name="keywords" content="boekhouden, mkb, midden- en kleinbedrijf, financiën,
+                open source, boekhoudsoftware, boekhoud software,
+		boekhoudpakket, boekhoud pakket">
+  <meta name="robots" content="all">
  </head>
 
  <body bgcolor="#FFFFFF"
@@ -122,24 +125,25 @@
       <h2>Verkoopfakturen</h2>
 
 <p>Verkoopfakturen worden geboekt in een dagboek van het type Verkoop.
-Zo'n dagboek heet typisch 'Verkoop' of 'Verkopen'. De keuze van de
-naam is vrij, en er mogen meerdere verkoopdagboeken tegelijk zijn.</p>
+Zo'n dagboek heet typisch &ldquo;Verkoop&rdquo; of
+&ldquo;Verkopen&rdquo;. De keuze van de naam is vrij, en er mogen
+meerdere verkoopdagboeken tegelijk zijn.</p>
 
 <p>De naam van de boekingsopdracht is gelijk aan die van het dagboek.
-We nemen hier als voorbeeld het dagboek 'Verkopen'.</p>
+We nemen hier als voorbeeld het dagboek &ldquo;Verkoop&rdquo;.</p>
 
 <p>Zoals alle boekingen bestaat ook de verkoopboeking uit twee delen: de
 <dfn>boekstukkop</dfn> en een of meer <dfn>boekstukregels</dfn>.</p>
 
 <p>Syntaxvoorbeeld van een boekstukkop:</p>
 
-<blockquote class="code">verkopen:12 11-09-2005 Consultancy ACME</blockquote>
+<blockquote class="code">verkoop:12 11-09-2007 Consultancy ACME</blockquote>
 
 <p>De onderdelen:</p>
 
 <table border="1" width="100%" cellpadding="5">
   <tr valign="top">
-    <td><code>verkopen:12</code></td>
+    <td><code>verkoop:12</code></td>
     <td>Het boekstuknummer. Dit bestaat uit de naam van het dagboek
 	en het (vrij te kiezen) boekstuknummer, gescheiden door een
 	dubbele punt '<code>:</code>'.
@@ -149,7 +153,7 @@ We nemen hier als voorbeeld het dagboek 'Verkopen'.</p>
     </td>
   </tr>
   <tr valign="top">
-    <td><code>11-09-2005</code></td>
+    <td><code>11-09-2007</code></td>
     <td>De boekingsdatum in <a href="../date.html">een van de ondersteunde vormen</a>.</td>
   </tr>
   <tr valign="top">
@@ -168,7 +172,7 @@ We nemen hier als voorbeeld het dagboek 'Verkopen'.</p>
 
 <p>Syntaxvoorbeeld van een boekingsregel:</p>
 
-<blockquote class="code">Werkzaamheden 369,82 8104</blockquote>
+<blockquote class="code">Werkzaamheden 369,82 8900</blockquote>
 
 <p>De onderdelen:</p>
 
@@ -192,7 +196,7 @@ We nemen hier als voorbeeld het dagboek 'Verkopen'.</p>
     </td>
   </tr>
   <tr valign="top">
-    <td><code>8104</code></td>
+    <td><code>8900</code></td>
     <td>De grootboekrekening waarop dit bedrag moet worden
 	geboekt. Deze rekening behoort een omzetrekening te zijn.</td>
   </tr>
@@ -224,7 +228,7 @@ de oorspronkelijke, als de credit-faktuur worden getoond.</p>
 <p>De beide boekingen dienen daarom tegen elkaar te worden weggeboekt
 in een <a href="memorial.html">memoriaalboeking</a>, bijvoorbeeld:
 
-<blockquote class="code">memoriaal 20-11-2005 Creditering \
+<blockquote class="code">memoriaal 20-11-2007 Creditering \
   deb ACME Werkzaamheden 369,82 \
   deb ACME "Creditering Werkzaamheden" -369,82
 </blockquote>
@@ -259,7 +263,7 @@ in een <a href="memorial.html">memoriaalboeking</a>, bijvoorbeeld:
 Deze site is gemaakt met de 
 <a href='http://www.squirrel.nl/people/jvromans/tt2site/'>TT2Site
 Site Builder</a>.<br />
-bookings/receivable.html laatste aanpassing 20 juni 2006, 15:37:32
+bookings/receivable.html laatste aanpassing 24 augustus 2008, 16:55:33
 </p>
 
     </td>
