@@ -5,9 +5,9 @@
 # Package name, lowcase (eekboek)
 %define lcname eekboek
 # Package version
-%define pkgversion 1.03.93
+%define pkgversion 1.04
 # Suffix (-unstable, or empty)
-%define pkgsuffix -unstable
+%define pkgsuffix 
 
 ################ Build Options ################
 %define gui 0
