@@ -2,8 +2,8 @@
 # Author          : Johan Vromans
 # Created On      : Thu Sep  1 17:28:26 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Tue Sep  9 15:23:26 2008
-# Update Count    : 109
+# Last Modified On: Tue Sep  9 15:29:22 2008
+# Update Count    : 110
 # Status          : Experimental
 
 # Ease the life of the CPAN testers.
@@ -62,12 +62,12 @@ my $build = $class->new
 	   MailingList => 'http://lists.sourceforge.net/lists/listinfo/eekboek',
 	 }
      },
-   meta_add            => {
+#   meta_add            => {
      no_index          => { directory => [ qw(inc lib) ] },
      provides	       => {
        'EekBoek' => { file => "lib/EekBoek.pm", version => "1.04.00_01" },
      },
-   },
+#   },
   );
 
 $build->create_build_script;

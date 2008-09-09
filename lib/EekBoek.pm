@@ -11,7 +11,7 @@ use 5.008003;
 
 my $RCS_Id = '$Id: EekBoek.pm,v 1.70 2008/09/04 19:45:45 jv Exp $ ';
 our $PACKAGE = 'EekBoek';
-our $VERSION = '1.04.00_01';
+our $VERSION = '1.04.00_02';
 
 =head1 NAME
 

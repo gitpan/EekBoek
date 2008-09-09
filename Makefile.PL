@@ -3,8 +3,8 @@
 # Author          : Johan Vromans
 # Created On      : Fri Sep  2 14:25:11 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Tue Sep  9 15:20:18 2008
-# Update Count    : 101
+# Last Modified On: Tue Sep  9 15:23:47 2008
+# Update Count    : 102
 # Status          : Unknown, Use with caution!
 
 # Ease the life of the CPAN testers.
@@ -40,7 +40,7 @@ WriteMakefile(
 	      EXE_FILES   => $data->{script_files},
 	      VERSION_FROM => "lib/EekBoek.pm",
 	      PREREQ_PM   => { %{$data->{prereq_pm}},
-			       %{$data->{buildprereq_pm}},
+			       %{$data->{buildreq_pm}},
 			     },
 	      PM          => filelist("lib", '$(INST_LIBDIR)/'),
 	     );
