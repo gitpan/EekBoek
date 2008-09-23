@@ -2,8 +2,8 @@
 # Author          : Johan Vromans
 # Created On      : Thu Sep  1 17:28:26 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Tue Sep 23 19:50:00 2008
-# Update Count    : 114
+# Last Modified On: Tue Sep 23 19:51:22 2008
+# Update Count    : 115
 # Status          : Experimental
 
 # Ease the life of the CPAN testers.
@@ -72,6 +72,7 @@ my $build = $class->new
    },
   );
 
+# Rerun to get the version right for provides => EeoBoek.
 $build = $class->new
   (
    module_name	       => $data->{distname},
