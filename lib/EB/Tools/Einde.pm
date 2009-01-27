@@ -5,8 +5,8 @@
 # Author          : Johan Vromans
 # Created On      : Sun Oct 16 21:27:40 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Thu Feb  7 13:30:02 2008
-# Update Count    : 224
+# Last Modified On: Fri Oct 17 00:03:36 2008
+# Update Count    : 225
 # Status          : Unknown, Use with caution!
 
 package main;
@@ -54,7 +54,11 @@ sub perform {
     my $def = $opts->{definitief};
     my $eb;
     if ( $opts->{eb} ) {
-	open($eb, '>', $opts->{eb});
+	unless ( open($eb, '>', $opts->{eb}) ) {
+	    warn("?", __x("Fout tijdens het aanmaken van bestand {file}: {err}",
+			 file => $opts->{eb}, err => $!."")."\n");
+	    return;
+	}
 	$opts->{eb_handle} = $eb;
     }
 

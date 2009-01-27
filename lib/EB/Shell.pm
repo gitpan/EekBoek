@@ -746,6 +746,7 @@ Opties:
   --noreport                  Geen rapportage. Dit is enkel zinvol samen
                               met --definitief om de afgesloten BTW periode
                               aan te passen.
+  --noround		      Alle bedragen zonder af te ronden.
 
 Zie verder "help rapporten" voor algemene informatie over aan te maken
 rapporten.

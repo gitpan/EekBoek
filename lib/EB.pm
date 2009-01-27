@@ -5,8 +5,8 @@
 # Author          : Johan Vromans
 # Created On      : Fri Sep 16 18:38:45 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Sat Mar 22 16:45:55 2008
-# Update Count    : 219
+# Last Modified On: Mon Oct  6 14:50:32 2008
+# Update Count    : 221
 # Status          : Unknown, Use with caution!
 
 package main;
@@ -109,7 +109,9 @@ INIT {
 	my ($id, $major) = @a[4,1];
 	die unless defined $id;
 	warn(_T("EekBoek is VRIJE software, ontwikkeld om vrij over uw eigen gegevens te kunnen beschikken.")."\n");
-	if ( $id <= 1 || ( $id == 2 && $major <= 5) || $id >= 3 ) {
+	if ( $cfg->val(qw(security override_security_for_vista), 0)
+	     or
+	     ( $id <= 1 || ( $id == 2 && $major <= 5) || $id >= 3 ) ) {
 	    warn(_T("Met uw keuze voor het Microsoft Windows besturingssysteem geeft u echter alle vrijheden weer uit handen. Dat is erg triest.")."\n");
 	}
 	else {
