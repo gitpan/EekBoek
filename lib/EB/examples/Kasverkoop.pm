@@ -1,6 +1,6 @@
 #! perl
 
-# RCS Info        : $Id: Kasverkoop.pm,v 1.1 2008/12/30 11:56:14 jv Exp $
+# RCS Info        : $Id: Kasverkoop.pm,v 1.1 2009/05/06 18:11:04 jv Exp $
 # Author          : Johan Vromans
 # Created On      : Tue Dec 30 11:56:22 2008
 # Last Modified By: Johan Vromans
@@ -23,7 +23,7 @@ package EB::Shell::Kasverkoop;
 use strict;
 use warnings;
 
-our $VERSION = sprintf "%d.%03d", q$Revision: 1.3 $ =~ /(\d+)/g;
+our $VERSION = sprintf "%d.%03d", q$Revision: 1.1 $ =~ /(\d+)/g;
 
 use EB;
 

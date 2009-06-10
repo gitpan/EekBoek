@@ -10,7 +10,7 @@ package EB::Shell;
 use strict;
 use warnings;
 
-our $VERSION = sprintf "%d.%03d", q$Revision: 1.109 $ =~ /(\d+)/g;
+our $VERSION = sprintf "%d.%03d", q$Revision: 1.110 $ =~ /(\d+)/g;
 
 use EB;
 

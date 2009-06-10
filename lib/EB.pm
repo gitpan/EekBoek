@@ -1,7 +1,7 @@
 #! perl
 
 # EB.pm -- EekBoek Base module.
-# RCS Info        : $Id: EB.pm,v 1.86 2008/03/22 15:54:57 jv Exp $
+# RCS Info        : $Id: EB.pm,v 1.87 2009/04/03 09:41:55 jv Exp $
 # Author          : Johan Vromans
 # Created On      : Fri Sep 16 18:38:45 2005
 # Last Modified By: Johan Vromans
@@ -16,7 +16,7 @@ our $cfg;
 
 package EB;
 
-our $VERSION = sprintf "%d.%03d", q$Revision: 1.86 $ =~ /(\d+)/g;
+our $VERSION = sprintf "%d.%03d", q$Revision: 1.87 $ =~ /(\d+)/g;
 
 use strict;
 use base qw(Exporter);

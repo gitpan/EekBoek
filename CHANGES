@@ -1,4 +1,14 @@
-??????
+# CHANGES		-*- coding: utf-8 -*-
+
+1.04.04
+
+	* Bugfix voor --createsampleconfig .
+
+1.04.03	2009-04-03 12:18
+
+	* Consolidatie. Geen wijzigingen.
+
+1.04.02	2009-01-25 21:20
 
 	* Nieuwe voorbeeldmodule voor userdefs: examples/Kasveroop.pm .
 
@@ -12,7 +22,7 @@
 
 	* Fix probleem met Windows Vista.
 
-1.04	2008-08-30
+1.04	2008-08-30 10:53
 
 	* Versienummer aangepast.
 
@@ -38,7 +48,7 @@
 
 	    balans --title="Voorlopige balans 2009" --out=x.html
 
-	* Bugfix: Meer dan één -D / --define op de command line
+	* Bugfix: Meer dan Ã©Ã©n -D / --define op de command line
           mogelijk.
 
 	* Kleine wijzigingen in het verwerken van de config files. De
@@ -70,11 +80,11 @@
 
 1.03.11	22-032008 17:07
 
-	* BTW tariefgroepen Privé en Anders.
+	* BTW tariefgroepen PrivÃ© en Anders.
 
 	  In schema:
 
-	     5  BTW Privé    :tariefgroep=privé :perc=12,00 :exclusief
+	     5  BTW PrivÃ©    :tariefgroep=privÃ© :perc=12,00 :exclusief
 	     6  BTW Anders   :tariefgroep=anders :perc=14,50 :exclusief
 
 	  Als deze taeriefgroepen worden opgevoerd dan moeten de
@@ -85,7 +95,7 @@
 
 	  Etc.
 
-	  BTW 'Privé' komt in de BTW aangifte in groep 1d, BTW
+	  BTW 'PrivÃ©' komt in de BTW aangifte in groep 1d, BTW
 	  'Anders' komt in groep 1e. Deze groepen worden niet op het
 	  aangifteformulier vermeld als de betreffende tariefgroep
 	  ontbreekt.
@@ -172,7 +182,7 @@
 	  Config: strategy:bkm_multi_max (default = 15).
 
 	* Bij een inkoop/verkoop boeking kun je een willekeurige (moet
-	  tenminste één niet-cijfer bevatten) string opgeven als
+	  tenminste Ã©Ã©n niet-cijfer bevatten) string opgeven als
 	  referentie:
 
 	     inkoop 25-12 CREDITEUR "Diversen" --ref="P24XyzBla!" 100
@@ -263,8 +273,8 @@
 1.03.04	18-07-2007 19:15
 
 	WAARSCHUWING: Hoewel de database niet is gewijzigd moeten
-	bestaande administraties worden geëxporteerd en weer
-	geïmporteerd. Dit kan met de nieuwe versie van EekBoek, dus na
+	bestaande administraties worden geÃ«xporteerd en weer
+	geÃ¯mporteerd. Dit kan met de nieuwe versie van EekBoek, dus na
 	de upgrade.
 
 	BTW Aangifte: Toon ook het onafgeronde totaal en de afronding.
@@ -357,7 +367,7 @@
 1.02.01
 
 	Config::IniFiles is nu onderdeel van EekBoek en hoeft niet
-	langer apart te worden geïnstalleerd.
+	langer apart te worden geÃ¯nstalleerd.
 
 	Fix migratieprobleem 1.0.9 -> 1.0.10 voor PostgreSQL 7.x of zo.
 
@@ -570,7 +580,7 @@
 	    inkopen 10-10 "Internetkosten" XS4ALL "" 10,00
 
 	* Fix een (overigens onschuldige) "undefined" warning bij verwijderen
-	  van een partiële boeking.
+	  van een partiÃ«le boeking.
 
 0.60	2006-06-09 15:08
 
@@ -607,7 +617,7 @@
 
 	* Bijkomende wijzigingen voor CSS handling (zie 0.58).
 
-	* Fix probleem met verwijderen script dir van geïnstalleerde rpm.
+	* Fix probleem met verwijderen script dir van geÃ¯nstalleerde rpm.
 
 	* Fix 1 januari-probleem met openingsbalans.
 
@@ -658,7 +668,7 @@
 	  de vorm van een SQL file in de example directory
 	  meegeleverd.
 
-	  Dit is met name van belang indien er wordt geïnstalleerd
+	  Dit is met name van belang indien er wordt geÃ¯nstalleerd
 	  vanuit een RPM, want dan is de probeerdatabase niet
 	  aangemaakt.
 
@@ -758,7 +768,7 @@
 	  Latin1.
 
 	* De HTML uitvoer kan gebruik maken van de module HTML::Entities,
-	  indien deze is geïnstalleerd.
+	  indien deze is geÃ¯nstalleerd.
 
 0.53	29-03-2005 20:35
 
@@ -775,7 +785,7 @@
 	    lang = nl_NL.utf8
 
 	  Elke suffix anders dan utf8 (of utf-8) wordt als latin1
-	  geïnterpreteerd.
+	  geÃ¯nterpreteerd.
 
 	  ("unicode" heeft prioriteit over "lang").
 
@@ -806,7 +816,7 @@
 	   $ rpmbuild ... --with dbtests ...
 
 	* De source-RPM is getekend met mijn GPG key. Om de source-RPM te
-	  verifiëren moet je mijn GPG key in het rpm systeem importeren,
+	  verifiÃ«ren moet je mijn GPG key in het rpm systeem importeren,
 	  bijvoorbeeld:
 
 	   $ wget http://www.squirrel.nl/people/jvromans/pubkey.asc
@@ -829,7 +839,7 @@
 
 	* Een compatibility-mode Makefile.PL is meegeleverd.
 
-	* De installatie-verificatieprocedure is nu geïntegreerd in de build
+	* De installatie-verificatieprocedure is nu geÃ¯ntegreerd in de build
 	  tests. 
 
 	* De build, test en installatie kan nu ook onder ActiveState Perl
@@ -846,7 +856,7 @@
 
 	* De oorspronkelijke, boekhoudkundige berekening van het
 	  balanstotaal voor de openingsbalans wordt nu ook weer
-	  geaccepteerd, evenals de in de vorige versie geïntroduceerde
+	  geaccepteerd, evenals de in de vorige versie geÃ¯ntroduceerde
 	  rekenkundige berekening. Zie de documentatie.
 
 	* Kleine bugfixes.
@@ -889,7 +899,7 @@
 
 0.46	07-03-2006 10:06
 
-	* Duizendpuntjes worden niet worden toegepast in geëporteerde gegevens
+	* Duizendpuntjes worden niet worden toegepast in geÃ«porteerde gegevens
 	  omdat die anders niet meer kunnen worden ingelezen.
 
 0.45	06-03-2006 17:23
@@ -989,7 +999,7 @@
 
 	* Opdrachten "import" en "include" (experimenteel).
 
-	  Met "import" kan een eerder geëxporteerde administratie in één klap
+	  Met "import" kan een eerder geÃ«xporteerde administratie in Ã©Ã©n klap
 	  weer worden gereconstrueerd. De huidige inhoud van de database wordt
 	  daarbij volledig overschreven.
 
@@ -1017,7 +1027,7 @@
 
 0.37	02-02-2006 15:08
 
-	In batch mode wordt backslash-continuering ook beëindigd door
+	In batch mode wordt backslash-continuering ook beÃ«indigd door
 	een lege regel.
 
 0.36	24-01-2006 18:16
@@ -1202,7 +1212,7 @@
 	Automatische migratie van database naar een nieuwe versie.
 	(EB::Tools::SQLEngine): Afvangen transactionele commandos.
 	(Shell) Correct completions after "help".
-	(EB::Booking::*) Partiële boekingen.
+	(EB::Booking::*) PartiÃ«le boekingen.
 
 0.13	30-09-2005 18:40
 
@@ -1286,8 +1296,8 @@
 	Tot nu toe werd de richting van een boeking bepaald door het
 	dagboek en de Debet/Credit setting van de betreffende
 	grootboekrekening. Dit werd door enkele testers als
-	contra-intuïtief ervaren en daarom heb ik in overleg een
-	nieuwe manier geïmplementeerd.
+	contra-intuÃ¯tief ervaren en daarom heb ik in overleg een
+	nieuwe manier geÃ¯mplementeerd.
 
 	Consequenties voor bestaande mutatie-bestanden:
 
@@ -1349,7 +1359,7 @@
 	(Schema) CHECK constraints toegevoegd.
 	(sample/setup.sh) Opvangen ontbreken van PERL5LIB
 	(sample/setup.csh) Opvangen ontbreken van PERL5LIB
-	(sample/newdb.sh) Creëer database met Latin1 encoding.
+	(sample/newdb.sh) CreÃ«er database met Latin1 encoding.
 	(Term::Size) Stub voor mogelijk ontbrekende module.
 
 0.03	15-08-2005 22:42

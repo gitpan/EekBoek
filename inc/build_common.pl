@@ -1,5 +1,5 @@
 # build_common.inc -- Build file common info -*- perl -*-
-# RCS Info        : $Id: build_common.pl,v 1.20 2008/09/09 19:11:32 jv Exp $
+# RCS Info        : $Id: build_common.pl,v 1.21 2009/04/03 09:43:43 jv Exp $
 # Author          : Johan Vromans
 # Created On      : Thu Sep  1 17:28:26 2005
 # Last Modified By: Johan Vromans
