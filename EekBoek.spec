@@ -5,7 +5,7 @@
 # Package name, lowcase (eekboek)
 %define lcname eekboek
 # Package version
-%define pkgversion 1.04.04
+%define pkgversion 1.04.05
 # Suffix (-unstable, or empty)
 %define pkgsuffix %nil
 
@@ -196,6 +196,8 @@ pod2man blib/script/ebshell > ${RPM_BUILD_ROOT}%{_mandir}/man1/ebshell.1
 %post
 
 %changelog
+* Sun Dec 27 2009 Johan Vromans <jvromans@squirrel.nl> - 1.04.05
+- New upstream.
 * Sun Jan 26 2009 Johan Vromans <jvromans@squirrel.nl> - 1.04.02
 - Remove QUICKSTART.
 * Sat Jul 19 2008 Johan Vromans <jvromans@squirrel.nl> - 1.03.90

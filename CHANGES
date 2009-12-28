@@ -1,6 +1,13 @@
 # CHANGES		-*- coding: utf-8 -*-
 
-1.04.04
+1.04.05
+
+	* Fix jaarafsluiting bug met afboeken van BTW prive/anders.
+
+	* (ebshell) Exit met return status indien --errexit is
+          opgegeven en er een foutoptreedt.
+
+1.04.04	2009-06-10 12:13
 
 	* Bugfix voor --createsampleconfig .
 
