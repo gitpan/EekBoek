@@ -1,6 +1,9 @@
 package Module::Build::Platform::VOS;
 
 use strict;
+use vars qw($VERSION);
+$VERSION = '0.32';
+$VERSION = eval $VERSION;
 use Module::Build::Base;
 
 use vars qw(@ISA);
@@ -22,7 +25,7 @@ C<Module::Build::Base>.  Please see the L<Module::Build> for the docs.
 
 =head1 AUTHOR
 
-Ken Williams <ken@cpan.org>
+Ken Williams <kwilliams@cpan.org>
 
 =head1 SEE ALSO
 

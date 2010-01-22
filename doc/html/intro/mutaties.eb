@@ -1,5 +1,5 @@
 # $Id: mutaties.eb,v 1.1 2008/08/24 16:26:52 jv Exp $ -*- coding: iso-8859.1 -*-
-# Content-Type: text/plain; charset = ISO-8859.1
+# Content-Type: text/plain; charset = UTF-8
 
 # Inkopen (Dagboek: Inkoop)
 
@@ -24,7 +24,7 @@
 # Een credit-boeking kan worden gespecificeerd door een negatief
 # bedrag.
 
-# Enkelvoudig, met één enkele boekstukregel.
+# Enkelvoudig, met Ã©Ã©n enkele boekstukregel.
 inkoop 05-01 "Internet" XS4ALL "ADSL" 22,80
 
 # Meerdere boekstukregels; de grootboekrekening is dan verplicht.

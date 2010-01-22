@@ -1,10 +1,9 @@
-<?xml version="1.0" encoding="iso-8859-1"?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
  <head>
   <title>EekBoek</title>
     <link rel="stylesheet" href="../css/site.css" type="text/css">
-      <meta name="keywords" content="boekhouden, mkb, midden- en kleinbedrijf, financiën,
+      <meta name="keywords" content="boekhouden, mkb, midden- en kleinbedrijf, financi&amp;emul;n,
                 open source, boekhoudsoftware, boekhoud software,
 		boekhoudpakket, boekhoud pakket">
   <meta name="robots" content="all">
@@ -90,6 +89,8 @@
     <td align="left">
       <a href="../intro/index.html" class="menu">Inleiding</a>
 <br>
+<a href="../install/index.html" class="menu">Installeren</a>
+<br>
 <a href="../ebshell/index.html" class="menuselect">De EekBoek shell</a>
 <br>
 &nbsp;-&nbsp;<a href="../ebshell/commands.html" class="menu">Opdrachten</a>
@@ -98,6 +99,8 @@
 <br>
 &nbsp;-&nbsp;<a href="../ebshell/files.html" class="menu">Bestanden</a>
 <br>
+<br>
+<a href="../ebwxshell/index.html" class="menu">De grafische EekBoek shell</a>
 <br>
 <a href="../config.html" class="menu">Configuratie</a>
 <br>
@@ -130,13 +133,6 @@
     </td>
   </tr>
   <tr valign="top">
-    <td><code>--init</code></td>
-    <td>Initialiseer een nieuwe administratie uitgaande van de <a href="../intro/working.html#best4">vier
-	bestanden</a> die zich in de huidige directory bevinden.
-	<br>Zie de EekBoek opdracht <a href="../inex.html#import">import</a> voor details.
-    </td>
-  </tr>
-  <tr valign="top">
     <td><code>-c<br>--command</code></td>
     <td>De rest van de opdrachtregel wordt als een EekBoek shell opdracht
 	ge&iuml;nterpreteerd.
@@ -161,18 +157,23 @@
 	<br>Deze opdracht impliceert <code>--createdb</code>.
     </td>
   </tr>
+  <tr valign="top">
+    <td><code>--init</code></td>
+    <td>Initialiseer een nieuwe administratie uitgaande van de <a href="../intro/working.html#best4">vier
+	bestanden</a> die zich in de huidige directory bevinden.
+	<br>Zie de EekBoek opdracht <a href="../inex.html#import">import</a> voor details.
+    </td>
+  </tr>
 </table>
 
 <h4>De volgende opdrachten zijn alleen voor experts.</h4>
 
 <table border="1" width="100%" cellpadding="5">
   <tr valign="top">
-    <td><code>--createdb</code></td>
-    <td>Cre&euml;er een lege database. Indien de database al bestaat
-	wordt deze geheel leeggemaakt, anders wordt een nieuwe, lege
-	database aangemaakt.
-	<br>Deze opdracht is alleen zinvol in combinatie met de
-	opdracht <code>--schema</code>, zie hieronder.
+    <td><code>--wizard</code></td>
+    <td>Forceer het opstarten van de administratie selectie wizard ook
+	als er een configuratiebestand in de huidige directory
+	aanwezig is.
     </td>
   </tr>
   <tr valign="top">
@@ -194,23 +195,6 @@
 	en de bijbehorenden waardes worden uitgeprint. Zie <a
 	href="../config.html">Configuratiebestanden</a>.
 	<br><em>Deze optie moet als eerste op de commandoregel voorkomen.</em>
-    </td>
-  </tr>
-  <tr valign="top">
-    <td><code>--schema=<var>name</var></code></td>
-    <td>Initialiseer de administratie met het opgegeven schema. Dit
-	kan uitsluitend indien de te gebruiken database nog helemaal
-	leeg is.
-	<br>Als de opgegeven schemanaam alleen letters,
-	cijfers en onderstrepingen bevat wordt het schema gezocht in de volgende
-	plaatsen:
-	<br><code>./<var>naam</var>.dat</code>
-	<br><code>schema/<var>naam</var>.dat</code>
-	<br><code><var>EBLIB</var>/schema/<var>naam</var>.dat</code>
-	<br>In het laatste geval staat <var>EBLIB</var> voor de
-	locatie waar EekBoek is ge&iuml;nstalleerd.
-	<br>Als de opgegeven schemanaam andere tekens bevat  wordt het als een
-	bestandsnaam beschouwd en wordt het schema vanuit dat bestand geladen.
     </td>
   </tr>
   <tr valign="top">
@@ -248,11 +232,11 @@
       <img src="../images/validcss.png" alt="[Valid CSS]" border="0" width="88" height="31">
 
       </p>
-      <p class="info">Copyright &copy; 2005-2008 <a href="http://www.squirrel.nl">Squirrel Consultancy</a>. All Rights Reserved.<br />
+      <p class="info">Copyright &copy; 2005-2010 <a href="http://www.squirrel.nl">Squirrel Consultancy</a>. All Rights Reserved.<br />
 Deze site is gemaakt met de 
 <a href='http://www.squirrel.nl/people/jvromans/tt2site/'>TT2Site
 Site Builder</a>.<br />
-ebshell/clo.html laatste aanpassing 24 augustus 2008, 18:26:52
+ebshell/clo.html laatste aanpassing 12 januari 2010, 16:11:12
 </p>
 
     </td>

@@ -15,7 +15,7 @@ use Module::Build::Base;
 
 use vars qw($VERSION @ISA);
 @ISA = qw(Module::Build::Base);
-$VERSION = '0.28';
+$VERSION = '0.32';
 $VERSION = eval $VERSION;
 
 # Okay, this is the brute-force method of finding out what kind of
@@ -26,17 +26,22 @@ my %OSTYPES = qw(
 		 aix       Unix
 		 bsdos     Unix
 		 dgux      Unix
+		 dragonfly Unix
 		 dynixptx  Unix
 		 freebsd   Unix
 		 linux     Unix
+		 haiku     Unix
 		 hpux      Unix
 		 irix      Unix
 		 darwin    Unix
 		 machten   Unix
+		 midnightbsd Unix
+		 mirbsd    Unix
 		 next      Unix
 		 openbsd   Unix
 		 netbsd    Unix
 		 dec_osf   Unix
+		 nto       Unix
 		 svr4      Unix
 		 svr5      Unix
 		 sco_sv    Unix
@@ -46,7 +51,10 @@ my %OSTYPES = qw(
 		 sunos     Unix
 		 cygwin    Unix
 		 os2       Unix
-		 
+		 interix   Unix
+		 gnu       Unix
+		 gnukfreebsd Unix
+
 		 dos       Windows
 		 MSWin32   Windows
 
@@ -92,6 +100,10 @@ if (grep {-e File::Spec->catfile($_, qw(Module Build Platform), $^O) . '.pm'} @I
 }
 
 sub os_type { $OSTYPES{$^O} }
+
+sub is_vmsish { return ((os_type() || '') eq 'VMS') }
+sub is_windowsish { return ((os_type() || '') eq 'Windows') }
+sub is_unixish { return ((os_type() || '') eq 'Unix') }
 
 1;
 
@@ -149,22 +161,24 @@ This illustrates initial configuration and the running of three
 'actions'.  In this case the actions run are 'build' (the default
 action), 'test', and 'install'.  Other actions defined so far include:
 
-  build                          install     
-  clean                          manifest    
-  code                           manpages    
-  config_data                    ppd         
-  diff                           ppmdist     
+  build                          manpages    
+  clean                          pardist     
+  code                           ppd         
+  config_data                    ppmdist     
+  diff                           prereq_data 
   dist                           prereq_report
   distcheck                      pure_install
   distclean                      realclean   
-  distdir                        skipcheck   
-  distmeta                       test        
-  distsign                       testcover   
-  disttest                       testdb      
-  docs                           testpod     
-  fakeinstall                    testpodcoverage
-  help                           versioninstall
-  html                                       
+  distdir                        retest      
+  distmeta                       skipcheck   
+  distsign                       test        
+  disttest                       testall     
+  docs                           testcover   
+  fakeinstall                    testdb      
+  help                           testpod     
+  html                           testpodcoverage
+  install                        versioninstall
+  manifest                                   
 
 
 You can run the 'help' action for a complete list of actions.
@@ -219,10 +233,8 @@ C<Build test verbose=1>), in which case their values last only for the
 lifetime of that command.  Per-action command line parameters take
 precedence over parameters specified at C<perl Build.PL> time.
 
-The build process also relies heavily on the C<Config.pm> module, and
-all the key=value pairs in C<Config.pm> are available in
-
-C<< $self->{config} >>.  If the user wishes to override any of the
+The build process also relies heavily on the C<Config.pm> module.
+If the user wishes to override any of the
 values in C<Config.pm>, she may specify them like so:
 
   perl Build.PL --config cc=gcc --config ld=gcc
@@ -347,7 +359,7 @@ F<META.yml> file must also be listed in F<MANIFEST> - if it's not, a
 warning will be issued.
 
 The current version of the F<META.yml> specification can be found at
-L<http://module-build.sourceforge.net/META-spec-v1.2.html>
+L<http://module-build.sourceforge.net/META-spec-current.html>
 
 =item distsign
 
@@ -466,6 +478,15 @@ also supply or override install paths by specifying there values on
 the command line with the C<bindoc> and C<libdoc> installation
 targets.
 
+=item pardist
+
+[version 0.2806]
+
+Generates a PAR binary distribution for use with L<PAR> or L<PAR::Dist>.
+
+It requires that the PAR::Dist module (version 0.17 and up) is
+installed on your system.
+
 =item ppd
 
 [version 0.20]
@@ -493,6 +514,14 @@ This uses the same mechanism as the C<dist> action to tar & zip its
 output, so you can supply C<tar> and/or C<gzip> parameters to affect
 the result.
 
+=item prereq_data
+
+[version 0.32]
+
+This action prints out a Perl data structure of all prerequsites and the versions
+required.  The output can be loaded again using C<eval()>.  This can be useful for
+external tools that wish to query a Build script for prerequisites.
+
 =item prereq_report
 
 [version 0.28]
@@ -507,7 +536,7 @@ for a bug report.
 [version 0.28]
 
 This action is identical to the C<install> action.  In the future,
-though, if C<install> starts writing to the file file
+though, when C<install> starts writing to the file 
 F<$(INSTALLARCHLIB)/perllocal.pod>, C<pure_install> won't, and that
 will be the only difference between them.
 
@@ -520,6 +549,17 @@ C<_build> directory and the C<Build> script.  If you run the
 C<realclean> action, you are essentially starting over, so you will
 have to re-create the C<Build> script again.
 
+=item retest
+
+[version 0.2806]
+
+This is just like the C<test> action, but doesn't actually build the
+distribution first, and doesn't add F<blib/> to the load path, and
+therefore will test against a I<previously> installed version of the
+distribution.  This can be used to verify that a certain installed
+distribution still works, or to see whether newer versions of a
+distribution still pass the old regression tests, and so on.
+
 =item skipcheck
 
 [version 0.05]
@@ -531,16 +571,24 @@ F<MANIFEST.SKIP> file (See L<manifest> for details)
 
 [version 0.01]
 
-This will use C<Test::Harness> to run any regression tests and report
-their results.  Tests can be defined in the standard places: a file
-called C<test.pl> in the top-level directory, or several files ending
-with C<.t> in a C<t/> directory.
+This will use C<Test::Harness> or C<TAP::Harness> to run any regression
+tests and report their results. Tests can be defined in the standard
+places: a file called C<test.pl> in the top-level directory, or several
+files ending with C<.t> in a C<t/> directory.
 
 If you want tests to be 'verbose', i.e. show details of test execution
 rather than just summary information, pass the argument C<verbose=1>.
 
 If you want to run tests under the perl debugger, pass the argument
 C<debugger=1>.
+
+If you want to have Module::Build find test files with different file
+name extensions, pass the C<test_file_exts> argument with an array
+of extensions, such as C<[qw( .t .s .z )]>.
+
+If you want test to be run by C<TAP::Harness>, rather than C<Test::Harness>,
+pass the argument C<tap_harness_args> as an array reference of arguments to
+pass to the TAP::Harness constructor.
 
 In addition, if a file called C<visual.pl> exists in the top-level
 directory, this file will be executed as a Perl script and its output
@@ -561,6 +609,33 @@ You may also pass several C<test_files> arguments separately:
 or use a C<glob()>-style pattern:
 
   ./Build test --test_files 't/01-*.t'
+
+=item testall
+
+[verion 0.2807]
+
+[Note: the 'testall' action and the code snippets below are currently
+in alpha stage, see
+L<"http://www.nntp.perl.org/group/perl.module.build/2007/03/msg584.html"> ]
+
+Runs the C<test> action plus each of the C<test$type> actions defined by
+the keys of the C<test_types> parameter.
+
+Currently, you need to define the ACTION_test$type method yourself and
+enumerate them in the test_types parameter.
+
+  my $mb = Module::Build->subclass(
+    code => q(
+      sub ACTION_testspecial { shift->generic_test(type => 'special'); }
+      sub ACTION_testauthor  { shift->generic_test(type => 'author'); }
+    )
+  )->new(
+    ...
+    test_types  => {
+      special => '.st',
+      author  => ['.at', '.pt' ],
+    },
+    ...
 
 =item testcover
 
@@ -659,6 +734,13 @@ false to prevent the custom resource file from being loaded.
 =item verbose
 
 Display extra information about the Build on output.
+
+=item allow_mb_mismatch
+
+Suppresses the check upon startup that the version of Module::Build
+we're now running under is the same version that was initially invoked
+when building the distribution (i.e. when the C<Build.PL> script was
+first run).  Use with caution.
 
 =back
 
@@ -841,8 +923,7 @@ system, you'll install as follows:
   libhtml => /home/ken/html
 
 Note that this is I<different> from how MakeMaker's C<PREFIX>
-parameter works.  See L</"Why PREFIX is not recommended"> for more
-details.  C<install_base> just gives you a default layout under the
+parameter works.  C<install_base> just gives you a default layout under the
 directory you specify, which may have little to do with the
 C<installdirs=site> layout.
 
@@ -867,113 +948,29 @@ This will effectively install to "/tmp/foo/$sitelib",
 C<File::Spec> to make the pathnames work correctly on whatever
 platform you're installing on.
 
-=back
+=item prefix
 
+Provided for compatibility with ExtUtils::MakeMaker's PREFIX argument.
+C<prefix> should be used when you wish Module::Build to install your
+modules, documentation and scripts in the same place
+ExtUtils::MakeMaker does.
 
-=head2 About PREFIX Support
+The following are equivalent.
 
-[version 0.28]
+    perl Build.PL --prefix /tmp/foo
+    perl Makefile.PL PREFIX=/tmp/foo
 
-First, it is necessary to understand the original idea behind
-C<PREFIX>.  If, for example, the default installation locations for
-your machine are F</usr/local/lib/perl5/5.8.5> for modules,
-F</usr/local/bin> for executables, F</usr/local/man/man1> and
-F</usr/local/man/man3> for manual pages, etc., then they all share the
-same "prefix" F</usr/local>.  MakeMaker's C<PREFIX> mechanism was
-intended as a way to change an existing prefix that happened to occur
-in all those paths - essentially a C<< s{/usr/local}{/foo/bar} >> for
-each path.
+Because of the very complex nature of the prefixification logic, the
+behavior of PREFIX in MakeMaker has changed subtly over time.
+Module::Build's --prefix logic is equivalent to the PREFIX logic found
+in ExtUtils::MakeMaker 6.30.
 
-However, the real world is more complicated than that.  The C<PREFIX>
-idea is fundamentally broken when your machine doesn't jibe with
-C<PREFIX>'s worldview.
+If you do not need to retain compatibility with ExtUtils::MakeMaker or
+are starting a fresh Perl installation we recommand you use
+C<install_base> instead (and C<INSTALL_BASE> in ExtUtils::MakeMaker).
+See L<Module::Build::Cookbook/Instaling in the same location as
+ExtUtils::MakeMaker> for further information.
 
-
-=over 4
-
-=item Why PREFIX is not recommended
-
-=over 4
-
-=item *
-
-Many systems have Perl configs that make little sense with PREFIX.
-For example, OS X, where core modules go in
-F</System/Library/Perl/...>, user-installed modules go in
-F</Library/Perl/...>, and man pages go in F</usr/share/man/...>.  The
-PREFIX is thus set to F</>.  Install L<Foo::Bar> on OS X with
-C<PREFIX=/home/spurkis> and you get things like
-F</home/spurkis/Library/Perl/5.8.1/Foo/Bar.pm> and
-F</home/spurkis/usr/share/man/man3/Foo::Bar.3pm>.  Not too pretty.
-
-The problem is not limited to Unix-like platforms, either - on Windows
-builds (e.g. ActiveState perl 5.8.0), we have user-installed modules
-going in F<C:\Perl\site\lib>, user-installed executables going in
-F<C:\Perl\bin>, and PREFIX=F<C:\Perl\site>.  The prefix just doesn't
-apply neatly to the executables.
-
-=item *
-
-The PREFIX logic is too complicated and hard to predict for the user.
-It's hard to document what exactly is going to happen.  You can't give
-a user simple instructions like "run perl Makefile.PL PREFIX=~ and
-then set PERL5LIB=~/lib/perl5".
-
-=item *
-
-The results from PREFIX will change if your configuration of Perl
-changes (for example, if you upgrade Perl).  This means your modules
-will end up in different places.
-
-=item *
-
-The results from PREFIX can change with different releases of
-MakeMaker.  The logic of PREFIX is subtle and it has been altered in
-the past (mostly to limit damage in the many "edge cases" when its
-behavior was undesirable).
-
-=item *
-
-PREFIX imposes decisions made by the person who configured Perl onto
-the person installing a module.  The person who configured Perl could
-have been you or it could have been some guy at Redhat.
-
-=back
-
-
-=item Alternatives to PREFIX
-
-Module::Build offers L</install_base> as a simple, predictable, and
-user-configurable alternative to ExtUtils::MakeMaker's C<PREFIX>.
-What's more, MakeMaker will soon accept C<INSTALL_BASE> -- we strongly
-urge you to make the switch.
-
-Here's a quick comparison of the two when installing modules to your
-home directory on a unix box:
-
-MakeMaker [*]:
-
-  % perl Makefile.PL PREFIX=/home/spurkis
-  PERL5LIB=/home/spurkis/lib/perl5/5.8.5:/home/spurkis/lib/perl5/site_perl/5.8.5
-  PATH=/home/spurkis/bin
-  MANPATH=/home/spurkis/man
-
-Module::Build:
-
-  % perl Build.PL install_base=/home/spurkis
-  PERL5LIB=/home/spurkis/lib/perl5
-  PATH=/home/spurkis/bin
-  MANPATH=/home/spurkis/man
-
-[*] Note that MakeMaker's behaviour cannot be guaranteed in even this
-common scenario, and differs among different versions of MakeMaker.
-
-In short, using C<install_base> is similar to the following MakeMaker usage:
-
-  perl Makefile.PL PREFIX=/home/spurkis LIB=/home/spurkis/lib/perl5
-
-See L</"INSTALL PATHS"> for details on other
-installation options available and how to configure them.
 
 =back
 
@@ -1064,7 +1061,7 @@ signature or the like, if available.  See C<cons> for an example.
 Ken Williams <kwilliams@cpan.org>
 
 Development questions, bug reports, and patches should be sent to the
-Module-Build mailing list at <module-build-general@lists.sourceforge.net>.
+Module-Build mailing list at <module-build@perl.org>.
 
 Bug reports are also welcome at
 <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Module-Build>.
@@ -1075,7 +1072,7 @@ repository at <https://svn.perl.org/modules/Module-Build/trunk/>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2001-2005 Ken Williams.  All rights reserved.
+Copyright (c) 2001-2006 Ken Williams.  All rights reserved.
 
 This library is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
@@ -1083,11 +1080,11 @@ modify it under the same terms as Perl itself.
 
 =head1 SEE ALSO
 
-perl(1), L<Module::Build::Cookbook>(3), L<Module::Build::Authoring>(3),
-L<Module::Build::API>(3), L<ExtUtils::MakeMaker>(3), L<YAML>(3)
+perl(1), L<Module::Build::Cookbook>, L<Module::Build::Authoring>,
+L<Module::Build::API>, L<ExtUtils::MakeMaker>, L<YAML>
 
 F<META.yml> Specification:
-L<http://module-build.sourceforge.net/META-spec-v1.2.html>
+L<http://module-build.sourceforge.net/META-spec-current.html>
 
 L<http://www.dsmit.com/cons/>
 

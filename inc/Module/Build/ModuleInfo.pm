@@ -1,3 +1,5 @@
+# -*- mode: cperl; tab-width: 8; indent-tabs-mode: nil; basic-offset: 2 -*-
+# vim:ts=8:sw=2:et:sta:sts=2
 package Module::Build::ModuleInfo;
 
 # This module provides routines to gather information about
@@ -5,21 +7,25 @@ package Module::Build::ModuleInfo;
 # parrot future to look at other types of modules).
 
 use strict;
+use vars qw($VERSION);
+$VERSION = '0.32';
+$VERSION = eval $VERSION;
 
 use File::Spec;
 use IO::File;
+use Module::Build::Version;
 
 
-my $PKG_REGEXP  = qr/   # match a package declaration
+my $PKG_REGEXP  = qr{   # match a package declaration
   ^[\s\{;]*             # intro chars on a line
   package               # the word 'package'
   \s+                   # whitespace
   ([\w:]+)              # a package name
   \s*                   # optional whitespace
   ;                     # semicolon line terminator
-/x;
+}x;
 
-my $VARNAME_REGEXP = qr/ # match fully-qualified VERSION name
+my $VARNAME_REGEXP = qr{ # match fully-qualified VERSION name
   ([\$*])         # sigil - $ or *
   (
     (             # optional leading package name
@@ -28,9 +34,9 @@ my $VARNAME_REGEXP = qr/ # match fully-qualified VERSION name
     )?
     VERSION
   )\b
-/x;
+}x;
 
-my $VERS_REGEXP = qr/ # match a VERSION definition
+my $VERS_REGEXP = qr{ # match a VERSION definition
   (?:
     \(\s*$VARNAME_REGEXP\s*\) # with parens
   |
@@ -38,43 +44,45 @@ my $VERS_REGEXP = qr/ # match a VERSION definition
   )
   \s*
   =[^=~]  # = but not ==, nor =~
-/x;
+}x;
 
 
 sub new_from_file {
-  my $package  = shift;
+  my $class    = shift;
   my $filename = File::Spec->rel2abs( shift );
+
   return undef unless defined( $filename ) && -f $filename;
-  return $package->_init( undef, $filename, @_ );
+  return $class->_init(undef, $filename, @_);
 }
 
 sub new_from_module {
-  my $package = shift;
+  my $class   = shift;
   my $module  = shift;
   my %props   = @_;
+
   $props{inc} ||= \@INC;
-  my $filename = $package->find_module_by_name( $module, $props{inc} );
+  my $filename = $class->find_module_by_name( $module, $props{inc} );
   return undef unless defined( $filename ) && -f $filename;
-  return $package->_init( $module, $filename, %props );
+  return $class->_init($module, $filename, %props);
 }
 
 sub _init {
-  my $package  = shift;
+  my $class    = shift;
   my $module   = shift;
   my $filename = shift;
-
   my %props = @_;
+
   my( %valid_props, @valid_props );
   @valid_props = qw( collect_pod inc );
   @valid_props{@valid_props} = delete( @props{@valid_props} );
   warn "Unknown properties: @{[keys %props]}\n" if scalar( %props );
 
   my %data = (
-    module   => $module,
-    filename => $filename,
-    version  => undef,
-    packages => [],
-    versions => {},
+    module       => $module,
+    filename     => $filename,
+    version      => undef,
+    packages     => [],
+    versions     => {},
     pod          => {},
     pod_headings => [],
     collect_pod  => 0,
@@ -82,20 +90,22 @@ sub _init {
     %valid_props,
   );
 
-  my $self = bless( \%data, $package );
+  my $self = bless(\%data, $class);
 
   $self->_parse_file();
 
-  unless ( $self->{module} && length( $self->{module} ) ) {
-    my( $v, $d, $f ) = File::Spec->splitpath( $self->{filename} );
-    if ( $f =~ /\.pm$/ ) {
+  unless($self->{module} and length($self->{module})) {
+    my ($v, $d, $f) = File::Spec->splitpath($self->{filename});
+    if($f =~ /\.pm$/) {
       $f =~ s/\..+$//;
       my @candidates = grep /$f$/, @{$self->{packages}};
-      $self->{module} = shift( @candidates ); # punt
-    } else {
-      if ( grep /main/, @{$self->{packages}} ) {
-	$self->{module} = 'main';
-      } else {
+      $self->{module} = shift(@candidates); # punt
+    }
+    else {
+      if(grep /main/, @{$self->{packages}}) {
+        $self->{module} = 'main';
+      }
+      else {
         $self->{module} = $self->{packages}[0] || '';
       }
     }
@@ -109,7 +119,7 @@ sub _init {
 
 # class method
 sub _do_find_module {
-  my $package = shift;
+  my $class   = shift;
   my $module  = shift || die 'find_module_by_name() requires a package name';
   my $dirs    = shift || \@INC;
 
@@ -162,6 +172,12 @@ sub _parse_file {
   my $fh = IO::File->new( $filename )
     or die( "Can't open '$filename': $!" );
 
+  $self->_parse_fh($fh);
+}
+
+sub _parse_fh {
+  my ($self, $fh) = @_;
+
   my( $in_pod, $seen_end, $need_vers ) = ( 0, 0, 0 );
   my( @pkgs, %vers, %pod, @pod );
   my $pkg = 'main';
@@ -169,11 +185,15 @@ sub _parse_file {
   my $pod_data = '';
 
   while (defined( my $line = <$fh> )) {
+    my $line_num = $.;
 
     chomp( $line );
     next if $line =~ /^\s*#/;
 
     $in_pod = ($line =~ /^=(?!cut)/) ? 1 : ($line =~ /^=cut/) ? 0 : $in_pod;
+
+    # Would be nice if we could also check $in_string or something too
+    last if !$in_pod && $line =~ /^__(?:DATA|END)__$/;
 
     if ( $in_pod || $line =~ /^=cut/ ) {
 
@@ -211,14 +231,16 @@ sub _parse_file {
 	push( @pkgs, $vers_pkg ) unless grep( $vers_pkg eq $_, @pkgs );
 	$need_vers = 0 if $vers_pkg eq $pkg;
 
-	my $v =
-	  $self->_evaluate_version_line( $vers_sig, $vers_fullname, $line );
 	unless ( defined $vers{$vers_pkg} && length $vers{$vers_pkg} ) {
-	  $vers{$vers_pkg} = $v;
+	  $vers{$vers_pkg} = 
+	    $self->_evaluate_version_line( $vers_sig, $vers_fullname, $line );
 	} else {
-	  warn <<"EOM";
-Package '$vers_pkg' already declared with version '$vers{$vers_pkg}'
-ignoring new version '$v'.
+	  # Warn unless the user is using the "$VERSION = eval
+	  # $VERSION" idiom (though there are probably other idioms
+	  # that we should watch out for...)
+	  warn <<"EOM" unless $line =~ /=\s*eval/;
+Package '$vers_pkg' already declared with version '$vers{$vers_pkg}',
+ignoring subsequent declaration on line $line_num.
 EOM
 	}
 
@@ -248,7 +270,7 @@ EOM
 	} else {
 	  warn <<"EOM";
 Package '$pkg' already declared with version '$vers{$pkg}'
-ignoring new version '$v'.
+ignoring new version '$v' on line $line_num.
 EOM
 	}
 
@@ -268,40 +290,47 @@ EOM
   $self->{pod_headings} = \@pod;
 }
 
+{
+my $pn = 0;
 sub _evaluate_version_line {
   my $self = shift;
   my( $sigil, $var, $line ) = @_;
 
   # Some of this code came from the ExtUtils:: hierarchy.
 
-  my $eval = qq{q#  Hide from _packages_inside()
-		 #; package Module::Build::ModuleInfo::_version;
-		 no strict;
+  # We compile into $vsub because 'use version' would cause
+  # compiletime/runtime issues with local()
+  my $vsub;
+  $pn++; # everybody gets their own package
+  my $eval = qq{BEGIN { q#  Hide from _packages_inside()
+    #; package Module::Build::ModuleInfo::_version::p$pn;
+    use Module::Build::Version;
+    no strict;
 
-		 local $sigil$var;
-		 \$$var=undef; do {
-		   $line
-		 }; \$$var
-		};
+    local $sigil$var;
+    \$$var=undef;
+      \$vsub = sub {
+        $line;
+        \$$var
+      };
+  }};
+
   local $^W;
+  # Try to get the $VERSION
+  eval $eval;
+  warn "Error evaling version line '$eval' in $self->{filename}: $@\n"
+    if $@;
+  (ref($vsub) eq 'CODE') or
+    die "failed to build version sub for $self->{filename}";
+  my $result = eval { $vsub->() };
 
-  # version.pm will change the ->VERSION method, so we mitigate the
-  # potential effects here.  Unfortunately local(*UNIVERSAL::VERSION)
-  # will crash perl < 5.8.1.  We also use * Foo::VERSION instead of
-  # *Foo::VERSION so that old versions of CPAN.pm, etc. with a
-  # too-permissive regex don't think we're actually declaring a
-  # version.
+  die "Could not get version from $self->{filename} by executing:\n$eval\n\nThe fatal error was: $@\n" if $@;
 
-  my $old_version = \&UNIVERSAL::VERSION;
-  eval {require version};
-  my $result = eval $eval;
-  * UNIVERSAL::VERSION = $old_version;
-  warn "Error evaling version line '$eval' in $self->{filename}: $@\n" if $@;
-
-  # Unbless it if it's a version.pm object
-  $result = $result->numify if UNIVERSAL::isa($result, 'version');
+  # Bless it into our own version class
+  $result = Module::Build::Version->new($result);
 
   return $result;
+}
 }
 
 
@@ -421,12 +450,12 @@ Can be called as either an object or a class method.
 
 =head1 AUTHOR
 
-Ken Williams <ken@cpan.org>, Randy W. Sims <RandyS@ThePierianSpring.org>
+Ken Williams <kwilliams@cpan.org>, Randy W. Sims <RandyS@ThePierianSpring.org>
 
 
 =head1 COPYRIGHT
 
-Copyright (c) 2001-2005 Ken Williams.  All rights reserved.
+Copyright (c) 2001-2006 Ken Williams.  All rights reserved.
 
 This library is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.

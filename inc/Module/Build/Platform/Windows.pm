@@ -1,6 +1,9 @@
 package Module::Build::Platform::Windows;
 
 use strict;
+use vars qw($VERSION);
+$VERSION = '0.32';
+$VERSION = eval $VERSION;
 
 use Config;
 use File::Basename;
@@ -18,6 +21,13 @@ sub manpage_separator {
 }
 
 sub have_forkpipe { 0 }
+
+sub _detildefy {
+  my ($self, $value) = @_;
+  $value =~ s,^~(?= [/\\] | $ ),$ENV{HOME},x
+    if $ENV{HOME};
+  return $value;
+}
 
 sub ACTION_realclean {
   my ($self) = @_;
@@ -54,17 +64,26 @@ sub make_executable {
   $self->SUPER::make_executable(@_);
 
   foreach my $script (@_) {
-    my %opts = ();
-    if ( $script eq $self->build_script ) {
-      $opts{ntargs}    = q(-x -S %0 --build_bat %*);
-      $opts{otherargs} = q(-x -S "%0" --build_bat %1 %2 %3 %4 %5 %6 %7 %8 %9);
-    }
 
-    my $out = eval {$self->pl2bat(in => $script, update => 1, %opts)};
-    if ( $@ ) {
-      $self->log_warn("WARNING: Unable to convert file '$script' to an executable script:\n$@");
+    # Native batch script
+    if ( $script =~ /\.(bat|cmd)$/ ) {
+      $self->SUPER::make_executable($script);
+      next;
+
+    # Perl script that needs to be wrapped in a batch script
     } else {
-      $self->SUPER::make_executable($out);
+      my %opts = ();
+      if ( $script eq $self->build_script ) {
+        $opts{ntargs}    = q(-x -S %0 --build_bat %*);
+        $opts{otherargs} = q(-x -S "%0" --build_bat %1 %2 %3 %4 %5 %6 %7 %8 %9);
+      }
+
+      my $out = eval {$self->pl2bat(in => $script, update => 1, %opts)};
+      if ( $@ ) {
+        $self->log_warn("WARNING: Unable to convert file '$script' to an executable script:\n$@");
+      } else {
+        $self->SUPER::make_executable($out);
+      }
     }
   }
 }
@@ -156,6 +175,29 @@ EOT
 }
 
 
+sub _quote_args {
+  # Returns a string that can become [part of] a command line with
+  # proper quoting so that the subprocess sees this same list of args.
+  my ($self, @args) = @_;
+
+  my @quoted;
+
+  for (@args) {
+    if ( /^[^\s*?!\$<>;|'"\[\]\{\}]+$/ ) {
+      # Looks pretty safe
+      push @quoted, $_;
+    } else {
+      # XXX this will obviously have to improve - is there already a
+      # core module lying around that does proper quoting?
+      s/"/\\"/g;
+      push @quoted, qq("$_");
+    }
+  }
+
+  return join " ", @quoted;
+}
+
+
 sub split_like_shell {
   # As it turns out, Windows command-parsing is very different from
   # Unix command-parsing.  Double-quotes mean different things,
@@ -214,6 +256,23 @@ sub split_like_shell {
   return @argv;
 }
 
+
+# system(@cmd) does not like having double-quotes in it on Windows.
+# So we quote them and run it as a single command.
+sub do_system {
+  my ($self, @cmd) = @_;
+
+  my $cmd = $self->_quote_args(@cmd);
+  my $status = system($cmd);
+  if ($status and $! =~ /Argument list too long/i) {
+    my $env_entries = '';
+    foreach (sort keys %ENV) { $env_entries .= "$_=>".length($ENV{$_})."; " }
+    warn "'Argument list' was 'too long', env lengths are $env_entries";
+  }
+  return !$status;
+}
+
+
 1;
 
 __END__
@@ -230,7 +289,7 @@ L<Module::Build> for the docs.
 
 =head1 AUTHOR
 
-Ken Williams <ken@cpan.org>, Randy W. Sims <RandyS@ThePierianSpring.org>
+Ken Williams <kwilliams@cpan.org>, Randy W. Sims <RandyS@ThePierianSpring.org>
 
 =head1 SEE ALSO
 

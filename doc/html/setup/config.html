@@ -1,10 +1,9 @@
-<?xml version="1.0" encoding="iso-8859-1"?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
  <head>
   <title>EekBoek</title>
     <link rel="stylesheet" href="../css/site.css" type="text/css">
-      <meta name="keywords" content="boekhouden, mkb, midden- en kleinbedrijf, financiën,
+      <meta name="keywords" content="boekhouden, mkb, midden- en kleinbedrijf, financi&amp;emul;n,
                 open source, boekhoudsoftware, boekhoud software,
 		boekhoudpakket, boekhoud pakket">
   <meta name="robots" content="all">
@@ -90,7 +89,11 @@
     <td align="left">
       <a href="../intro/index.html" class="menu">Inleiding</a>
 <br>
+<a href="../install/index.html" class="menu">Installeren</a>
+<br>
 <a href="../ebshell/index.html" class="menu">De EekBoek shell</a>
+<br>
+<a href="../ebwxshell/index.html" class="menu">De grafische EekBoek shell</a>
 <br>
 <a href="../config.html" class="menu">Configuratie</a>
 <br>
@@ -128,69 +131,144 @@
 
 <h2>Het opzetten van de werkomgeving</h2>
 
-<p>Alle EekBoek instellingen worden opgeslagen in <a
-href="../config.html">configuratiebestanden</a>. De meest relevante
-instelling is de naam van de database die de administratiegegevens
-moet gaan bevatten.</p>
+<p>EekBoek versie 2 werkt met een administratie directory, dit is een
+directory waar alle administratiebestanden worden ondergebracht. De
+standaardplek voor deze directory is afhankelijk van het gebruikte
+platform. Onder Linux systemen is dit de directory
+<code>.eekboek/admdir</code> in de home-directory van de gebruiker.
+Deze directory kan worden gewijzigd middels de variabele
+<code>admdir</code> in sectie <code>[general]</code> van
+<code>.eekboek/eekboek.conf</code>.</p>
 
-<p>Het werkt doorgaans het beste wanneer u een directory aanmaakt waar
-alle bestanden van de administratie geplaatst kunnen worden. In deze
-directory cre&euml;ert u dan een configuratiebestand met de naam
-<code>.eekboek.conf</code> en de volgende inhoud:</p>
+<p>Elke administratie heeft een naam, en een korte code. Deze laatste
+wordt bij het aanmaken van de administratie afgeleid van de naam. De
+code wordt gebruikt om een subdirectory in de administratie directory
+aan te maken waar de bestanden van deze administratie geplaatst gaan
+worden. Ook wordt de code gebruikt als naam voor de database waarin de
+administratie wordt onderhouden.</p>
 
-<blockquote class="code">[database]
-name = mijndb
-driver = postgresql
+<p>Wanneer EekBoek wordt opgestart zal deze eerst in de administratie
+directory kijken welke administraties daar zijn aangemaakt. U kunt dan
+een van deze administraties kiezen om mee te gaan werken, of om een
+nieuwe administratie aan te maken. Als er geen administraties
+beschikbaar zijn wordt automatisch de wizard voor het aanmaken van een
+nieuwe administratie gestart.</p>
+
+<p><strong>Let op:</strong> Uit compatibiliteit met vorige versies zal
+de EekBoek shell <code>ebshell</code> onmiddelijk tot uitvoering
+overgaan wanneer in de huidige directory een configuratiebestand
+aanwezig is. Om in dit geval de administratieselectiewizard te
+activeren dient de command line optie <code>--wizard</code> te worden
+meegegeven.</p>
+
+<h3>Het aanmaken van een nieuwe administratie</h3>
+
+<p>Met de wizard kunt u met het beantwoorden van enkele eenvoudige
+vragen een nieuwe administratie opzetten. U kunt daarbij kiezen uit
+een van de meegeleverde sjabloonadministraties, de EekBoek
+voorbeeldadministratie, of een compleet lege minimale
+administratie.</p>
+
+<p><i>Als u voor het eerst met EekBoek gaat werken is het zeer aan te
+raden om eerst een voorbeeldadministratie aan te maken en daarmee van
+alles uit te proberen. Op deze manier raakt u snel vertrouwd met de
+wijze waarop EekBoek werkt.</i></p>
+
+<p>Een voorbeeld van het aanmaken van een administratie. Op alle
+vragen wordt het standaardantwoord geaccepteerd door het indrukken van
+de Enter toets. Door een vraag met een &lsquo;-&rsquo; teken te
+beantwoorden gaat de wizard terug naar de vorige vraag.</p>
+
+<blockquote class="code">$ ebshell
+EekBoek 2.00.00 -- Copyright 2005-2010 Squirrel Consultancy
+
+Geef een unieke naam voor de nieuwe administratie. Deze wordt
+gebruikt voor rapporten en dergelijke.
+
+Naam [Mijn eerste EekBoek]: 
+
+Geef het boekjaar voor deze administatie. De administatie
+begint op 1 januari van het opgegeven jaar.
+
+Begindatum <1990..2020> [2010]: 
+
+Geef een unieke code voor de administratie. Deze wordt gebruikt
+als interne naam voor de database en administratiefolders.
+De standaardwaarde is afgeleid van de administratienaam en de
+begindatum.
+
+Code [mijn_eerste_eekboek_2010]: 
+
+U kunt een van de meegeleverde sjablonen gebruiken voor uw
+administratie.
+
+  1: Lege administratie
+  2: Eenmanszaak (ZZP)
+  3: BV / NV
+  4: Ondernemer
+  5: EekBoek voorbeeldadministratie
+  6: Vereniging / Stichting
+
+Sjabloon <1..6> [5]: 
+
+Kies het type database dat u wilt gebruiken voor deze
+administratie.
+
+  1: postgres
+  2: sqlite
+
+Database <1..2> [2]: 
+
+Gereed om de administratieve bestanden en de database aan te maken.
+
+Doorgaan [Ja]: 
+EekBoek 2.00.00 -- Copyright 2005-2010 Squirrel Consultancy
+%Lege database mijn_eerste_eekboek_2010 is aangemaakt
+...
+
+De administratie is aangemaakt. U kunt meteen aan de slag.
 </blockquote>
 
-<p>waarbij <var>mijndb</var> de gewenste naam van de database
-is.<br>Indien u met de SQLite database wilt werken, dient u als driver
-<code>sqlite</code> op te geven.</p>
+<p>Hierna krijgt u de prompt van de EekBoek shell en kunt u opdrachten
+ingeven.</p>
 
-<p>In deze directory dient u de volgende vier bestanden aan te maken:
+<p>Het aanmaken van een administratie met de GUI verloopt op eenzelfde
+wijze.</p>
+
+<p>Als de wizard gereed is met het aanmaken van de administratie dan
+vindt u in de administratie directory een subdirectory met de naam
+<code>mijn_eerste_eekboek_2010</code>, met daarin de volgende bestanden:</p>
+
 <ul>
+<li><code>eekboek.conf</code> - het administratie-specifieke
+    configuratiebestand;
 <li><code>schema.dat</code> - de administratiegegevens;
 <li><code>relaties.eb</code> - de relaties (debiteuren en
     crediteuren);
 <li><code>opening.eb</code> - de openingsbalans;
 <li><code>mutaties.eb</code> - de mutaties (boekingen). Dit bestand
-    zal in eerste instantie leeg zijn.
+    zal leeg zijn tenzij u heeft gekozen een voorbeeldadministratie
+    aan te maken.
 </ul>
 <p>De volgende secties van de documentatie beschrijven wat er in deze
 bestanden moet komen.</p>
 
 <a name="sampledb"></a><h4>De voorbeeldadministratie</h4>
 
-<p>Wanneer u de verschillende aspecten van EekBoek wilt uitproberen
-kan dat gemakkelijk aan de hand van een eenvoudig op te zetten
-voorbeeldadministratie.</p>
-
-<p>U dient daartoe, nadat u het bovenstaande bestandje
-<code>.eekboek.conf</code> heeft aangemaakt, de volgende
-systeemopdracht uitvoeren:</p>
-
-<blockquote class="code">ebshell --createsampledb</blockquote>
-
-<p>De voorbeeldadministratie is nu gereed voor gebruik. Deze
-administratie heeft als boekjaar 2007. Wilt u boekingen toevoegen dan
-dient u deze daarom ook in 2007 te dateren.</p>
-
-<p>De bestanden van de voorbeeldadministratie kunt u hier inzien:</p>
+<p>De bestanden van de voorbeeldadministratie kunt u hier inzien::</p>
 
 <ul>
 <li><a href="../intro/schema.dat"><code>schema.dat</code></a> - de administratiegegevens;
 <li><a href="../intro/relaties.eb"><code>relaties.eb</code></a> - de relaties (debiteuren en
     crediteuren);
-<li><a href="../intro/opening.eb"><code>opening.eb</code></a> - de openingsbalans;
+<li><a href="../intro/opening.eb"><code>opening.eb</code></a> - de
+    openingsgegevens. Als uw voorbeeldadministratie met de wizard is
+    aangemaakt zal de naam van de administratie en de begindatum zijn
+    aangepast aan de in de wizard opgegeven waarden;
 <li><a href="../intro/mutaties.eb"><code>mutaties.eb</code></a> - de
     mutaties.
 </ul>
 
-<p>U kunt een kopie van deze bestanden in uw huidige directory
-plaatsen door direct na het aanmaken van de voorbeeldadministratie de
-volgende systeemopdracht uit te voeren:</p>
-
-<blockquote class="code">ebshell --export --dir=.</blockquote>
 
     </td>
   </tr>
@@ -217,11 +295,11 @@ volgende systeemopdracht uit te voeren:</p>
       <img src="../images/validcss.png" alt="[Valid CSS]" border="0" width="88" height="31">
 
       </p>
-      <p class="info">Copyright &copy; 2005-2008 <a href="http://www.squirrel.nl">Squirrel Consultancy</a>. All Rights Reserved.<br />
+      <p class="info">Copyright &copy; 2005-2010 <a href="http://www.squirrel.nl">Squirrel Consultancy</a>. All Rights Reserved.<br />
 Deze site is gemaakt met de 
 <a href='http://www.squirrel.nl/people/jvromans/tt2site/'>TT2Site
 Site Builder</a>.<br />
-setup/config.html laatste aanpassing 24 augustus 2008, 18:26:52
+setup/config.html laatste aanpassing 12 januari 2010, 15:37:17
 </p>
 
     </td>

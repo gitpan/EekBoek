@@ -1,6 +1,9 @@
 package Module::Build::Platform::Unix;
 
 use strict;
+use vars qw($VERSION);
+$VERSION = '0.32';
+$VERSION = eval $VERSION;
 use Module::Build::Base;
 
 use vars qw(@ISA);
@@ -11,6 +14,17 @@ sub make_tarball {
   $self->{args}{tar}  ||= ['tar'];
   $self->{args}{gzip} ||= ['gzip'];
   $self->SUPER::make_tarball(@_);
+}
+
+sub is_executable {
+  # We consider the owner bit to be authoritative on a file, because
+  # -x will always return true if the user is root and *any*
+  # executable bit is set.  The -x test seems to try to answer the
+  # question "can I execute this file", but I think we want "is this
+  # file executable".
+
+  my ($self, $file) = @_;
+  return +(stat $file)[2] & 0100;
 }
 
 sub _startperl { "#! " . shift()->perl }
@@ -28,6 +42,16 @@ sub _construct {
   return $self;
 }
 
+sub _detildefy {
+  my ($self, $value) = @_;
+  $value =~ s[^~(\w[-\w]*)?(?=/|$)]   # tilde with optional username
+    [$1 ?
+     ((getpwnam $1)[7] || "~$1") :
+     ($ENV{HOME} || (getpwuid $>)[7])
+    ]ex;
+  return $value;
+}
+
 1;
 __END__
 
@@ -43,7 +67,7 @@ C<Module::Build::Base>.  Please see the L<Module::Build> for the docs.
 
 =head1 AUTHOR
 
-Ken Williams <ken@cpan.org>
+Ken Williams <kwilliams@cpan.org>
 
 =head1 SEE ALSO
 

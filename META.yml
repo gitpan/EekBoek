@@ -1,6 +1,6 @@
 ---
 name: EekBoek
-version: 1.04.06
+version: 1.04.06.01
 author:
   - Johan Vromans (jvromans@squirrel.nl)
 abstract: Elementary Bookkeeping (for the Dutch/European market)
@@ -8,7 +8,7 @@ license: perl
 resources:
   MailingList: http://lists.sourceforge.net/lists/listinfo/eekboek
   homepage: http://www.eekboek.nl
-  license: http://dev.perl.org/licenses/
+  license: ~
 requires:
   DBI: 1.40
   Getopt::Long: 2.13
@@ -26,8 +26,15 @@ recommends:
 provides:
   EekBoek:
     file: lib/EekBoek.pm
-    version: 1.04.06
-generated_by: Module::Build version 0.28
+    version: !!perl/hash:Module::Build::Version
+      original: 1.04.06.01
+      qv: 1
+      version:
+        - 1
+        - 4
+        - 6
+        - 1
+generated_by: Module::Build version 0.32
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.2.html
   version: 1.2

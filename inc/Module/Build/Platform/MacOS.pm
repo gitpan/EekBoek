@@ -1,8 +1,12 @@
 package Module::Build::Platform::MacOS;
 
 use strict;
+use vars qw($VERSION);
+$VERSION = '0.32';
+$VERSION = eval $VERSION;
 use Module::Build::Base;
-use base qw(Module::Build::Base);
+use vars qw(@ISA);
+@ISA = qw(Module::Build::Base);
 
 use ExtUtils::Install;
 
@@ -13,11 +17,14 @@ sub new {
   my $self = $class->SUPER::new(@_);
   
   # $Config{sitelib} and $Config{sitearch} are, unfortunately, missing.
-  $self->{config}{sitelib}  ||= $self->{config}{installsitelib};
-  $self->{config}{sitearch} ||= $self->{config}{installsitearch};
+  foreach ('sitelib', 'sitearch') {
+    $self->config($_ => $self->config("install$_"))
+      unless $self->config($_);
+  }
   
   # For some reason $Config{startperl} is filled with a bunch of crap.
-  $self->{config}{startperl} =~ s/.*Exit \{Status\}\s//;
+  (my $sp = $self->config('startperl')) =~ s/.*Exit \{Status\}\s//;
+  $self->config(startperl => $sp);
   
   return $self;
 }

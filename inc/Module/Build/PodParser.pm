@@ -1,6 +1,9 @@
 package Module::Build::PodParser;
 
 use strict;
+use vars qw($VERSION);
+$VERSION = '0.32';
+$VERSION = eval $VERSION;
 use vars qw(@ISA);
 
 sub new {

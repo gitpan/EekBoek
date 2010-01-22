@@ -1,6 +1,9 @@
 package Module::Build::PPMMaker;
 
 use strict;
+use vars qw($VERSION);
+$VERSION = '0.32';
+$VERSION = eval $VERSION;
 
 # This code is mostly borrowed from ExtUtils::MM_Unix 6.10_03, with a
 # few tweaks based on the PPD spec at
@@ -173,12 +176,12 @@ L<http://aspn.activestate.com/ASPN/Downloads/ActivePerl/PPM/>
 
 =head1 AUTHOR
 
-Dave Rolsky <autarch@urth.org>, Ken Williams <ken@cpan.org>
+Dave Rolsky <autarch@urth.org>, Ken Williams <kwilliams@cpan.org>
 
 
 =head1 COPYRIGHT
 
-Copyright (c) 2001-2005 Ken Williams.  All rights reserved.
+Copyright (c) 2001-2006 Ken Williams.  All rights reserved.
 
 This library is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.

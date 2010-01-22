@@ -1,7 +1,6 @@
 package Module::Build::YAML;
 
 use strict;
-
 use vars qw($VERSION @EXPORT @EXPORT_OK);
 $VERSION = "0.50";
 @EXPORT = ();
@@ -102,26 +101,24 @@ sub _yaml_chunk {
 }
 
 sub _yaml_value {
-  # XXX doesn't handle embedded newlines
   my ($value) = @_;
-  # undefs and empty strings will become empty strings
-  if (! defined $value || $value eq "") {
-    return('""');
-  }
+  # undefs become ~
+  return '~' if not defined $value;
+
+  # empty strings will become empty strings
+  return '""' if $value eq '';
+
   # allow simple scalars (without embedded quote chars) to be unquoted
-  elsif ($value !~ /["'\\]/) {
-    return($value);
-  }
-  # strings without double-quotes get double-quoted
-  elsif ($value !~ /\"/) {
-    $value =~ s{\\}{\\\\}g;
-    return qq{"$value"};
-  }
-  # other strings get single-quoted
-  else {
-    $value =~ s{([\\'])}{\\$1}g;
-    return qq{'$value'};
-  }
+  # (includes $%_+=-\;:,./)
+  return $value if $value !~ /["'`~\n!\@\#^\&\*\(\)\{\}\[\]\|<>\?]/;
+
+  # quote and escape strings with special values
+  return "'$value'"
+    if $value !~ /['`~\n!\#^\&\*\(\)\{\}\[\]\|\?]/;  # nothing but " or @ or < or > (email addresses)
+
+  $value =~ s/\n/\\n/g;    # handle embedded newlines
+  $value =~ s/"/\\"/g;     # handle embedded quotes
+  return qq{"$value"};
 }
 
 1;
