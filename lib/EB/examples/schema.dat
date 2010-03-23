@@ -1,4 +1,4 @@
-# $Id: schema.dat,v 1.13 2008/02/20 23:24:53 jv Exp $ -*- coding: utf-8 -*-
+# $Id: schema.dat,v 1.15 2010/01/09 21:36:28 jv Exp $ -*- coding: utf-8 -*-
 # EekBoek Rekeningschema voor eekboek_sample
 # Content-Type: text/plain; charset = UTF-8
 
@@ -31,6 +31,8 @@
 #   :btw=nul
 #   :btw=hoog
 #   :btw=laag
+#   :btw=privé
+#   :btw=anders
 #
 # Ook is het mogelijk aan te geven dat een rekening een koppeling
 # (speciale betekenis) heeft met :koppeling=xxx. De volgende koppelingen
@@ -42,6 +44,10 @@
 #   btw_il	idem, laag tarief
 #   btw_vh	idem, verkopen, hoog tarief
 #   btw_vl	idem, laag tarief
+#   btw_ph	idem, privé, hoog tarief
+#   btw_pl	idem, laag tarief
+#   btw_ah	idem, anders, hoog tarief
+#   btw_al	idem, laag tarief
 #   btw_ok	rekening voor de betaalde BTW
 #   winst	rekening waarop de winst wordt geboekt
 #
@@ -100,8 +106,10 @@ Balansrekeningen
      42  Belastingen & soc. lasten
          4200  C   BTW Verkoop Hoog                           :koppeling=btw_vh
          4210  C   BTW Verkoop Laag                           :koppeling=btw_vl
+         4212  C   BTW Verkoop Privé                          :koppeling=btw_vp
          4220  D   BTW Inkoop Hoog                            :koppeling=btw_ih
          4230  D   BTW Inkoop Laag                            :koppeling=btw_il
+         4232  D   BTW Inkoop Privé                           :koppeling=btw_ip
          4240  C   BTW Autokostenvergoeding
          4290  C   Omzetbelasting betaald                     :koppeling=btw_ok
 
@@ -148,6 +156,7 @@ Resultaatrekeningen
          6971  K   Verzending portikosten
          6980  K   Bankkosten
          6981  K   Kasverschillen
+         6982  K   Afrondingen
          6990  K   Overige algemene kosten                    :btw=hoog
 
   8  Bedrijfsopbrengsten
@@ -178,6 +187,7 @@ Resultaatrekeningen
          9230  K   Rente last Postbank Inbedrijf
          9290  K   Rente last overige
      93  Overige baten
+	 9380  O   Bijtelling privégebruik auto		      :btw=privé
          9390  O   Kleine ondernemersregeling
 
 # DAGBOEKEN
@@ -202,16 +212,18 @@ Dagboeken
 
 # BTW TARIEVEN
 #
-# Er zijn drie tariefgroepen: "hoog", "laag" en "nul". De tariefgroep
-# bepaalt het rekeningnummer waarop de betreffende boeking plaatsvindt.
+# Er zijn vijf tariefgroepen: "hoog", "laag", "nul", "privé" en
+# "anders". De tariefgroep bepaalt het rekeningnummer waarop de
+# betreffende boeking plaatsvindt.
 # Binnen elke tariefgroep zijn meerdere tarieven mogelijk, hoewel dit
 # in de praktijk niet snel zal voorkomen.
 # In de eerste kolom wordt de (numerieke) code voor dit tarief
 # opgegeven. Deze kan o.m. worden gebruikt om expliciet een BTW tarief
-# op te geven bij het boeken. Voor elk tarief (behalve die van groep
-# "nul") moet het percentage worden opgegeven. Met de aanduiding
-# :exclusief kan worden opgegeven dat boekingen op rekeningen met deze
-# tariefgroep standaard het bedrag exclusief BTW aangeven.
+# op te geven bij het boeken. Voor elk gebruikt tarief (behalve die
+# van groep "nul") moet het percentage worden opgegeven. Met de
+# aanduiding :exclusief kan worden opgegeven dat boekingen op
+# rekeningen met deze tariefgroep standaard het bedrag exclusief BTW
+# aangeven.
 #
 # BELANGRIJK: Mutaties die middels de command line shell of de API
 # worden uitgevoerd maken gebruik van het geassocieerde BTW tarief van
@@ -225,5 +237,6 @@ BTW Tarieven
    2  BTW 19% excl.          :tariefgroep=hoog :perc=19,00 :exclusief
    3  BTW 6,0% incl.         :tariefgroep=laag :perc=6,00
    4  BTW 6,0% excl.         :tariefgroep=laag :perc=6,00 :exclusief
+   5  BTW Privé 12% ex.	     :tariefgroep=privé :perc=12,00 :exclusief
 
 # Einde EekBoek schema

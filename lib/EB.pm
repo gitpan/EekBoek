@@ -1,22 +1,23 @@
-#! perl
+#! perl --			-*- coding: utf-8 -*-
+
+use utf8;
 
 # EB.pm -- EekBoek Base module.
-# RCS Info        : $Id: EB.pm,v 1.87 2009/04/03 09:41:55 jv Exp $
+# RCS Info        : $Id: EB.pm,v 1.94 2009/10/28 22:08:26 jv Exp $
 # Author          : Johan Vromans
 # Created On      : Fri Sep 16 18:38:45 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Mon Oct  6 14:50:32 2008
-# Update Count    : 221
+# Last Modified On: Wed Oct 28 21:02:59 2009
+# Update Count    : 253
 # Status          : Unknown, Use with caution!
 
 package main;
 
 our $app;
-our $cfg;
 
 package EB;
 
-our $VERSION = sprintf "%d.%03d", q$Revision: 1.87 $ =~ /(\d+)/g;
+our $VERSION = sprintf "%d.%03d", q$Revision: 1.94 $ =~ /(\d+)/g;
 
 use strict;
 use base qw(Exporter);
@@ -28,28 +29,35 @@ our @EXPORT_OK;
 
 # Establish location of our data, relative to this module.
 my $lib;
-BEGIN {
-    $lib = $INC{"EB.pm"};
-    $lib =~ s/EB\.pm$//;
-    $ENV{EB_LIB} = $lib;
-    # warn("lib = $lib\n");
+sub libfile {
+    my ($f) = @_;
+    unless ( $lib ) {
+	$lib = $INC{"EB.pm"};
+	$lib =~ s/EB\.pm$//;
+    }
+    $lib."EB/$f";
 }
 
-# Make it accessible.
-sub EB_LIB() { $lib }
+sub findlib {
+    my ($file) = @_;
+    foreach ( @INC ) {
+	return "$_/EB/$file" if -e "$_/EB/$file";
+    }
+    undef;
+}
 
-# Some standard modules.
+use lib ( grep { defined } findlib("CPAN") );
+
+# Some standard modules (locale-free).
 use EB::Globals;
 use Carp;
-use EB::Assert;
 use Data::Dumper;
+use Carp::Assert;
 
 BEGIN {
-    # The core and GUI use a different EB::Locale module.
+    # The CLI and GUI use different EB::Locale modules.
     if ( $app ) {
-	require EB::Wx::Locale;
-	# Force UNICODE for Wx.
-	$cfg->newval(qw(locale unicode), 1);
+	require EB::Wx::Locale;	# provides EB::Locale, really
     }
     else {
 	require EB::Locale;
@@ -57,35 +65,24 @@ BEGIN {
     EB::Locale::->import;
 }
 
-# Utilities.
+# Some standard modules (locale-dependent).
 use EB::Utils;
 
 # Export our and the imported globals.
-BEGIN {
-    @EXPORT = ( qw(EB_LIB),
-		@EB::Globals::EXPORT,
-		@EB::Utils::EXPORT,
-		@EB::Locale::EXPORT,
-		qw(carp croak),
-		qw(Dumper),
-		qw(findlib),
-		qw(assert affirm),
-	      );
-}
+@EXPORT = ( @EB::Globals::EXPORT,
+	    @EB::Utils::EXPORT,
+	    @EB::Locale::EXPORT,
+	    qw(carp croak),		# Carp
+	    qw(Dumper),			# Data::Dumper
+	    qw(findlib libfile),	# <self>
+	    qw(assert affirm),		# Carp::Assert
+	  );
 
-our @months;
-our @month_names;
-our @days;
-our @day_names;
 our $ident;
 our $imsg;
 our $url = "http://www.eekboek.nl";
 
-# Most elegant (and correct) would be to use an INIT block here, but
-# currently PAR is not able to handle INIT blocks.
-INIT {
-    return if $ident;		# already done
-    my $incompatibleOS = 0;
+unless ( $ident ) {		# already done (can this happen?)
 
     my $year = 2005;
     my $thisyear = (localtime(time))[5] + 1900;
@@ -95,13 +92,12 @@ INIT {
 		 version => $EekBoek::VERSION);
     my @locextra;
     push(@locextra, _T("Nederlands")) if LOCALISER;
-    push(@locextra, "Latin1") unless $cfg->val(qw(locale unicode), 0);
     $imsg = __x("{ident}{extra}{locale} -- Copyright {year} Squirrel Consultancy",
 		ident   => $ident,
-		extra   => ($app ? " Wx " : ""),
+		extra   => ($app ? " Wx" : ""),
 		locale  => (@locextra ? " (".join(", ", @locextra).")" : ""),
 		year    => $year);
-    warn($imsg, "\n") unless @ARGV && $ARGV[0] =~ /-(P|-?printcfg)$/;
+    warn($imsg, "\n") unless @ARGV && $ARGV[0] =~ /-(P|-?printconfig)$/;
 
     eval {
 	require Win32;
@@ -109,34 +105,9 @@ INIT {
 	my ($id, $major) = @a[4,1];
 	die unless defined $id;
 	warn(_T("EekBoek is VRIJE software, ontwikkeld om vrij over uw eigen gegevens te kunnen beschikken.")."\n");
-	if ( $cfg->val(qw(security override_security_for_vista), 0)
-	     or
-	     ( $id <= 1 || ( $id == 2 && $major <= 5) || $id >= 3 ) ) {
-	    warn(_T("Met uw keuze voor het Microsoft Windows besturingssysteem geeft u echter alle vrijheden weer uit handen. Dat is erg triest.")."\n");
-	}
-	else {
-	    $incompatibleOS++;
-	    warn(_T("Dit is niet te verenigen met uw keuze voor dit Microsoft Windows besturingssysteem.")."\n");
-	}
+	warn(_T("Met uw keuze voor het Microsoft Windows besturingssysteem geeft u echter alle vrijheden weer uit handen. Dat is erg triest.")."\n");
     } unless $ENV{AUTOMATED_TESTING};
 
-    @months =
-      split(" ", _T("Jan Feb Mrt Apr Mei Jun Jul Aug Sep Okt Nov Dec"));
-    @month_names =
-      split(" ", _T("Januari Februari Maart April Mei Juni Juli Augustus September Oktober November December"));
-    @days =
-      split(" ", _T("Zon Maa Din Woe Don Vri Zat"));
-    @day_names =
-      split(" ", _T("Zondag Maandag Dinsdag Woensdag Donderdag Vrijdag Zaterdag"));
-    die("?"._T("FATALE FOUT: Ongeschikt besturingssysteem")."\n") if $incompatibleOS;
-}
-
-sub findlib {
-    my ($file) = @_;
-    foreach ( @INC ) {
-	return "$_/EB/$file" if -e "$_/EB/$file";
-    }
-    undef;
 }
 
 1;

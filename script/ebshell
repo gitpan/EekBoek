@@ -1,20 +1,91 @@
 #! perl
 
+# $Id: ebshell,v 1.22 2010/03/17 10:47:49 jv Exp $
+
+package main;
+
 use strict;
+use warnings;
+use utf8;
+
 # use lib qw(EekBoekLibrary);
 
-use EB::Main;
-run();
+use File::Spec;
+use File::Basename;
+
+use Encode;
+binmode( STDERR, ':encoding(utf-8)' );
+
+# Common case when run from unpacked dist.
+my $script = $0;
+my $dir = dirname($script);
+my $lib = File::Spec->catfile( dirname($dir), "lib" );
+if ( -s File::Spec->catfile( $lib, "EekBoek.pm" ) ) {
+    # Need abs paths since we're going to chdir later.
+    unshift( @INC, File::Spec->rel2abs($lib) );
+    my $sep = $ENV{PATH} =~ m?;??q:;::q;:;;;; # just for fun
+    $ENV{PATH} = File::Spec->rel2abs($dir) . $sep . $ENV{PATH};
+}
+
+check_install( "EekBoek", "EekBoek.pm", "EB.pm", "EB/schema/eekboek.sql" );
+
+require EekBoek;
+check_version( "EekBoek", $EekBoek::VERSION, "2.00.00" );
+
+require EB::Main;
+EB::Main->run;
+
+################ Subroutines ################
+
+sub findfile {
+    my ( $file ) = @_;
+    foreach ( @INC ) {
+	my $f = File::Spec->catfile( $_, $file );
+	return $f if -s $f;
+    }
+    return;
+}
+
+sub check_install {
+    my ( $what, @checks ) = @_;
+    foreach ( @checks ) {
+	next if findfile( $_ );
+	error( <<END_MSG, "Installatiefout" );
+$what is niet geïnstalleerd, of kon niet worden gevonden.
+
+Raadplaag uw systeembeheerder.
+END_MSG
+	return;
+    }
+}
+
+sub check_version {
+    my ( $what, $version, $required ) = @_;
+    $version =~ s/^(\d+\.\d+\.\d+).*/$1/;
+    return if $version ge $required;
+    error( <<END_MSG, "Ontoereikende $what versie" );
+De geïnstalleerde versie van $what is niet toereikend.
+Versie $version is geïnstalleerd terwijl versie $required of later is vereist.
+
+Raadplaag uw systeembeheerder.
+END_MSG
+}
+
+################ Messengers ################
+
+sub error {
+    my ( $msg, $caption, $style ) = @_;
+    warn( $caption, "\n", $msg, "\n" );
+    exit(1);
+}
+
+1;
 
 =head1 NAME
 
 EekBoek - Bookkeeping software for small and medium-size businesses
 
 =head1 SYNOPSIS
-
-  perl -MEB::Main -e run --
-
-If properly installed:
 
   ebshell
 
@@ -43,7 +114,7 @@ Web site: L<http://www.eekboek.nl>.
 
 =head1 COPYRIGHT AND DISCLAIMER
 
-This program is Copyright 2005-2008 by Squirrel Consultancy. All
+This program is Copyright 2005-2010 by Squirrel Consultancy. All
 rights reserved.
 
 This program is free software; you can redistribute it and/or modify
@@ -58,7 +129,3 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See either the
 GNU General Public License or the Artistic License for more details.
 
 =cut
-
-1;
-
-# $Id: ebshell,v 1.18 2008/02/18 10:34:50 jv Exp $

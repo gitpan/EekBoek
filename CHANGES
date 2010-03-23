@@ -1,20 +1,331 @@
-# CHANGES		-*- coding: utf-8 -*-
+# $Id$
 
-1.04.06
+2.00.00		
 
-	* Fix probleem met het herkennen van tabelnamen in nieuwere
-          SQLite implementaties.
+	* Release 2.00.00
 
-1.04.05	2009-12-28 13:36
+2.00.00.RC03	2010-03-22 14:04
 
-	* Fix jaarafsluiting bug met afboeken van BTW prive/anders.
+	* Fix probleem dat een overbodige dialoog vraagt om een
+          eekboek.conf.
 
-	* (ebshell) Exit met return status indien --errexit is
-          opgegeven en er een foutoptreedt.
+2.00.00.RC02	2010-03-17 13:40
+
+	* Tweede release candidate 2.00.
+
+	* Diverse fixes voor Windows.
+
+	* Fix probleem met niet eenduidige interpretatie van getallen.
+	  In expressies als "5*0.005" werd 0.005 als 5 gezien i.p.v.
+	  0,005. 
+
+	* Kleine verbeteringen in de wizards. 
+
+2.00.RC01	2010-03-12 23:13
+
+	* Eerste release candidate 2.00.
+
+	* (iniwiz) Fix dubbele foutmelding.
+	
+	* Kleine, maar belangrijke aanpassingen t.b.v. Microsoft
+	  Windows.
+
+	* Onderhoud vertalingen toegevoegd aan de kit.
+
+1.05.20	2010-02-19 23:26
+
+	* Documentatie aanpassingen.
+
+	* (iniwiz) Fix probleem met crash na db selectie.
+
+	* Fix probleem met \ op laatste regel.
+
+	(wbwxshell) Fix probleem met de result rapporten.
+
+1.05.19	2010-01-27 10:25
+
+	* (ebshell) Fix unicode probleem in help strings.
+
+	* (ebshell) Fix unicode probleem in wizard waardoor
+          administratie namen/codes geen non-ascii tekens konden
+          bevatten.
+
+1.05.18	2010-01-26 10:56
+
+	* (ebwxshell) Fix unicode issues.
+
+	* (ebwxshell) Filter duplicaten uit de history en beperk het
+          aantal teruggeschreven regels tot een instelbaar maximum
+          (default 200).
+
+	* Upgrade Wx::Perl::ProcessStream to 0.24.
+
+1.05.17	2010-01-22 13:10
+
+	* Nieuw command: schema. Hiermee kunnen interactief
+          (vooralsnog alleen) grootboekrekeningen worden aangemaakt.
+
+	  Onderhoud van het schema. Deze opdracht kent sub-opdrachten:
+
+	    schema <opdracht> [ <opties> ] <argumenten>
+
+	  Aanmaken grootboekrekening
+
+	    schema gbk <rekening> [ <type> <omschrijving> <verdichting> ]
+
+	       <rekening>      de gewenste grootboekrekening
+	       <type>          D/C voor Debet / Credit
+			       K/O/N voor Kosten / Omzet / Neutraal
+			       Eventueel gevolgd door ! als deze 
+			       balansrekening vast staat aan één kant
+	       <omschrijving>  De omschrijving van deze grootboekrekening
+	       <verdichting>   De verdichting waaronder deze rekening valt
+
+	       Wanneer enkel een nummer wordt opgegeven dan worden de gegevens
+	       van de betreffende grootboekrekening getoond.
+
+	* Fix probleem met completion van rekeningnummers.
+
+	* Upgrade Module::Build to 0.32 to have decent prereq support.
+
+1.05.16 2010-01-17 00:14
+
+	* (ebshell) Non-zero exit status indien fouten zijn
+          opgetreden. Dit kan consequenties hebben als ebshell wordt
+          toegepast in makefiles.
+
+	* (ebshell) Verwijderen opties --createsampleconfig en
+          --createsampledb (vervangen door de wizard).
+
+	* (ebshell, wizard) Gebruik eigen code (recursief) om --init
+	  uit te voeren.
+
+	* (ebshell, shell) Grote opruiming.
+
+	* (migration) Fix: DB automigratie van SQLite zat PostgreSQL
+          in de weg.
+
+1.05.15 2010-01-16 16:32
+
+	* Small changes for the packaging.
+
+1.05.14 2010-01-13 11:12
+
+	* (ebwxshell) Icon buttons i.p.v. [Edit] en [Send].
+	  Conform to Gnome Human Interface Guide.
+
+	* (ebwxshell, editdialoog) Resizable, onthoudt size/pos.
+
+	* (ebwxshell) Meer rapporten in het menu.
+
+	* (ebwxshell) EditDialog meeleveren :)
+
+	* Eerste herziening van de documentatie.
+
+	* Fix test probleem op een virgo install.
+
+	* Fix probleem met het verwerken van het schema (privé werd
+          niet herkend).
+
+	* Kleine aanpassingen om het opstartgedrag van ebshell en
+          ebwxshell consistent te maken.
+
+1.05.13 2010-01-06 21:21
+1.05.12 2010-01-06 20:09
+
+	=== EXPERIMENTAL ===
+
+	* De configuratie file mag nu ook "eekboek.conf" heten.
+
+	  Sterker nog, "eekboek.conf" wordt geprefereerd boven
+	  ".eekboek.conf". Dus wanneer beide er zijn wordt alleen
+	  "eekboek.conf" gebruikt. Wanneer nieuwe files worden
+	  aangemaakt wordt alleen "eekboek.conf" aangemaakt.
+
+	  Wanneer er alleen ".eekboek.conf" bestanden zijn moet het
+	  gedrag ongewijzigd zijn gebleven.
+
+1.05.11	2010-01-06 13:56
+
+	* (ebwxshell, wizard) Verplicht unieke administratie naam en code.
+
+	* (ebshell) Wizard om administraties aan te maken.
+
+	* (ebwxshell) Mogelijkheid om de input regel uitgebreid te
+	  editen, inclusief multi-line support.
+
+1.05.10	2009-12-23 22:32
+
+	* (ebwxshell) Persistent window size/positions.
+
+	* (MS-Windows) Consequent gebruik van de registry.
+
+	  HKCU\Software\Squirrel Consultancy\EekBoek\ebwxshell
+
+	* (Config) Gebruik HOMEDRIVE/HOMEPATH voor Windows.
+
+1.05.09	2009-12-23 13:18
+
+	* (ebwxshell) Drill-down. In de rapportage windows kun je
+          klikken op (de meeste) grootboeknummers, journaalposten en
+          relatiecodes om daarmee het bijbehorende overzicht op te
+          roepen.
+
+	  Voor het beste resultaat verdient het aanbeveling de
+	  preference "Rapporten in hetzelfde venster" uit te zetten.
+
+1.05.08	2009-12-22 23:00
+
+	* Configuratie files:
+
+	  [locale] lang werkt nu (weer).
+
+	  [database]
+	  - fullname is vervallen.
+	  - name prefix "eekboek_" wordt niet langer gestript. 
+	  - driver = sqlite is nu default.
+
+	* (ebwxshell) Fix preferences save/restore.
+
+	* examples/eekboek.conf bijgewerkt.
+
+	* Meer vertaald.
+
+1.05.07	2009-12-22 14:00
+
+	* (ebwxshell) Preferences voor error/warning/info popup windows.
+
+	* (ebwxshell) Icon.
+
+	* (ebwxshell) Altijd wizard/sel opstarten, ook als er een
+          .eekboek.conf is.
+
+1.05.06	2009-12-20 13:18
+
+	* Fix probleem dat ebshell niet langer
+          create{database|sampleconfig} kon doen.
+
+	* Missend icon toevoegen.
+
+	* ebwxshell installeren ipv. ebgui.
+
+	* Nieuwe settings toegevoegd aan examples/eekboek.conf.
+
+1.05.05	2009-12-19 15:23
+
+	* Integratie met EB WxShell.
+
+	* Verwijder (tijdelijk) GUI voor ombouw tot browser.
+
+	* (Wizard) Config 'admdir' in sectie '[general]' kan worden
+          gebruikt om te bepalen waar de administraties (moeten komen
+          te) staan.
+
+	* (Wizard) Voorkom dat de verkeerde ebshell wordt opgestart.
+
+	* (Wizard) Gebruik de voorbeeldadministratie als default.
+
+	* Bugfix (regressie) BTW werd niet afgeboekt in de volgjaren
+	  van een meerjarige boekhouding.
+
+	* Bugfix: meervoudige definitie van 'min' in
+          EB/Tools/Einde.pm.
+
+	* Bugfix: ebgui kende --[no]wizard niet.
+
+	* (Wizard): Defaults voor adm code en database naam.
+
+1.05.04	2009-10-28 23:47
+
+	* Many internal changes for GUI integration.
+
+	* Consistent gedrag gui/wizard.
+
+1.05.03	2009-10-27 16:15
+
+	* !!! SNAPSHOT !!! SNAPSHOT !!! SNAPSHOT !!!
+
+	* (GUI) Bugfix: Dagboeken -> Inkoop/Verkoop hadden geen title.
+
+	* (Wizard) Toon alle beschkbare database drivers.
+
+	* (Wizard) Fix vertaling <Prev and Next> buttons.
+
+	* (Wizard) Ingave database folder.
+
+	* (Wizard) Automatisch vormen van database naam uit de
+          naam van de administratie.
+
+	* (GUI) Aanmaken van en kiezen uit administraties die in een
+          folder zijn ondergebracht. --admdir command line optie.
+	  
+1.05.02	2009-10-19 11:47
+
+	* !!! SNAPSHOT !!! SNAPSHOT !!! SNAPSHOT !!!
+
+	* (GUI) Verhelpen probleem van opstarten GUI vanuit Wizard.
+
+	* Verhelpen probleem met de voorbeeldadmin (mutaties waren nog niet
+	  omgezet naar UTF-8).
+
+1.05.01	2009-10-18 22:46
+
+	* !!! SNAPSHOT !!! SNAPSHOT !!! SNAPSHOT !!!
+
+	* (GUI) Templates voor de setup wizard.
+
+	* Discontinueer ondersteuning voor latin1 bestanden. Alles is
+          nu UTF-8.
+
+	* Export ondersteunt --titel (omschrijving van de export kit).
+	  Vooralsnog alleen relevant voor export naar ebz file.
+
+	* (GUI) Export/EekBoek: Omschrijving kan worden opgegeven.
+
+	* (GUI) IniWiz: Gebruik omschrijving in de templates lijst.
+
+	* (SQLite) Config database::path bepaalt waar de databases
+          worden neergezet.
+
+	* Andere processing van de configuratiefiles. Mag geen
+          zichtbare gevolgen hebben.
+
+	* Andere processing van numerieke expressies in bedragen. Mag
+          geen zichtbare gevolgen hebben.
+
+	* Bedragen mogen nu ook worden ingegeven met
+          duizendtalscheidingstekens, dus b.v. 1.234,56 of 1,234.56 .
+
+	* (IVP) Verbetering opzet en afhandeling.
+
+	* (Config) format:amount vervangt locale:decimalpt,
+          locale:thousandsep en text:numwidth.
+
+	  1234.56      -> dpt = "."
+	  1234,56      -> dpt = ","
+	  1.234,56     -> dpt = ",", sep = "."
+	  1,234.56     -> dpt = ".", sep = ","
+	  1.234.567,89 -> dpt = ",", sep = ".", width = 12
+
+	  De width wordt alleen aangepast als het format breder is dan
+	  9 tekens.
+
+1.05.00	2009-10-09 17:50
+
+	* !!! SNAPSHOT !!! SNAPSHOT !!! SNAPSHOT !!!
+
+	* (GUI) Admin setup wizard.
+
+	* Strafbankje voor balansrekeningen.
+
+	* Fix problem dat 'privé' niet wordt gematched als
+	  content-type = utf8 en $cfg->unicode.
 
 1.04.04	2009-06-10 12:13
 
 	* Bugfix voor --createsampleconfig .
+
+	* Bugfix voor --createsampledb .
 
 1.04.03	2009-04-03 12:18
 

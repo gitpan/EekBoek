@@ -1,4 +1,6 @@
-#! perl
+#! perl --			-*- coding: utf-8 -*-
+
+use utf8;
 
 package main;
 
@@ -10,7 +12,7 @@ package EB::Shell;
 use strict;
 use warnings;
 
-our $VERSION = sprintf "%d.%03d", q$Revision: 1.110 $ =~ /(\d+)/g;
+our $VERSION = sprintf "%d.%03d", q$Revision: 1.116 $ =~ /(\d+)/g;
 
 use EB;
 
@@ -112,6 +114,8 @@ sub eb_complete {
     my $pre = substr($line, 0, $pos);
     #warn "\n[$pre][", substr($line, $pos), "]\n";
 
+    select(STDERR); $| = 1; select(STDOUT);
+
     if ( $i < 0 || $i > $pos-1 || $pre =~ /^help\s+$/ ) {
 	my @extra;
 	@extra = qw(rapporten periodes) if $pre =~ /^help\s+$/;
@@ -125,7 +129,7 @@ sub eb_complete {
     }
     if ( $word =~ /^\d+$/ )  {
 	my $sth = $dbh->sql_exec("SELECT acc_id,acc_desc from Accounts".
-				 " WHERE acc_id LIKE ?".
+				 " WHERE CAST(acc_id AS text) LIKE ?".
 				 " ORDER BY acc_id", "$word%");
 	my $rr = $sth->fetchrow_arrayref;
 	return () unless $rr;
@@ -177,13 +181,13 @@ sub parseline {
     my ($self, $line) = @_;
     $line =~ s/\\\s*$//;
     $line =~ s/;\s*$//;
-    my ($cmd, $env, @args) = $self->SUPER::parseline($line);
+    my ($cmd, @args) = $self->SUPER::parseline($line);
 
     if ( $cmd =~ /^(.+):(\S+)$/ ) {
 	$cmd = $1;
 	unshift(@args, "--nr=$2");
     }
-    ($cmd, $env, @args);
+    ($cmd, @args);
 }
 
 ################ Subroutines ################
@@ -199,10 +203,12 @@ sub _plug_cmds {
 	my ($dbk_id, $dbk_desc, $dbk_type) = @$rr;
 	no strict 'refs';
 	my $dbk = lc($dbk_desc);
+	undef &{"do_$dbk"};
 	*{"do_$dbk"} = sub {
 	    my $self = shift;
 	    $self->_add($dbk_id, @_);
 	};
+	undef &{"help_$dbk"};
 	*{"help_$dbk"} = sub {
 	    my $self = shift;
 	    $self->_help($dbk, $dbk_id, $dbk_desc, $dbk_type, @_);
@@ -228,10 +234,12 @@ sub _plug_cmds {
 	$cmd =~ s/^set_//;
 	next if $cmd =~ /^btw/ && !$does_btw;
 	no strict 'refs';
+	undef &{"do_adm_$cmd"};
 	*{"do_adm_$cmd"} = sub {
 	    (shift->{o} ||= EB::Tools::Opening->new)->$adm(@_);
 	};
 	my $help = "help_$cmd";
+	undef &{"help_adm_$cmd"};
 	*{"help_adm_$cmd"} = sub {
 	    my $self = shift;
 	    ($self->{o} ||= EB::Tools::Opening->new)->can($help)
@@ -242,7 +250,9 @@ sub _plug_cmds {
     # BTW aangifte.
     if ( $does_btw ) {
 	no strict 'refs';
+	undef &{"do_btwaangifte"};
 	*{"do_btwaangifte"}   = \&_do_btwaangifte;
+	undef &{"help_btwaangifte"};
 	*{"help_btwaangifte"} = \&_help_btwaangifte;
     }
 
@@ -907,6 +917,74 @@ wordt het huidige boekjaar verondersteld.
 EOS
 }
 
+################ Schema ################
+
+sub do_schema {
+    my ( $self, @args ) = @_;
+
+    my $opts = {
+	       };
+
+    goto &help_schema unless @args >= 2;
+
+    my $cmd = shift(@args);
+
+    require EB::Tools::Schema;
+
+    if ( $cmd eq 'gbk' ) {
+	goto &help_schema
+	  unless @args % 4 == 0 || @args % 4 == 1; # weird, but okay
+	my $fail;
+	for ( my $i = 0; $i < @args; $i += 4 ) {
+	    unless ( $args[$i] =~ /^[[:digit:]]+$/i ) {
+		warn("?".__x("Ongeldig of ontbrekend rekeningnummer: {x}",
+			     x => $args[$i])."\n");
+		$fail++;
+	    }
+	    next if $i+1 >= @args;
+	    unless ( $args[$i+1] =~ /^[dc]!?|[kon]$/i ) {
+		warn("?".__x("Ongeldige of ontbrekende type specificatie: {x}",
+			     x => $args[$i+1])."\n");
+		$fail++;
+	    }
+	    unless ( $args[$i+3] =~ /^[[:digit:]]+$/i ) {
+		warn("?".__x("Ongeldige of ontbrekende verdichting: {x}",
+			     x => $args[$i])."\n");
+		$fail++;
+	    }
+	}
+	goto &help_schema if $fail;
+	EB::Tools::Schema->new->add_gbk( @args, $opts );
+    }
+
+    else {
+	goto &help_schema;
+    }
+}
+
+sub help_schema {
+    my $ret = <<EOS;
+Onderhoud van het schema. Deze opdracht kent sub-opdrachten:
+
+  schema <opdracht> [ <opties> ] <argumenten>
+
+Aanmaken grootboekrekening
+
+  schema gbk <rekening> [ <type> <omschrijving> <verdichting> ]
+
+     <rekening>      de gewenste grootboekrekening
+     <type>          D/C voor Debet / Credit
+		     K/O/N voor Kosten / Omzet / Neutraal
+		     Eventueel gevolgd door ! als deze 
+		     balansrekening vast staat aan Ã©Ã©n kant
+     <omschrijving>  De omschrijving van deze grootboekrekening
+     <verdichting>   De verdichting waaronder deze rekening valt
+
+     Wanneer enkel een nummer wordt opgegeven dan worden de gegevens
+     van de betreffende grootboekrekening getoond.
+EOS
+}
+
 ################ Relations ################
 
 sub do_relatie {
@@ -968,6 +1046,7 @@ sub do_export {
 	       [ 'dir=s',
 		 'file|output=s',
 		 'boekjaar=s',
+		 'titel=s',
 		 'xaf=s',
 		 'single',
 		 'explicit',
@@ -994,7 +1073,7 @@ sub do_export {
     if ( $opts->{xaf} ) {
 	if ( findlib "Export/XAF.pm" ) {
 	    require EB::Export::XAF;
-	    # XAF bevat altijd maar één boekjaar.
+	    # XAF bevat altijd maar Ã©Ã©n boekjaar.
 	    $opts->{boekjaar} ||= $bky;
 	    EB::Export::XAF->export($opts);
 	}
@@ -1004,9 +1083,10 @@ sub do_export {
     }
     else {
 	if ( $opts->{boekjaar} ) {
-	    warn("?"._T("Optie --boekjaar wordt niet ondersteunt door deze export")."\n");
-	return;
+	    warn("?"._T("Optie --boekjaar wordt niet ondersteund door deze export")."\n");
+	    return;
 	}
+	$opts->{desc} = delete $opts->{titel};
 	require EB::Export;
 	EB::Export->export($opts);
     }
@@ -1028,8 +1108,8 @@ Opties:
   --boekjaar=<code>         Selecteer boekjaar (alleen met --xaf)
 
 Er moet een --file, --dir of een --xaf optie worden opgegeven.
-De XAF export exporteert altijd één enkel boekjaar. Voor de andere
-exports wordt altijd de gehele administratie geëxporteerd.
+De XAF export exporteert altijd Ã©Ã©n enkel boekjaar. Voor de andere
+exports wordt altijd de gehele administratie geÃ«xporteerd.
 Eventueel bestaande files worden overschreven.
 EOS
 }
@@ -1071,7 +1151,7 @@ sub do_import {
 
 sub help_import {
     <<EOS;
-Importeert een complete, geëxporteerde administratie.
+Importeert een complete, geÃ«xporteerde administratie.
 
   import [ <opties> ]
 
@@ -1097,6 +1177,8 @@ sub do_include {
 	       ], $opts);
     return unless argcnt(scalar(@args), 1);
     my $file = shift(@args);
+
+    # Note: no :encoding, this is handled by the input loop.
     if ( open(my $fd, '<', $file) ) {
 	$self->attach_file($fd);
     }

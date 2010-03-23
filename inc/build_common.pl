@@ -1,10 +1,10 @@
 # build_common.inc -- Build file common info -*- perl -*-
-# RCS Info        : $Id: build_common.pl,v 1.21 2009/04/03 09:43:43 jv Exp $
+# RCS Info        : $Id: build_common.pl,v 1.26 2010/03/17 12:12:55 jv Exp $
 # Author          : Johan Vromans
 # Created On      : Thu Sep  1 17:28:26 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Sun Jan 25 21:02:53 2009
-# Update Count    : 93
+# Last Modified On: Fri Mar 12 22:48:00 2010
+# Update Count    : 101
 # Status          : Unknown, Use with caution!
 
 use strict;
@@ -23,12 +23,14 @@ $data =
     distname        => 'EekBoek',
     license         => "perl",
     script_files    => [ map { File::Spec->catfile("script", $_) }
-			 qw(ebshell) ],
+			 qw(ebshell ebwxshell) ],
     prereq_pm =>
     { 'Getopt::Long'        => '2.13',
       'Term::ReadLine'      => 0,
       $^O eq "linux" ? ('Term::ReadLine::Gnu' => 0) : (),
       'DBI'                 => '1.40',
+      'Archive::Zip'	    => '1.16',
+      'DBD::SQLite'         => '1.13',
     },
     buildreq_pm =>
     { # These are required for the build/test, and will be included.
@@ -37,10 +39,8 @@ $data =
     },
     recomm_pm =>
     { 'Getopt::Long'        => '2.32',
-      'Archive::Zip'	    => '1.16',
       'HTML::Entities'	    => '1.35',
       'DBD::Pg'             => '1.41',
-      'DBD::SQLite'         => '1.13',
     },
     usrbin => "/usr/bin",
   };
@@ -52,7 +52,7 @@ sub checkbin {
     return if $installscript eq $data->{usrbin};
     print STDERR <<EOD;
 
-WARNING: This build process will install a user accessible script.
+WARNING: This build process will install user accessible scripts.
 The default location for user accessible scripts is
 $installscript.
 EOD
@@ -115,6 +115,10 @@ sub ProcessTemplates {
 
     vcopy( _tag	    => "RPM spec file",
 	   _dst	    => "$name.spec",
+	   %vars);
+
+    vcopy( _tag	    => "XAF ref file",
+	   _dst	    => "t/ivp/ref/export.xaf",
 	   %vars);
 
 =begin Debian

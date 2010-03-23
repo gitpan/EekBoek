@@ -1,7 +1,4 @@
-#! perl
-
-#package Carp::Assert;
-package EB::Assert;
+package Carp::Assert;
 
 require 5.004;
 
@@ -47,7 +44,7 @@ sub import {
     }
     else {
         *DEBUG = *REAL_DEBUG;
-        __PACKAGE__->_export_to_level(1, @_);
+        Carp::Assert->_export_to_level(1, @_);
     }
 }
 

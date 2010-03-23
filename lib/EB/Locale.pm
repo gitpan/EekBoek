@@ -1,39 +1,32 @@
-#! perl
+#! perl --			-*- coding: utf-8 -*-
+
+use utf8;
 
 # Locale.pm -- EB Locale setup (core version)
-# RCS Info        : $Id: Locale.pm,v 1.12 2008/03/22 15:54:44 jv Exp $ 
+# RCS Info        : $Id: Locale.pm,v 1.15 2009/10/24 20:01:01 jv Exp $ 
 # Author          : Johan Vromans
 # Created On      : Fri Sep 16 20:27:25 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Sat Mar 22 16:54:24 2008
-# Update Count    : 100
+# Last Modified On: Sat Oct 24 22:00:58 2009
+# Update Count    : 117
 # Status          : Unknown, Use with caution!
-
-package main;
-
-our $cfg;
 
 package EB::Locale;
 
 use strict;
 
-our $VERSION = sprintf "%d.%03d", q$Revision: 1.12 $ =~ /(\d+)/g;
+our $VERSION = sprintf "%d.%03d", q$Revision: 1.15 $ =~ /(\d+)/g;
 
 use base qw(Exporter);
 
 use constant COREPACKAGE => "ebcore";
 
-our @EXPORT_OK;
-our @EXPORT;
-
-BEGIN {
-    @EXPORT_OK = qw(LOCALISER _T __x __n __nx __xn);
-    @EXPORT = ( @EXPORT_OK );
-}
+our @EXPORT_OK = qw(LOCALISER _T __x __n __nx __xn);
+our @EXPORT = @EXPORT_OK;
 
 # This module supports three different gettext implementations.
 
-use POSIX;			# for setlocale
+use POSIX qw(setlocale LC_MESSAGES);
 
 my $gotone = 0;
 
@@ -46,7 +39,8 @@ unless ( $gotone ) {
 	our $core_localiser;
 	unless ( $core_localiser ) {
 	    $core_localiser = Locale::gettext->domain(COREPACKAGE);
-	    $core_localiser->dir($ENV{EB_LIB} . "EB/locale");
+	    # Since EB is use-ing Locale, we cannot use the EB exported libfile yet.
+	    $core_localiser->dir(EB::libfile("locale"));
 	}
 
 	eval 'sub _T($) {
@@ -61,17 +55,7 @@ unless ( $gotone ) {
 
 unless ( $gotone ) {
 
-    if ( !$cfg || $cfg->val(qw(locale unicode), 0) ) {
-	require Encode;
-	eval 'sub _T($) { Encode::decode("ISO-8859-1", $_[0]) };';
-	binmode(STDIN,  ":encoding(utf8)") if -t;
-	binmode(STDOUT, ":encoding(utf8)");
-	binmode(STDERR, ":encoding(utf8)");
-    }
-    else {
-	eval 'sub _T($) { $_[0] };';
-    }
-
+    eval 'sub _T($) { $_[0] };';
     eval 'sub LOCALISER() { "" }';
 
 }
@@ -92,7 +76,7 @@ setlocale(LC_MESSAGES, $ENV{EB_LANG}||"");
 our $core_localiser;
 unless ( $core_localiser ) {
     $core_localiser = Locale::gettext->domain(COREPACKAGE);
-    $core_localiser->dir($ENV{EB_LIB} . "EB/locale");
+    $core_localiser->dir( libfile("locale") );
 }
 
 sub _T($) {
@@ -141,7 +125,7 @@ sub __nx($$$@) {
 # references.
 # It also provides the utility routines __x __n __xn __nx and more.
 
-use Locale::TextDomain(COREPACKAGE, $ENV{EB_LIB} . "EB/locale");
+use Locale::TextDomain( COREPACKAGE, libfile("locale") );
 
 sub _T($) { $__->{$_[0]} }
 

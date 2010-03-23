@@ -37,20 +37,7 @@
       <table width="100%" border="0" cellpadding="0" cellspacing="0">
   <tr valign="middle">
     <td align="left">
-      <table border="0" cellpadding="0" cellspacing="2">
-  <tr valign="middle">
-
-    <td class="info"></td>
-    <td><a href="../intro/index.html" class="menu">Inleiding</a>
-</td>
-	<td> &#xbb; </td>
-    <td class="info"></td>
-    <td><a href="../intro/working.html" class="menu">Werkwijze</a>
-</td>
-	
-  </tr>
-</table>
-
+      
 
     </td>
     <td align="right">
@@ -87,12 +74,7 @@
   </tr>
   <tr valign="top">
     <td align="left">
-      <a href="../intro/index.html" class="menuselect">Inleiding</a>
-<br>
-&nbsp;-&nbsp;<a href="../intro/working.html" class="menuselect">Werkwijze</a>
-<br>
-&nbsp;-&nbsp;<a href="../intro/backups.html" class="menu">Backups</a>
-<br>
+      <a href="../intro/index.html" class="menu">Inleiding</a>
 <br>
 <a href="../install/index.html" class="menu">Installeren</a>
 <br>
@@ -145,7 +127,8 @@ op de knop kan te allen tijde de gehele administratie opnieuw worden
 opgebouwd door het verwerken van het schema en het mutatiebestand.</p>
 
 <p>Natuurlijk is het ook mogelijk om incrementeel te werken, en steeds
-interactief met de <a href="../ebshell/index.html">EekBoek
+interactief met de <a href="../ebshell/index.html">EekBoek command
+line shell</a> of de <a href="../ebwxshell/index.html">grafische
 shell</a> mutaties toe te voegen. Of een combinatie: elke nieuwe
 mutatie toevoegen aan het mutatiebestand en dan alleen de nieuw
 toegevoegde mutaties via de batch-faciliteit verwerken. De meeste
@@ -186,10 +169,9 @@ en de te gebruiken database driver.
 <br><a href="eekboek.conf">Bekijk een voorbeeld.</a>
 </p>
 
-<p>Het is mogelijk te werken met een <strong>2-bestanden
-systeem</strong> door de relaties, opening en mutaties in een enkel
+<p><i>Het is ook mogelijk de relaties, opening en mutaties in een enkel
 bestand te onderhouden. In de praktijk werkt dit echter minder
-handig.</p>
+handig.</i></p>
 
 <p>Tijdens het werken met de administratie kunnen nieuwe boekingen
 worden toegevoegd aan het mutaties bestand. Nieuwe relaties komen
@@ -197,19 +179,24 @@ vanzelfsprekend in het relaties bestand. Het schema dient doorgaans
 enkel te worden aangepast als nieuwe grootboekrekeningen nodig zijn.
 De openingsgegevens zullen niet wijzigen.</p>
 
-<p>Het is niet nodig na elke nieuwe boeking de gehele set bestanden
-opnieuw te verwerken. Het is bijvoorbeeld handig om nieuwe boekingen
-in een afzonderlijk bestandje op te nemen, dit bestandje te verwerken
-in de bestaande administratie, en dan de inhoud ervan toe te voegen
-aan het mutaties bestand.</p>
+<p>Het is niet nodig om voor elke nieuwe boeking de gehele set
+bestanden opnieuw te verwerken. U kunt bijvoorbeeld de nieuwe
+boekingen in een afzonderlijk bestandje op te nemen, dit bestandje te
+verwerken in de bestaande administratie, en daarna de inhoud ervan
+toevoegen aan het mutaties bestand.</p>
+
+<p>Er zijn vele wegen die naar Rome leiden. De ondersteuning door de
+standaard EekBoek tools gaat uit van het hier beschreven
+vier-bestandensysteem.</p>
 
 <h2>Import en Export</h2>
 
-<p>Met behulp van de EekBoek import voorziening kan een set bestanden
-eenvoudig worden verwerkt. Met de export voorziening kan te allen
-tijde de volledige inhoud van de administratie weer worden
-weggeschreven naar een volledige set bestanden. <br>Zie voor meer
-informatie <a href="../inex.html">Import en Export</a>.</p>
+<p>Met behulp van de EekBoek import voorziening kan een set van de
+vier hierboven beschreven bestanden eenvoudig worden verwerkt. Met de
+export voorziening kan te allen tijde de volledige inhoud van de
+administratie weer worden weggeschreven naar een volledige set van
+vier bestanden. <br>Zie voor meer informatie <a
+href="../inex.html">Import en Export</a>.</p>
 
 <h2>Meerdere boekjaren</h2>
 
@@ -219,7 +206,7 @@ administratie worden opgezet. Beide methodes hebben voor- en
 nadelen.</p>
 
 <p>In het geval meerdere boekjaren in een enkele administratie
-voorkomen is het gemakkelijker om oude boekstukken terug te vinden, en
+voorkomen is het gemakkelijker om oude boekstukken terug te vinden en
 rapportages te maken die over boekjaargrenzen lopen. Denk bijvoorbeeld
 aan een resultaatrekening van mei tot en met april voor een
 seizoensgebonden bedrijf. Of een resultaatrekening die meerdere jaren
@@ -230,30 +217,31 @@ administratie echter kleiner en gemakkelijker hanteerbaar.</p>
 
 <p>EekBoek biedt voor deze laatste werkwijze een extra faciliteit: bij
 het afsluiten van een boekjaar kunnen de openingsgegevens voor het
-eropvolgende boekjaar worden aangemaakt. Door deze door middel van de
-<code>include</code> opdracht in de opening op te nemen, kunnen
-meerdere boekjaren in onafhankelijke administraties worden gevoerd,
-terwijl elke administratie toch steeds automatisch de meest actuele
-eindgegevens van het voorgaande boekjaar kan gebruiken.</p>
+eropvolgende boekjaar automatisch worden aangemaakt. Door deze door
+middel van de <code>include</code> opdracht in de opening van het
+nieuwe boekjaar op te nemen, kunnen meerdere boekjaren in
+onafhankelijke administraties worden gevoerd, terwijl elke
+administratie toch steeds automatisch de meest actuele eindgegevens
+van het voorgaande boekjaar kan gebruiken.</p>
 
-<p>Een voorbeeld. Stel u heeft de bestanden van boekjaar 2005 in de
-directory <code>adm2005</code>, en die van 2006 in
-<code>adm2006</code>. U neemt dan in <code>adm2005/mutaties.eb</code>
+<p>Een voorbeeld. Stel u heeft de bestanden van boekjaar 2009 in de
+directory <code>adm2009</code>, en die van 2010 in
+<code>adm2010</code>. U neemt dan in <code>adm2009/mutaties.eb</code>
 als laatste opdracht op:</p>
 
-<blockquote class="code">jaareinde --eb=opening2006.eb</blockquote>
+<blockquote class="code">jaareinde --eb=opening2010.eb</blockquote>
 
 <p>Bij het verwerken van de mutaties wordt het boekjaar afgesloten en de
 openingsgegevens voor het volgende boekjaar geplaatst in het bestand
-<code>opening2006.eb</code>.</p>
+<code>opening2010.eb</code>.</p>
 
-<p>In het bestand <code>adm2006/opening.eb</code> neemt u dan de
+<p>In het bestand <code>adm2010/opening.eb</code> neemt u dan de
 volgende opdrachten op:</p>
 
-<blockquote class="code">adm_naam "Mijn Administratie 2006"
-adm_begindatum 2006
+<blockquote class="code">adm_naam "Mijn Administratie 2010"
+adm_begindatum 2010
 adm_btwperiode jaar
-include "../adm2005/opening2006.eb"
+include "../adm2009/opening2010.eb"
 adm_open
 </blockquote>
 
@@ -290,7 +278,7 @@ gegevens gebruikt.</p>
 Deze site is gemaakt met de 
 <a href='http://www.squirrel.nl/people/jvromans/tt2site/'>TT2Site
 Site Builder</a>.<br />
-intro/working.html laatste aanpassing 12 januari 2010, 16:12:43
+intro/working.html laatste aanpassing 08 februari 2010, 21:13:42
 </p>
 
     </td>

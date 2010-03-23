@@ -211,6 +211,12 @@ zijn daarom voor alle talen hetzelfde, en enigszins taal-neutraal
     <td>De standaardplek voor administraties.
     <br>Default: <code>.eekboek/admdir</code> in de home-directory van de gebruiker.</td>
   </tr>
+  <tr valign="top">
+    <td><a name="general_wizard"></a><code>wizard</code></td>
+    <td>Forceer de selectiewizard ook als er een
+  <code>eekboek/admdir</code> in de directory staat. Hiermee kunt u
+  meerdere administratie-directories realiseren.</td>
+  </tr>
 </table>
 
 <p><a name="locale"></a><b>Sectie "Locale"</b></p>
@@ -222,39 +228,13 @@ zijn daarom voor alle talen hetzelfde, en enigszins taal-neutraal
 	gebruiken taal (locale) te selecteren.<br>Standaard wordt de
 	instelling van het systeem overgenomen.
 	<br>De waarde is doorgaans een string als
-	<code>nl_NL.iso8859-1</code> of <code>nl_NL.utf8</code>. Als
-	de tekensetaanduiding <code>utf8</code> is, zal EekBoek alle
-	invoer en uitvoer in Unicode verzorgen. In alle andere
-	gevallen vindt in- en uitvoer in ISO-8859-1 (Latin1) plaats.
-	<br>Default: <code>nl_NL.utf8</code> voor MS Windows systemen,
-	anders <code>nl_NL</code>.
+	<code>nl_NL.utf8</code>.
+	<br>Default: <code>nl_NL.utf8</code>.
 	<br><em>Taalinstelling is alleen effectief in de
 	internationale versie van EekBoek, en niet in de standaardversie.</em>
     </td>
   </tr>
-  <tr valign="top">
-    <td><a name="locale_unicode"></a><code>unicode</code></td>
-    <td>Deze variable kan worden gebruikt om expliciet aan te geven dat
-	EekBoek UNICODE moet gebruiken. 
-	<br>Deze variabele heeft voorrang boven de waarde van
-	<code>lang</code>.
-    </td>
-  </tr>
-  <tr valign="top">
-    <td><a name="locale_dpt"></a><code>decimalpt</code></td>
-    <td>Deze variable kan worden gebruikt om de door EekBoek te
-	gebruiken decimaalpunt te wijzigen.
-    </td>
-  </tr>
-  <tr valign="top">
-    <td><a name="locale_tsp"></a><code>thousandsep</code></td>
-    <td>Deze variable kan worden gebruikt om EekBoek duizendpuntjes te
-	laten zetten in bedragen. De waarde van de variabele is het
-	&lsquo;puntje&rsquo;. De breedte van de kolommen in de
-	rapportages wordt automatisch aangepast om ruimte te bieden
-	aan de duizendpuntjes.
-    </td>
-  </tr>
+
 </table>
 
 <p><a name="cpy"></a><b>Sectie "Company"</b></p>
@@ -309,31 +289,24 @@ zijn daarom voor alle talen hetzelfde, en enigszins taal-neutraal
   <tr valign="top">
     <td><a name="database_name"></a><code>name</code></td>
     <td>De naam van de te gebruiken database.<br>
-	Let op! De werkelijke naam wordt voorzien van
-	een voorvoegsel, om de EekBoek
-	databases te kunnen onderscheiden van de overige databases.
-	Deze configuratievariabele, indien opgevraagd, zal altijd de
-	naam weergeven <em>zonder</em> dit voorvoegsel. Zie ook
-	<code>fullname</code> hieronder.
+	
     </td>
   </tr>
-  <tr valign="top">
-    <td><a name="database_fullname"></a><code>fullname</code></td>
-    <td>De volledige naam van de database, dus inclusief het
-	voorvoegsel.<br>
-	Deze variabele kan niet worden opgegeven in de
-	configuratiebestanden maar wordt automatisch afgeleid van de
-	database naam.
-    </td>
-  </tr>
+
   <tr valign="top">
     <td><a name="database_driver"></a><code>driver</code></td>
     <td>De te gebruiken database-driverer.<br>
 	Mogelijke waarden zijn <code>postgres</code> voor het
 	PostgreSQL database systeem, en <code>sqlite</code> voor SQLite.
-	<br>Default: <code>postgres</code>.
+	<br>Default: <code>sqlite</code>.
     </td>
   </tr>
+</table>
+
+<p>De volgende configuratie-variabelen zijn enkel van belang indien
+het gebruikte database systeem deze vereist.</p>
+
+<table border="1" width="100%" cellpadding="5">
   <tr valign="top">
     <td><a name="database_user"></a><code>user</code></td>
     <td>De naam van de database-gebruiker.<br>
@@ -434,7 +407,7 @@ zijn daarom voor alle talen hetzelfde, en enigszins taal-neutraal
 	invoer van de gebruiker verwacht. De standaardprompt is de
 	tekst eekboek, gevolgd door de naam van de huidige database,
 	bijvoorbeeld:
-	<blockquote class="code"eekboek [sample] </code>
+	<blockquote class="code">eekboek [sample] </blockquote>
     </td>
   </tr>
   <tr valign="top">
@@ -466,28 +439,26 @@ zijn daarom voor alle talen hetzelfde, en enigszins taal-neutraal
 	</table>
     </td>
   </tr>
-</table>
-
-<p><a name="text"></a><b>Sectie "Text"</b></p>
-
-<table border="1" width="100%" cellpadding="5">
-  <tr valign="top">
-    <td><a name="text_numwidth"></a><code>numwidth</code></td>
-    <td>De standaardbreedte voor de kolommen met bedragen in 
-	tekstuele rapportages. Deze is standaard 9 posities, voldoende
-	voor bedragen onder het miljoen (zes cijfers voor de komma, komma
-	plus twee achter de komma). Heeft u een miljoenenadministratie
-	dan kan de breedte hiermee worden aangepast.
-	<br><code>numwidth</code> kan een waarde worden toegekend,
-	maar ook &lsquo;<code>+<var>n</var></code>&rsquo;,
-	&lsquo;<code>-<var>n</var></code>&rsquo; of
-	&lsquo;<code><var>nnn</var>%</code>&rsquo; om de breedte te
-	vergroten of te verkleinen.
-	<br>Merk op dat bij gebruik van duizendpuntjes de kolombreedte
-	automatisch wordt aangepast om de plaats te bieden aan de puntjes.
-    </td>
+  <tr>
+    <td valign="top"><a name="format_amount"></a><code>amount</code></td>
+    <td>De vorm waarin bedragen moeten worden getoond. Hierin zijn
+  drie dingen van belang: de decimale punt, de duizendtallenscheider
+  en de breedte van de te tonen bedragen. Het onderstaande overzicht
+  geeft het verband tussen het opgegeven <code>amount</code> en het effect
+  op de decimale punt, duizendtallenscheider en de breedte. 
+  <table width="100%" border="1">
+    <tr><td>amount</td><td>decimaalpunt</td><td>duizendscheider</td><td>breedte</td></tr>
+    <tr><td>1234.56</td><td>. (punt)</td><td>(geen)</td><td>9</td></tr>
+    <tr><td>1234,56</td><td>, (komma)</td><td>(geen)</td><td>9</td></tr>
+    <tr><td>1.234,56</td><td>, (komma)</td><td>. (punt)</td><td>9</td></tr>
+    <tr><td>1,234.56</td><td>. (punt)</td><td>, (komma)</td><td>9</td></tr>
+    <tr><td>1.234.567,89</td><td>, (komma)</td><td>. (punt)</td><td>12</td></tr>
+  </table>
+<p>De breedte wordt alleen aangepast als het format breder is dan 9 tekens.</p>
   </tr>
 </table>
+
+
 
 <p><a name="html"></a><b>Sectie "Html"</b></p>
 
@@ -533,7 +504,7 @@ zijn daarom voor alle talen hetzelfde, en enigszins taal-neutraal
     <td>Deze variable kan worden gebruikt om de kolom-scheider in te
 	stellen voor de in de vorm van CSV bestanden aangemaakte
 	rapporten. Standaard staat de kolom-scheider ingesteld op
-	&lsquo;<code>,</code>&rsquo;.
+	&lsquo;<code>,</code>&rsquo; (komma).
     </td>
   </tr>
 </table>
@@ -584,7 +555,7 @@ ongewenste problemen leiden.</em></p>
 Deze site is gemaakt met de 
 <a href='http://www.squirrel.nl/people/jvromans/tt2site/'>TT2Site
 Site Builder</a>.<br />
-config.html laatste aanpassing 12 januari 2010, 14:46:57
+config.html laatste aanpassing 08 februari 2010, 22:16:34
 </p>
 
     </td>

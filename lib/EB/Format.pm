@@ -9,10 +9,9 @@ package EB::Format;
 
 use strict;
 
-our $VERSION = sprintf "%d.%03d", q$Revision: 1.37 $ =~ /(\d+)/g;
+our $VERSION = sprintf "%d.%03d", q$Revision: 1.41 $ =~ /(\d+)/g;
 
 use EB;
-use EB::Expression;
 
 use base qw(Exporter);
 
@@ -92,6 +91,8 @@ sub numround_bankers {
 
 sub _setup  {
 
+    assert( NUMGROUPS != AMTPRECISION, "NUMGROUPS != AMTPRECISION" );
+
     ################ BTW display format ################
 
     $btwfmt0 = '%.' . (BTWPRECISION-2) . 'f';
@@ -114,9 +115,31 @@ sub _setup  {
 	warn("?"._T("Configuratiefout: [format]numwidth moet een getal zijn")."\n");
 	$amount_width = AMTWIDTH;
     }
-    $decimalpt = $cfg->val(qw(locale decimalpt), _T(","));
-    $thousandsep = $cfg->val(qw(locale thousandsep), "");
-    $amount_width += int(($amount_width - AMTPRECISION - 2) / 3) if $thousandsep;
+
+    $decimalpt = $cfg->val(qw(locale decimalpt), undef);
+    $thousandsep = $cfg->val(qw(locale thousandsep), undef);
+
+    my $fmt = $cfg->val(qw(format amount), undef);
+    if ( $fmt || !defined($decimalpt) ) {
+	$fmt = _T("1.234,56") unless defined $fmt;
+	Carp::croak(__x("Configuratiefout: ongeldige waarde voor {item}",
+			item => "format".':'."amount")."\n")
+	    unless $fmt =~ /^\d+([.,])\d\d$/
+	      || $fmt =~ /^\d+(\.\d\d\d)*(\,)\d\d$/
+	      || $fmt =~ /^\d+(\,\d\d\d)*(\.)\d\d$/;
+	if ( defined $2 ) {
+	    $decimalpt = $2;
+	    $thousandsep = substr($1, 0, 1);
+	}
+	else {
+	    $decimalpt = $1;
+	    $thousandsep = "";
+	}
+	$amount_width = length($fmt) if length($fmt) > $amount_width;
+    }
+    else {
+	$amount_width += int(($amount_width - AMTPRECISION - 2) / 3) if $thousandsep;
+    }
 
     $stdfmt0 = '%.' . AMTPRECISION . 'f';
     $stdfmtw = '%' . $amount_width . "." . AMTPRECISION . 'f';
@@ -165,7 +188,7 @@ EOD
 
     ################ Date display format ################
 
-    my $fmt = $cfg->val(qw(format date), "YYYY-MM-DD");
+    $fmt = $cfg->val(qw(format date), "YYYY-MM-DD");
 
     $sub          = "sub datefmt { \$_[0] }";
     my $sub_full  = "sub datefmt_full { \$_[0] }";
@@ -189,19 +212,99 @@ EOD
     $date_width = length(datefmt("2006-01-01"));
 }
 
-BEGIN {
-    push(@EXPORT, qw(amount numround btwfmt));
-    push(@EXPORT, qw($amount_width numfmt numfmt_plain));
-    push(@EXPORT, qw($date_width datefmt datefmt_full datefmt_plain));
-    _setup();
+sub numxform_strict {
+    $_ = shift;
+    my $err = __x("Ongeldig bedrag: {num}", num => $_);
+
+    my $sign = "";
+    $sign = $1 if s/^([-+])// && $1 eq '-';
+
+    # NNNN -> NNNN.00
+    if ( /^\d+$/ ) {
+	s/^0+(\d)$/$1/;
+	return $sign . $_ . "." . ("0" x AMTPRECISION);
+    }
+
+    # N,NNN -> NNNN.00
+    if ( /^(\d{1,@{[NUMGROUPS]}})(\,\d{@{[NUMGROUPS]}})*$/ && $1 ) {
+	s/\,//g;
+	s/^0+(\d)$/$1/;
+	return $sign . $_ . "." . ("0" x AMTPRECISION);
+    }
+
+    # N.NNN -> NNNN.00
+    if ( /^(\d{1,@{[NUMGROUPS]}})(\.\d{@{[NUMGROUPS]}})*$/ && $1 ) {
+	s/\.//g;
+	s/^0+(\d)$/$1/;
+	return $sign . $_ . "." . ("0" x AMTPRECISION);
+    }
+
+    # N.NNN,NN or N,NNN.NN
+    return $err
+      unless /^([\d.]+)(\,)(\d{@{[AMTPRECISION]}})$/
+	  || /^([\d,]+)(\.)(\d{@{[AMTPRECISION]}})$/;
+
+    my ($mant, $sep, $frac) = ( $1, $2, $3 );
+
+    # N.NNN , NN -> NNNN NN
+    if ( $sep eq "," ) {
+	$mant =~ s/\.//g
+	  if $mant =~ /^\d{1,@{[NUMGROUPS]}}(\.\d{@{[NUMGROUPS]}})*$/;
+    }
+
+    # N,NNN . NN -> NNNN NN
+    else {
+	$mant =~ s/\,//g
+	  if $mant =~ /^\d{1,@{[NUMGROUPS]}}(\,\d{@{[NUMGROUPS]}})*$/;
+    }
+
+    # NNNN NN -> NNNN.NN
+    $mant =~ s/^0+(\d)$/$1/;
+    return $sign . $mant . "." . $frac if $mant =~ /^\d+$/;
+
+    die("?$err\n");		# not well-formed
+
+}
+
+sub numxform_loose {
+    $_ = shift;
+    my $err = __x("Ongeldig getal: {num}", num => $_);
+
+    # If there's a single comma, make decimal point.
+    s/,/./ if /^.*,.*$/;
+
+    return $_ if /^[-+]*\d+(\.\d+)?$/;
+
+    die("?$err\n");		# not well-formed
+
+}
+
+sub numxform {
+    my ($n) = @_;
+    my $res = numxform_strict($n);
+    return $res if defined $res;
+#    return $n if $n =~ /^[-a+]?\d+[.,]\d+$/;	# a ?
+    return $n if $n =~ /^[-+]?\d+[.,]\d+$/;
+    return undef;
 }
 
 sub amount($) {
     my $val = shift;
+    my $debug = $cfg->val(__PACKAGE__, "debugexpr", 0);
     if ( $val =~ /.[-+*\/\(\)]/ ) {
-	my $expr = EB::Expression->new;
-	my $tree = $expr->Parse($val);
-	$val = sprintf($stdfmt0, $expr->EvalToScalar($tree));
+	print STDERR ("val \"$val\" -> ") if $debug;
+	$val =~ s/([.,\d]+)/numxform_loose($1)/ge;
+	print STDERR ("\"$val\" -> ") if $debug;
+
+	my $res = eval($val);
+	warn("$val: $@"), return undef if $debug && $@;
+	return undef if $@;
+	$val = sprintf($stdfmt0, $res);
+	print STDERR ("$val\n") if $debug;
+    }
+    else {
+	return undef
+	  unless $val = numxform_strict($val); # fortunately, 0.00 is true
     }
 
     return undef unless $val =~ $numpat;
@@ -210,7 +313,6 @@ sub amount($) {
     return 0 + ($s.$w.$f);
 }
 
-#### USED BY GUI
 sub numfmtw {
     my $v = shift;
     if ( $v == int($v) && $v >= 0  ) {
@@ -247,5 +349,15 @@ sub btwfmt {
 }
 
 sub btwpat { $btwpat }
+
+################ Code ################
+
+push( @EXPORT,
+      qw(amount numround btwfmt),
+      qw($amount_width numfmt numfmt_plain),
+      qw($date_width datefmt datefmt_full datefmt_plain),
+    );
+
+_setup();
 
 1;

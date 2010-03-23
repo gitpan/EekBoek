@@ -143,7 +143,7 @@ bestand als standaardinvoer wordt meegegeven:</p>
 <p>In batch mode geldt dat lege regels, en regels die met een
 <code>#</code>-teken beginnen worden genegeerd. Verder mogen
 opdrachten over meerdere regels worden gespreid door het plaatsen van
-een <code>\</code>-teken aan het eind van de regel,
+een <code>\</code>-teken aan het eind van alle regels behalve de laatste,
 bijvoorbeeld:</p>
 
 <blockquote class="code">postbank:12 12-03-2004 "Diverse boekingen" \
@@ -155,7 +155,7 @@ opgestart, dan draait hij interactief en zal opdrachten lezen vanaf de
 terminal. Elke ingelezen regel vormt een opdracht.
 
 Het inlezen van opdrachten vindt indien mogelijk plaats door middel
-van de perl module <code>Term::ReadLine::Gnu</code>. Zie de <a
+van de Perl module <code>Term::ReadLine::Gnu</code>. Zie de <a
 href="http://search.cpan.org/dist/Term-ReadLine-Gnu">documentatie
 van deze module</a> voor alle mogelijkheden. Uitgevoerde opdrachten
 worden tot in bepaalde mate bewaard en kunnen later worden
@@ -190,7 +190,7 @@ aangeboden om verder afgemaakt te worden.</p>
 
 <p>In boekingsopdrachten, op plaatsen waar de code van een relatie
 wordt verwacht, zal het indrukken van de TAB toets proberen de relatie
-code op te zoeken en af te maken, Zijn er meerdere mogelijkheden dan
+code op te zoeken en af te maken. Zijn er meerdere mogelijkheden dan
 worden deze getoond:</p>
 
 <blockquote class="code">eekboek> inkopen:24 16-08-2007 XS<font color="red">[TAB]</font>
@@ -247,7 +247,7 @@ door verschrijnen. Dit zal op termijn worden aangepast.</p>
 Deze site is gemaakt met de 
 <a href='http://www.squirrel.nl/people/jvromans/tt2site/'>TT2Site
 Site Builder</a>.<br />
-ebshell/index.html laatste aanpassing 24 augustus 2008, 18:26:52
+ebshell/index.html laatste aanpassing 11 februari 2010, 21:19:11
 </p>
 
     </td>

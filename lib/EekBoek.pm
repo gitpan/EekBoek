@@ -1,17 +1,18 @@
-#! perl
+#! perl --			-*- coding: utf-8 -*-
 
 package EekBoek;
 
 # NOTE: This is a documentation-only module.
 
 use strict;
+use utf8;
 
 # Minimal version to prevent many Unicode bugs.
 use 5.008003;
 
-my $RCS_Id = '$Id: EekBoek.pm,v 1.73.2.1 2010/01/06 10:53:02 jv Exp $ ';
+my $RCS_Id = '$Id: EekBoek.pm,v 1.99 2010/03/23 19:10:55 jv Exp $ ';
 our $PACKAGE = 'EekBoek';
-our $VERSION = '1.04.06.01';
+our $VERSION = '2.00.00';
 
 =head1 NAME
 
@@ -44,7 +45,7 @@ Web site: L<http://www.eekboek.nl>.
 
 =head1 COPYRIGHT AND DISCLAIMER
 
-This program is Copyright 2005-2008 by Squirrel Consultancy. All
+This program is Copyright 2005-2010 by Squirrel Consultancy. All
 rights reserved.
 
 This program is free software; you can redistribute it and/or modify
@@ -62,4 +63,4 @@ GNU General Public License or the Artistic License for more details.
 
 1;
 
-# $Id: EekBoek.pm,v 1.73.2.1 2010/01/06 10:53:02 jv Exp $ 
+# $Id: EekBoek.pm,v 1.99 2010/03/23 19:10:55 jv Exp $ 

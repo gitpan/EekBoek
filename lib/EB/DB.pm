@@ -1,11 +1,13 @@
-#! perl
+#! perl --			-*- coding: utf-8 -*-
 
-# RCS Id          : $Id: DB.pm,v 1.59 2008/04/14 14:39:20 jv Exp $
+use utf8;
+
+# RCS Id          : $Id: DB.pm,v 1.63 2009/12/22 21:20:49 jv Exp $
 # Author          : Johan Vromans
 # Created On      : Sat May  7 09:18:15 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Sun Apr 13 18:06:04 2008
-# Update Count    : 431
+# Last Modified On: Tue Dec 22 22:20:26 2009
+# Update Count    : 441
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -19,7 +21,7 @@ package EB::DB;
 use strict;
 use warnings;
 
-our $VERSION = sprintf "%d.%03d", q$Revision: 1.59 $ =~ /(\d+)/g;
+our $VERSION = sprintf "%d.%03d", q$Revision: 1.63 $ =~ /(\d+)/g;
 
 use EB;
 use DBI;
@@ -50,7 +52,7 @@ sub check_db {
     warn(join(" ", sort keys %tables)."\n") if $fail;
     die("?".__x("Ongeldige EekBoek database: {db}.",
 		db => $dbh->{Name}) . " " .
-	_T("Wellicht is de database nog niet geïnitialiseerd?")."\n") if $fail;
+	_T("Wellicht is de database nog niet geÃ¯nitialiseerd?")."\n") if $fail;
 
     # Check version, and try automatic upgrade.
     my ($maj, $min, $rev)
@@ -60,11 +62,11 @@ sub check_db {
 	      sprintf("%03d%03d", $min, $rev) eq sprintf("%03d%03d", SCM_MINVERSION, SCM_REVISION)) ) {
 	# Basically, this will migrate to the highest possibly version, and then retry.
 	my $cur = sprintf("%03d%03d%03d", $maj, $min, $rev);
-	my $tmpl = EB_LIB . "EB/migrate/$cur?????????.*l";
+	my $tmpl = libfile("migrate/$cur?????????.*l");
 	my @a = reverse sort glob($tmpl);
 	last unless @a == 1;
 
-	if ( $a[0] =~ /\.sql$/ && open(my $fh, "<$a[0]")) {
+	if ( $a[0] =~ /\.sql$/ && open(my $fh, "<:encoding(utf-8)", $a[0])) {
 	    warn("!"._T("De database wordt aangepast aan de nieuwere versie")."\n");
 
 	    local($/);		# slurp mode
@@ -570,7 +572,14 @@ sub set_sequence {
 
 sub _loaddbbackend {
     my ($self) = @_;
-    my $dbtype = $cfg->val(qw(database driver), "postgres");
+    my $dbtype = $cfg->val(qw(database driver), "sqlite");
+
+    # Trim whitespace for stupid users.
+    for ( $dbtype ) {
+	s/^\s+//;
+	s/\s+$//;
+    }
+
     my $pkg = __PACKAGE__ . "::" . ucfirst(lc($dbtype));
     my $pkgfile = __PACKAGE__ . "::" . ucfirst(lc($dbtype)) . ".pm";
     $pkgfile =~ s/::/\//g;

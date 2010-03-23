@@ -1,10 +1,10 @@
 #! perl
-# $Id: 20_dates.t,v 1.3 2008/02/25 11:50:00 jv Exp $
+# $Id: 20_dates.t,v 1.5 2009/10/28 22:43:05 jv Exp $
 
 use strict;
 use warnings;
 
-use EB::Config qw(EekBoek);
+use EB::Config ( { app => "Test", nostdconf => 1 } );
 use EB;
 
 my @tests1;

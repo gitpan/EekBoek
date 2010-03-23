@@ -136,9 +136,7 @@ directory waar alle administratiebestanden worden ondergebracht. De
 standaardplek voor deze directory is afhankelijk van het gebruikte
 platform. Onder Linux systemen is dit de directory
 <code>.eekboek/admdir</code> in de home-directory van de gebruiker.
-Deze directory kan worden gewijzigd middels de variabele
-<code>admdir</code> in sectie <code>[general]</code> van
-<code>.eekboek/eekboek.conf</code>.</p>
+Deze directory kan worden gewijzigd in het <a href="../config.html#general_admdir">configuratiebestand</a>.
 
 <p>Elke administratie heeft een naam, en een korte code. Deze laatste
 wordt bij het aanmaken van de administratie afgeleid van de naam. De
@@ -147,12 +145,12 @@ aan te maken waar de bestanden van deze administratie geplaatst gaan
 worden. Ook wordt de code gebruikt als naam voor de database waarin de
 administratie wordt onderhouden.</p>
 
-<p>Wanneer EekBoek wordt opgestart zal deze eerst in de administratie
-directory kijken welke administraties daar zijn aangemaakt. U kunt dan
-een van deze administraties kiezen om mee te gaan werken, of om een
-nieuwe administratie aan te maken. Als er geen administraties
-beschikbaar zijn wordt automatisch de wizard voor het aanmaken van een
-nieuwe administratie gestart.</p>
+<p>Wanneer een van de EekBoek programma's wordt opgestart zal deze
+eerst in de administratie directory kijken welke administraties daar
+zijn aangemaakt. U kunt dan een van deze administraties kiezen om mee
+te gaan werken, of om een nieuwe administratie aan te maken. Als er
+geen administraties beschikbaar zijn wordt automatisch de wizard voor
+het aanmaken van een nieuwe administratie gestart.</p>
 
 <p><strong>Let op:</strong> Uit compatibiliteit met vorige versies zal
 de EekBoek shell <code>ebshell</code> onmiddelijk tot uitvoering
@@ -269,6 +267,16 @@ bestanden moet komen.</p>
     mutaties.
 </ul>
 
+<a name="wizzywiz"></a><h4>Meerdere administratie directories</h4>
+
+<p>Als u een configuratiebestand maakt met daarin de sectie
+&lsquo;general&rsquo; waarin de settings <code>admdir</code> alsmede
+<code>wizard=1</code>, en u start een van de EekBoek programma's op
+waarbij u dit configuratiebestand meegeeft aan de --config command
+line optie, dan zal het programma de selectiewizard opstarten in de
+opgegeven administratie directory. Op deze wijze kunt u meerdere
+groepen van administraties beheren.</p>
+
 
     </td>
   </tr>
@@ -299,7 +307,7 @@ bestanden moet komen.</p>
 Deze site is gemaakt met de 
 <a href='http://www.squirrel.nl/people/jvromans/tt2site/'>TT2Site
 Site Builder</a>.<br />
-setup/config.html laatste aanpassing 12 januari 2010, 15:37:17
+setup/config.html laatste aanpassing 08 februari 2010, 22:16:19
 </p>
 
     </td>

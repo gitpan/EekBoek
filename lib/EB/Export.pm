@@ -1,12 +1,14 @@
-#! perl
+#! perl --			-*- coding: utf-8 -*-
+
+use utf8;
 
 # Export.pm -- Export EekBoek administratie
-# RCS Info        : $Id: Export.pm,v 1.29 2008/03/02 15:21:20 jv Exp $
+# RCS Info        : $Id: Export.pm,v 1.31 2009/10/15 10:05:03 jv Exp $
 # Author          : Johan Vromans
 # Created On      : Mon Jan 16 20:47:38 2006
 # Last Modified By: Johan Vromans
-# Last Modified On: Sun Mar  2 16:18:39 2008
-# Update Count    : 221
+# Last Modified On: Thu Oct 15 11:35:50 2009
+# Update Count    : 233
 # Status          : Unknown, Use with caution!
 
 package main;
@@ -19,10 +21,11 @@ package EB::Export;
 use strict;
 use warnings;
 
-our $VERSION = sprintf "%d.%03d", q$Revision: 1.29 $ =~ /(\d+)/g;
+our $VERSION = sprintf "%d.%03d", q$Revision: 1.31 $ =~ /(\d+)/g;
 
 use EB;
 use EB::Format;
+use Encode;
 
 my $ident;
 
@@ -51,18 +54,18 @@ sub export {
 	  or die("?"._T("Module Archive::Zip, nodig voor export naar file, is niet beschikbaar")."\n");
 
 	my $zip = Archive::Zip->new();
-	$zip->zipfileComment(__x("Export van dataset {db} aangemaakt door {id} op {date}",
-				 id => $EB::ident,
-				 db => $cfg->val(qw(database name)),
-				 date => datefmt_full(iso8601date())));
+	my $comment = __x("Export van dataset {db} aangemaakt door {id} op {date}",
+			  id => $EB::ident,
+			  db => $cfg->val(qw(database name)),
+			  date => datefmt_full(iso8601date()));
+	$comment .= "\n".__x("Omschrijving: {desc}", desc => $opts->{desc})
+	  if $opts->{desc};
+	$zip->zipfileComment($comment);
 	my $m;
 
 	# For the schema, we need a temp file.
 	my ($fh, $tmpname) = Archive::Zip::tempFile();
-	if ( $cfg->unicode ) {
-	    require Encode;
-	    binmode($fh, ":encoding(utf8)");
-	}
+	binmode($fh, ":encoding(utf8)");
 	$self->_schema($fh);
 	$fh->close;
 	$m = $zip->addFile($tmpname, "schema.dat");
@@ -87,16 +90,26 @@ sub export {
     die("?ASSERT ERROR: missing --dir / --file in Export\n");
 }
 
+sub _enc {
+    my $t;
+    eval {
+	$t = encode( 'utf8', "".$_[0], 1 );
+    };
+    if ( $@ ) {
+	warn("?".__x("Geen geldige UTF-8 tekens for ZIP element",
+		     ).
+	     "\n".$_[0]."\n");
+	return;
+    }
+    $t;
+}
+
 sub _write {
     my ($self, $file, $producer) = @_;
     my $fh;
-    open($fh, ">", $file)
+    open($fh, ">:encoding(utf-8)", $file)
       or die("?".__x("Fout bij aanmaken bestand {file}: {err}",
 		     file => $file, err => $!)."\n");
-    if ( $cfg->unicode ) {
-	require Encode;
-	binmode($fh, ":encoding(utf8)");
-    }
     $producer->($fh)
       or die("?".__x("Fout bij schrijven bestand {file}: {err}",
 		     file => $file, err => $!)."\n");
@@ -117,18 +130,6 @@ sub _quote {
     '"'.$t.'"';
 }
 
-sub _enc {
-    my $line = shift;
-    return $line if $cfg->unicode;
-    # Encode to latin1.
-    eval {
-	my $s = $line;
-	$line = Encode::encode('latin1', $s, 1);
-    };
-    warn("?".__x("Geen geldige {cs} tekens in uitvoerregel", cs => "UTF-8")."\n") if $@;
-    $line;
-}
-
 sub _relaties {
     my ($self) = @_;
 
@@ -144,8 +145,7 @@ sub _relaties {
 		  what => _T("Relaties"), adm => $dbh->adm("name")) . "\n" .
 	      __x("# Aangemaakt door {id} op {date}",
 		  id => $EB::ident, date => datefmt_full(iso8601date())) . "\n" .
-	      "# Content-Type: text/plain; charset = " .
-	      ($cfg->unicode ? "UTF-8" : "ISO-8859.1");
+	      "# Content-Type: text/plain; charset = UTF-8";
     while ( my $rr = $sth->fetchrow_arrayref ) {
 	my ($code, $desc, $debcrd, $btw, $dbk, $acct) = @$rr;
 
@@ -175,9 +175,7 @@ sub _opening {
 		  what => _T("Openingsgegevens"), adm => $dbh->adm("name")) . "\n" .
 	      __x("# Aangemaakt door {id} op {date}",
 		  id => $EB::ident, date => datefmt_full(iso8601date())) . "\n" .
-	      "# Content-Type: text/plain; charset = " .
-	      ($cfg->unicode ? "UTF-8" : "ISO-8859.1") .
-	      "\n\n";
+	      "# Content-Type: text/plain; charset = UTF-8\n\n";
 
     $out .= "adm_naam         " . _quote($dbh->adm("name")) . "\n";
 
@@ -269,9 +267,7 @@ sub _mutaties {
 		  what => _T("Boekingen"), adm => $dbh->adm("name")) . "\n" .
 	      __x("# Aangemaakt door {id} op {date}",
 		  id => $EB::ident, date => datefmt_full(iso8601date())) . "\n" .
-	      "# Content-Type: text/plain; charset = " .
-	      ($cfg->unicode ? "UTF-8" : "ISO-8859.1") .
-	      "\n\n";
+	      "# Content-Type: text/plain; charset = UTF-8\n\n";
 
     my @bky;
     my $sth = $dbh->sql_exec("SELECT bky_code".

@@ -1,11 +1,13 @@
-#! perl
+#! perl --			-*- coding: utf-8 -*-
 
-# RCS Id          : $Id: Main.pm,v 1.4 2009/05/13 20:38:13 jv Exp $
+use utf8;
+
+# RCS Id          : $Id: Main.pm,v 1.15 2010/01/16 22:37:58 jv Exp $
 # Author          : Johan Vromans
 # Created On      : Thu Jul  7 15:53:48 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Wed May 13 21:57:01 2009
-# Update Count    : 907
+# Last Modified On: Sat Jan 16 22:42:00 2010
+# Update Count    : 996
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -20,171 +22,135 @@ package EB::Main;
 use strict;
 use warnings;
 
-our $VERSION = sprintf "%d.%03d", q$Revision: 1.4 $ =~ /(\d+)/g;
-
 use EekBoek;
-
-# This will set up the config at 'use' time.
-use EB::Config $EekBoek::PACKAGE;
-
 use EB;
+use EB::Config ();
 use EB::DB;
 use Getopt::Long 2.13;
 
-# Command line options.
-my $interactive = -t;
-my $command;
-my $echo;
-my $dataset;
-my $createdb;			# create database
-my $createsampledb;		# create demo database
-my $createsampleconfig;		# create config
-my $schema;			# initialise w/ schema
-my $confirm = 0;
-my $journal;
-my $inexport;			# in/export
-my $inex_file;			# file voor in/export
-my $inex_dir;			# directory voor in/export
-my $errexit = 0;		# disallow errors in batch
-my $verbose = 0;		# verbose processing
-my $bky;
-
-# Development options (not shown with -help).
-my $debug = 0;			# debugging
-my $trace = 0;			# trace (show process)
-my $test = 0;			# test mode.
-
-use base qw(Exporter);
-our @EXPORT = qw(run);
+################ The Process ################
 
 sub run {
+    my ( $pkg, $opts ) = @_;
+    $opts = {} unless defined $opts;
 
-    if ( @ARGV && ( $ARGV[0] eq '-P' || $ARGV[0] =~ /^--?printcfg$/ ) ) {
-	shift(@ARGV);
-	printconf();
+    binmode(STDOUT, ":encoding(utf8)");
+    binmode(STDERR, ":encoding(utf8)");
+
+    # Command line options.
+    $opts =
+      { interactive   => -t,		# runs interactively
+	#command,			# command to process
+	#echo,				# echo input
+	confirm	      => 0,		# NYI
+	#journal,			# show journal
+	#inexport,			# in/export
+	#file,				# file voor in/export
+	#dir,				# directory voor in/export
+	#title,				# title for export
+	errexit	      => 0,		# disallow errors in batch
+	verbose	      => 0,		# verbose processing
+	#bky,				# boekjaar
+
+	# Development options (not shown with -help).
+	debug	     => 0,		# debugging
+	trace	     => 0,		# trace (show process)
+	test	     => 0,		# test mode.
+
+	# Let supplied options override.
+	%$opts,
+      };
+
+    # Process command line options.
+    app_options($opts);
+
+    # Post-processing.
+    $opts->{trace} |= ($opts->{debug} || $opts->{test});
+
+    # Initialize config.
+    EB::Config->init_config( { app => $EekBoek::PACKAGE, %$opts } );
+    if ( $opts->{printconfig} ) {
+	$cfg->printconf( \@ARGV );
 	exit;
     }
 
-    # Command line options.
-    $interactive = -t;
-    $confirm = 0;
-    $errexit = 0;		# disallow errors in batch
-    $verbose = 0;		# verbose processing
-
-    # Development options (not shown with -help).
-    $debug = 0;			# debugging
-    $trace = 0;			# trace (show process)
-    $test = 0;			# test mode.
-
-    # Process command line options.
-    app_options();
-
-    # Post-processing.
-    $trace |= ($debug || $test);
-
-    my $app = $EekBoek::PACKAGE;
-    my $userdir = glob("~/.".lc($app));
+    my $userdir = $cfg->user_dir;
     mkdir($userdir) unless -d $userdir;
 
-    if ( $createsampleconfig ) {
-	$command = 1;
-	my $cfg = ".".lc($EekBoek::PACKAGE).".conf";
-	if ( -f $cfg ) {
-	    die("?".__x("Opdracht geweigerd, {conf} bestaat reeds",
-		    conf => $cfg)."\n");
-	}
-	my $file = findlib("schema/sample.conf");
-	die("?".__x("Geen voorbeeldgegevens: {conf}",
-		    conf => "schema/sample.conf")."\n") unless $file;
-	open(my $f, '<', $file)
-	  or die("?".__x("Fout bij openen {file}: {err}",
-			 file => $file, err => "$!")."\n");
-	my @data = map { s/[\n\r]+\Z//; $_ } <$f>;
-	close($f);
-	$f = undef;
-	open($f, '>', $cfg)
-	  or die("?".__x("Fout bij openen {file}: {err}",
-			 file => $cfg, err => "$!")."\n");
-	print { $f } "$_\n" foreach @data;
-	close($f)
-	  or die("?".__x("Fout bij afsluiten {file}: {err}",
-			 file => $cfg, err => "$!")."\n");
-	exit(0);
+    unless ( defined($opts->{wizard}) && !$opts->{wizard} ) {
+      if ( $opts->{wizard}
+	 or
+	 !$opts->{config}
+	 && ( ( -e $cfg->std_config || -e $cfg->std_config_alt ) ? $cfg->val( qw(general wizard), 0 ) : 1 )
+       ) {
+	require EB::IniWiz;
+	EB::IniWiz->run($opts); # sets $opts->{runeb}
+	die("?"._T("Geen administratie geselecteerd")."\n") unless $opts->{runeb};
+	undef $cfg;
+	EB::Config->init_config( { app => $EekBoek::PACKAGE, %$opts } );
+      }
     }
 
-    $echo = "eb> " if $echo;
-    if ( $createsampledb ) {
-	$dataset = "sample" unless defined $dataset;
-    }
-    else {
-	$dataset ||= $cfg->val(qw(database name), undef);
-    }
+    $opts->{echo} = "eb> " if $opts->{echo};
+
+    my $dataset = $cfg->val(qw(database name), undef);
 
     unless ( $dataset ) {
-	die("?"._T("Geen dataset opgegeven.".
-		   " Specificeer een dataset in de configuratiefile,".
+	die("?"._T("Geen EekBoek database opgegeven.".
+		   " Specificeer een database in de configuratiefile,".
 		   " of selecteer een andere configuratiefile".
 		   " op de command line met \"--config=...\".").
 	    "\n");
     }
 
     $cfg->newval(qw(database name), $dataset);
-    $cfg->newval(qw(preferences journal), $journal) if defined $journal;
+    $cfg->newval(qw(preferences journal), $opts->{journal})
+      if defined $opts->{journal};
 
-    $dbh = EB::DB->new(trace => $trace);
+    $dbh = EB::DB->new(trace => $opts->{trace});
 
-    if ( defined $inexport ) {
-	if ( $inexport ) {
-	    $command = 1;
+    my $createdb;
+    if ( defined $opts->{inexport} ) {
+	if ( $opts->{inexport} ) {
+	    $opts->{command} = 1;
 	    $createdb = 1;
 	    @ARGV = qw(import --noclean);
-	    push(@ARGV, "--file", $inex_file) if defined $inex_file;
-	    push(@ARGV, "--dir", $inex_dir) if defined $inex_dir;
+	    push(@ARGV, "--file", $opts->{file})
+	      if defined $opts->{file};
+	    push(@ARGV, "--dir", $opts->{dir})
+	      if defined $opts->{dir};
 	}
 	else {
-	    $command = 1;
+	    $opts->{command} = 1;
 	    @ARGV = qw(export);
-	    push(@ARGV, "--file", $inex_file) if defined $inex_file;
-	    push(@ARGV, "--dir", $inex_dir) if defined $inex_dir;
+	    push(@ARGV, "--file", $opts->{file})
+	      if defined $opts->{file};
+	    push(@ARGV, "--dir", $opts->{dir})
+	      if defined $opts->{dir};
+	    push(@ARGV, "--titel", $opts->{title})
+	      if defined $opts->{title};
 	}
-    }
-
-    if ( $createsampledb ) {
-	$command = 1;
-	$createdb = 1;
-	my $file = findlib("schema/sampledb.ebz");
-	die("?".__x("Geen demo gegevens: {ebz}",
-		    ebz => "schema/sampledb.ebz")."\n") unless $file;
-	@ARGV = qw(import --noclean);
-	push(@ARGV, "--file", $file);
     }
 
     if ( $createdb ) {
 	$dbh->createdb($dataset);
-	warn("%".__x("Lege dataset {db} is aangemaakt", db => $dataset)."\n");
+	warn("%".__x("Lege database {db} is aangemaakt", db => $dataset)."\n");
     }
 
-    if ( $schema ) {
-	require EB::Tools::Schema;
-	$dbh->connectdb(1);
-	EB::Tools::Schema->create($schema);
-	$dbh->setup;
-    }
-
-    exit(0) if $command && !@ARGV;
+    return 0 if $opts->{command} && !@ARGV;
 
     require EB::Shell;
     my $shell = EB::Shell->new
       ({ HISTFILE	   => $userdir."/history",
-	 command	   => $command,
-	 interactive	   => $interactive,
-	 errexit	   => $errexit,
-	 verbose	   => $verbose,
-	 trace		   => $trace,
+	 command	   => $opts->{command},
+	 interactive	   => $opts->{interactive},
+	 errexit	   => $opts->{errexit},
+	 verbose	   => $opts->{verbose},
+	 trace		   => $opts->{trace},
 	 journal	   => $cfg->val(qw(preferences journal), 0),
-	 echo		   => $echo,
-	 prompt		   => lc($app),
-	 boekjaar	   => $bky,
+	 echo		   => $opts->{echo},
+	 prompt		   => lc($cfg->app),
+	 boekjaar	   => $opts->{bky},
        });
 
     $| = 1;
@@ -195,38 +161,10 @@ sub run {
 
 ################ Subroutines ################
 
-sub printconf {
-    return unless @ARGV > 0;
-    my $sec = "general";
-    if ( !GetOptions(
-		     'section=s' => \$sec,
-		     '<>' => sub {
-			 my $conf = shift;
-			 my $sec = $sec;
-			 ($sec, $conf) = ($1, $2) if $conf =~ /^(.+?):(.+)/;
-			 my $val = $cfg->val($sec, $conf, undef);
-			 print STDOUT ($val) if defined $val;
-			 print STDOUT ("\n");
-		     }
-		    ) )
-    {
-	app_ident();
-	print STDERR __x(<<EndOfUsage, prog => $0);
-Gebruik: {prog} { --printcfg | -P } { [ --section=secname ] var ... } ...
-
-    Print de waarde van configuratie-variabelen.
-    Met --section=secname worden de eropvolgende variabelen
-    gezocht in sectie [secname].
-    Ook: secname:variabele.
-EndOfUsage
-    }
-}
-
 ################ Subroutines ################
 
 sub app_options {
-    my $help = 0;		# handled locally
-    my $ident = 0;		# handled locally
+    my ( $opts ) = @_;
 
     # Process options, if any.
     # Make sure defaults are set before returning!
@@ -234,52 +172,45 @@ sub app_options {
 
     Getopt::Long::Configure(qw(no_ignore_case));
 
-    if ( !GetOptions(
-		     'command|c'    => sub {
-			 $command = 1;
-			 die("!FINISH\n");
-		     },
-		     'import'       => sub {
-			 $inexport = 1;
-		     },
-		     'export'       => sub {
-			 $inexport = 0;
-		     },
-		     'init'         => sub {
-			 $inexport = 1;
-			 $inex_dir = ".";
-		     },
-		     'createdb'     => \$createdb,
-		     'createsampledb' => \$createsampledb,
-		     'createsampleconfig' => \$createsampleconfig,
-		     'define|D=s%'  => sub {
-			 die(__x("Ongeldige aanduiding voor config setting: {arg}",
-				 arg => $_[1])."\n");
-		     },
-		     'schema=s'     => \$schema,
-		     'echo|e!'	    => \$echo,
-		     'ident'	    => \$ident,
-		     'journaal'     => \$journal,
-		     'boekjaar=s'   => \$bky,
-		     'verbose'	    => \$verbose,
-		     'db|dataset=s' => \$dataset,
-		     'dir=s'	    => \$inex_dir,
-		     'file=s'	    => \$inex_file,
-		     'interactive!' => \$interactive,
-		     'errexit'      => \$errexit,
-		     'trace'	    => \$trace,
-		     'help|?'	    => \$help,
-		     'debug'	    => \$debug,
-		    ) or $help )
+    if ( !GetOptions( $opts,
+		      'command|c'    => sub {
+			  $opts->{command} = 1;
+			  die("!FINISH\n");
+		      },
+		      'import'       => sub {
+			  $opts->{inexport} = 1;
+		      },
+		      'export'       => sub {
+			  $opts->{inexport} = 0;
+		      },
+		      'init'         => sub {
+			  $opts->{inexport} = 1;
+			  $opts->{dir} = ".";
+		      },
+		      'define|D=s%',
+		      'printconfig|P',
+		      'nostdconf|X',
+		      'config|f=s',
+		      'title|titel=s',
+		      'echo|e!',
+		      'ident',
+		      'journaal',
+		      'boekjaar=s',
+		      'verbose',
+		      'dir=s',
+		      'file=s',
+		      'interactive!',
+		      'wizard!',
+		      'errexit',
+		      'trace',
+		      'help|?',
+		      'debug',
+		    ) or $opts->{help} )
     {
 	app_usage(2);
     }
-    app_usage(2) if @ARGV && !$command;
-    app_ident() if $ident;
-    if ( $dataset ) {
-	print STDERR (_T("De optie '--dataset' (of '--db') komt binnenkort te vervallen.".
-			 " Gebruik in plaats daarvan '--config' (of '-f') om een configuratiebestand te selecteren.")."\n");
-    }
+    app_usage(2) if @ARGV && !($opts->{command} || $opts->{printconfig});
+    app_ident() if $opts->{ident};
 }
 
 sub app_ident {
@@ -299,22 +230,26 @@ Gebruik: {prog} [options] [file ...]
     --command  -c       voer de rest van de opdrachtregel uit als command
     --echo  -e          toon ingelezen opdrachten
     --boekjaar=XXX	specificeer boekjaar
-    --createdb		maak nieuwe database aan
-    --createsampledb	maak nieuwe demo database aan
-    --schema=XXX        initialisser database met schema
     --import            importeer een nieuwe administratie
     --export            exporteer een administratie
     --dir=XXX           directory voor im/export
     --file=XXX          bestand voor im/export
-    --init		creëer nieuwe administratie
-    --define=XXX -D     definieer configuratiesetting
-    --[no]interactive   forceer [non]interactieve modus
-    --errexit           stop direct na een fout in de invoer
+    --titel=XXX		omschrijving voor export
+    --init		(re)creÃ«er administratie
     --help		deze hulpboodschap
     --ident		toon identificatie
     --verbose		geef meer uitgebreide information
+
+Voor experts:
+
+    --config=XXX -f     specificeer configuratiebestand
+    --nostdconf -X      gebruik uitsluitend dit configuratiebestand
+    --define=XXX -D     definieer configuratiesetting
+    --printconfig -P	print config waarden
+    --[no]interactive   forceer [non]interactieve modus
+    --errexit           stop direct na een fout in de invoer
 EndOfUsage
-    exit $exit if defined $exit && $exit != 0;
+    CORE::exit $exit if defined $exit && $exit != 0;
 }
 
 1;

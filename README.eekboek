@@ -1,0 +1,9 @@
+Package EekBoek heeeft enkel de functie om een standaard reeks
+packages binnen te halen:
+
+  EekBoek-core	   waar alles in zit voor het werken op de command line
+  EekBoek-gui	   waar alles in zit voor het werken met de GUI
+  EekBoek-contrib  door gebruikers bijgedragen files en programma's
+
+Alle relevante informatie omtrent EekBoek vind u onder EekBoek-core.
+

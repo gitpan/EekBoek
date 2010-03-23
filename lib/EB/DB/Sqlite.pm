@@ -1,12 +1,12 @@
 #! perl
 
 # Sqlite.pm -- EekBoek driver for SQLite database
-# RCS Info        : $Id: Sqlite.pm,v 1.8.4.1 2010/01/06 10:50:30 jv Exp $
+# RCS Info        : $Id: Sqlite.pm,v 1.12 2009/12/20 21:41:14 jv Exp $
 # Author          : Johan Vromans
 # Created On      : Sat Oct  7 10:10:36 2006
 # Last Modified By: Johan Vromans
-# Last Modified On: Mon Dec 28 21:09:09 2009
-# Update Count    : 150
+# Last Modified On: Sun Dec 20 19:32:13 2009
+# Update Count    : 159
 # Status          : Unknown, Use with caution!
 
 package main;
@@ -18,10 +18,11 @@ package EB::DB::Sqlite;
 use strict;
 use warnings;
 
-our $VERSION = sprintf "%d.%03d", q$Revision: 1.8.4.1 $ =~ /(\d+)/g;
+our $VERSION = sprintf "%d.%03d", q$Revision: 1.12 $ =~ /(\d+)/g;
 
 use EB;
 use DBI;
+use File::Spec;
 
 my $CONCURRENT;
 sub CONCURRENT() {
@@ -41,6 +42,8 @@ sub type { "SQLite" }
 sub _dbname {
     my ($dbname) = @_;
 
+    $dbname = File::Spec->catfile( $cfg->val(qw(database path)), $dbname )
+      if $cfg->val(qw(database path), undef);
     $dbname =~ s;(^|.*[/\\])(ebsqlite_|eekboek_)?([^/\\]+)$;${1}ebsqlite_$3;;
 
     return $dbname;
@@ -101,8 +104,13 @@ sub connect {
 	$sdb = $dbh;
     }
 
-    # ???
-    $dbh->{unicode} = 1 if $cfg->val(qw(locale unicode));
+    # Our database is UTF8, so deal with it properly.
+    if ( $DBD::SQLite::VERSION ge "1.26_06" ) {
+	$dbh->{sqlite_unicode} = 1;
+    }
+    else {
+	$dbh->{unicode} = 1;
+    }
 
     # Create some missing functions.
     register_functions();

@@ -1,12 +1,14 @@
-#! perl
+#! perl --			-*- coding: utf-8 -*-
+
+use utf8;
 
 # Config.pm -- Configuration files.
-# RCS Info        : $Id: Config.pm,v 1.17 2008/07/19 16:49:20 jv Exp $
+# RCS Info        : $Id: Config.pm,v 1.31 2010/03/16 09:47:12 jv Exp $
 # Author          : Johan Vromans
 # Created On      : Fri Jan 20 17:57:13 2006
 # Last Modified By: Johan Vromans
-# Last Modified On: Wed Jul  2 15:28:02 2008
-# Update Count    : 111
+# Last Modified On: Tue Mar 16 10:46:46 2010
+# Update Count    : 235
 # Status          : Unknown, Use with caution!
 
 package main;
@@ -18,53 +20,36 @@ package EB::Config;
 
 use strict;
 use warnings;
-
-our $VERSION = sprintf "%d.%03d", q$Revision: 1.17 $ =~ /(\d+)/g;
-
-use EB::Config::IniFiles;
+use Carp;
+use File::HomeDir;
 use File::Spec;
 
-my $unicode;
-
 sub init_config {
-    my ($app) = @_;
+    my ($pkg, $opts) = @_;
+    my $app;
+
+    Carp::croak("Internal error -- missing package arg for __PACKAGE__\n")
+	unless $app = delete $opts->{app};
 
     $app = lc($app);
 
+    return if $::cfg && $app && $::cfg->{app} eq lc($app);
+
     # Pre-parse @ARGV for "-f configfile".
-    my $extraconf;
-    my $skipconfig = 0;
-    my $i = 0;
-    while ( $i < @ARGV ) {
-	if ( $ARGV[$i] eq "-f" || $ARGV[$i] eq "-config" || $ARGV[$i] eq "--config" ) {
-	    if ( $i+1 < @ARGV ) {
-		$extraconf = $ARGV[$i+1];
-		splice(@ARGV, $i, 2);
-		last;
-	    }
-	}
-	elsif ( $ARGV[$i] =~ /^-f(.+)/ || $ARGV[$i] =~ /--?config=(.+)/ ) {
-	    $extraconf = $1;
-	    splice(@ARGV, $i, 1);
-	    last;
-	}
-	elsif ( $ARGV[$i] eq "-X" || $ARGV[$i] =~ /^--?no-?config$/ ) {
-	    $skipconfig++;
-	    splice(@ARGV, $i, 1);
-	    next;
-	}
-	$i++;
-    }
+    my $extraconf = $opts->{config};
+    my $skipconfig = $opts->{nostdconf};
 
     # Resolve extraconf to a file name. It must exist.
     if ( $extraconf ) {
 	if ( -d $extraconf ) {
-	    my $f = File::Spec->catfile($extraconf, "$app.conf");
+	    my $f = File::Spec->catfile( $extraconf,
+					 EB::Config::Handler::std_config($app) );
 	    if ( -e $f ) {
 		$extraconf = $f;
 	    }
 	    else {
-		$extraconf = File::Spec->catfile($extraconf, ".$app.conf");
+		$extraconf = File::Spec->catfile($extraconf,
+						 EB::Config::Handler::std_config_alt($app));
 	    }
 	}
 	die("$extraconf: $!\n") unless -f $extraconf;
@@ -73,43 +58,34 @@ sub init_config {
     # Build the list of config files.
     my @cfgs;
     if ( !$skipconfig ) {
-	@cfgs = ( "/etc/$app/$app.conf",
-		  glob("~/.$app") . "/$app.conf" );
-	push(@cfgs, ".$app.conf") unless $extraconf;
+	@cfgs = ( File::Spec->catfile( "etc", $app,
+				       EB::Config::Handler::std_config($app) ),
+		  EB::Config::Handler::user_dir
+		    ( $app, EB::Config::Handler::std_config($app) ),
+		);
+	unless ( $extraconf ) {
+	    push(@cfgs, EB::Config::Handler::std_config($app));
+	    $cfgs[-1] = EB::Config::Handler::std_config_alt($app) unless -e $cfgs[-1];
+	}
     }
     push(@cfgs, $extraconf) if $extraconf;
 
     # Load configs.
-    my $cfg;
+    my $cfg = EB::Config::Handler->new($app);
     for my $file ( @cfgs ) {
 	next unless -s $file;
-	#warn("Config: $file\n");
-	my @args = ( -file => $file, -nocase => 1 );
-	push(@args, -allowcode => 0) if $EB::Config::IniFiles::VERSION >= 2.39;
-	push(@args, -import => $cfg) if $cfg;
-	$cfg = EB::Config::IniFiles::Wrapper->new(@args);
-	unless ( $cfg ) {
-	    # Too early for localisation.
-	    die(join("\n", @Config::IniFiles::errors)."\n");
-	}
+	$cfg->load($file);
     }
-    # Make sure we have an object, even if no config files.
-    $cfg ||= EB::Config::IniFiles::Wrapper->new;
 
-    $i = 0;
-    while ( $i < @ARGV ) {
-	if ( $ARGV[$i] eq "-D" &&
-	     $i+1 < @ARGV && $ARGV[$i+1] =~ /^(\w+(?:::\w+)*)::?(\w+)=(.*)/ ) {
-	    $cfg->newval($1, $2, $3);
-	    splice(@ARGV, $i, 2);
-	    next;
+    if ( $opts->{define} ) {
+	while ( my ($k, $v) = each( %{ $opts->{define} } ) ) {
+	    if ( $k =~ /^(\w+(?:::\w+)*)::?(\w+)/ ) {
+		$cfg->newval($1, $2, $v);
+	    }
+	    else {
+		warn("define error: \"$k\" = \"$v\"\n");
+	    }
 	}
-	elsif ( $ARGV[$i] =~ /^--define=(\w+(?:::\w+)*)::?(\w+)=(.*)/ ) {
-	    $cfg->newval($1, $2, $3);
-	    splice(@ARGV, $i, 1);
-	    next;
-	}
-	$i++;
     }
 
     $ENV{EB_LANG} = $cfg->val('locale','lang',
@@ -117,20 +93,13 @@ sub init_config {
 			      ($^O =~ /^(ms)?win/i ? "nl_NL.utf8" : "nl_NL"));
 
     $cfg->_plug(qw(locale       lang         EB_LANG));
-    unless ( defined($cfg->val(qw(locale unicode), undef)) ) {
-	$cfg->newval(qw(locale unicode),
-		     ($^O =~ /^(ms)?win/i)
-		     || ($cfg->val(qw(locale lang)) =~ /\.utf-?8$/i)
-		     || 0);
-    }
-    $unicode = $cfg->val(qw(locale unicode));
+    $ENV{LANG} = $cfg->val(qw(locale lang));
 
     $cfg->_plug(qw(database     name         EB_DB_NAME));
 
     if ( my $db = $cfg->val(qw(database name), undef) ) {
-	$db =~ s/^eekboek_//;
+	$db =~ s/^eekboek_//;	# legacy
 	$cfg->newval(qw(database     name), $db);
-	$cfg->newval(qw(database fullname), "eekboek_".$db);
 	$ENV{EB_DB_NAME} = $db;
     }
 
@@ -149,23 +118,54 @@ sub init_config {
 
     if ( $cfg->val(__PACKAGE__, "showfiles", 0) ) {
 	warn("Config files:\n  ",
-	     $cfg->{imported}
-	     ? join("\n  ", @{$cfg->{imported}}, $cfg->{cf})
-	     : $cfg->{cf}, "\n");
+	     join( "\n  ", $cfg->files ),  "\n");
     }
 
-    return $cfg;
+    if ( $cfg->val(__PACKAGE__, "dumpcfg", 0) ) {
+	use Data::Dumper;
+	warn(Dumper($cfg));
+    }
+    $::cfg = $cfg;
 }
 
 sub import {
     my ($self, $app) = @_;
-    $cfg = init_config($app);
+    my $opts = ref($app) ? { %$app } : { app => $app };
+    return if $cfg && $opts->{app} && $cfg->app eq lc($opts->{app});
+    $cfg = $self->init_config($opts);
 }
 
-package EB::Config::IniFiles::Wrapper;
+package EB::Config::Handler;
 
-use base qw(EB::Config::IniFiles);
-use constant ATTR_PREF => __PACKAGE__."::"."pref";
+# Very simple inifile handler (read-only).
+
+sub _key {
+    my ($section, $parameter) = @_;
+    $section.'::'.$parameter;
+}
+
+sub val {
+    my ($self, $section, $parameter, $default) = @_;
+    my $res;
+    $res = $self->{data}->{ _key($section, $parameter) };
+    $res = $default unless defined $res;
+    Carp::cluck("=> missing config: \"" . _key($section, $parameter) . "\"\n")
+      unless defined $res || @_ > 3;
+    $res;
+}
+
+sub newval {
+    my ($self, $section, $parameter, $value) = @_;
+    $self->{data}->{ _key($section, $parameter) } = $value;
+}
+
+sub setval {
+    my ($self, $section, $parameter, $value) = @_;
+    my $key = _key( $section, $parameter );
+    Carp::cluck("=> missing config: \"$key\"\n")
+      unless exists $self->{data}->{ $key };
+    $self->{data}->{ $key } = $value;
+}
 
 sub _plug {
     my ($self, $section, $parameter, $env) = @_;
@@ -173,26 +173,110 @@ sub _plug {
       if $ENV{$env} && !$self->val($section, $parameter, undef);
 }
 
-sub prefer {
-    my ($self, $pref) = @_;
-    $self->{ATTR_PREF} = $pref;
+sub files {
+    my ($self) = @_;
+    return $self->{files}->[-1] unless wantarray;
+    return @{ $self->{files} };
 }
 
-sub val {
-    my ($self, $section, $parameter, $default) = @_;
-    my $res;
-    if ( my $pref = $self->{ATTR_PREF} ) {
-	$res = $self->SUPER::val("$pref $section", $parameter);
+sub file {
+    goto &files;		# for convenience
+}
+
+sub set_file {
+    my ( $self, $file ) = @_;
+    if ( $self->{files}->[0] eq '<empty>' ) {
+	$self->{files} = [];
     }
-    $res = $self->SUPER::val($section, $parameter, $default)
-      unless defined $res;
-    Carp::cluck("=> missing config: \"$section\" \"$parameter\"\n")
-      unless defined $res || @_ > 3;
-    $res;
+    push( @{ $self->{files} }, $file );
 }
 
-sub unicode {
-    $unicode;
+sub app {
+    my ($self) = @_;
+    $self->{app};
+}
+
+sub new {
+    my ($package, $app, $file) = @_;
+    my $self = bless {}, $package;
+    $self->{files} = [ '<empty>' ];
+    $self->{data} = {};
+    $self->{app} = $app;
+    $self->load($file) if defined $file;
+    return $self;
+}
+
+sub load {
+    my ($self, $file) = @_;
+
+    open( my $fd, "<:encoding(utf-8)", $file )
+      or Carp::croak("Error opening config $file: $!\n");
+
+    $self->set_file($file);
+
+    my $section = "global";
+    my $fail;
+    while ( <$fd> ) {
+	chomp;
+	next unless /\S/;
+	next if /^[#;]/;
+	if ( /^\s*\[\s*(.*?)\s*\]\s*$/ ) {
+	    $section = lc $1;
+	    next;
+	}
+	if ( /^\s*(.*?)\s*=\s*(.*?)\s*$/ ) {
+	    $self->{data}->{ _key($section, lc($1)) } = $2;
+	    next;
+	}
+	Carp::cluck("Error in config $file, line $.:\n$_\n");
+	$fail++;
+    }
+    Carp::croak("Error processing config $file, aborted\n")
+	if $fail;
+
+    $self;
+}
+
+sub printconf {
+    my ( $self, $list ) = @_;
+    return unless @$list > 0;
+    foreach my $conf ( @$list ) {
+	unless ( $conf =~ /^(.+?):([^:]+)/ ) {
+	    print STDOUT ("<error $conf>\n");
+	    next;
+	}
+	my ($sec, $conf) = ($1, $2);
+	$sec =~ s/:+$//;
+	my $val = $self->val($sec, $conf, undef);
+	print STDOUT ($val) if defined $val;
+	print STDOUT ("\n");
+    }
+}
+
+sub user_dir {
+    my ( $app, $item ) = @_;
+    eval { $app = $app->app };
+
+    if ( $^O =~ /^mswin/i ) {
+	my $f = File::Spec->catpath( $ENV{HOMEDRIVE}, $ENV{HOMEPATH},
+				     File::Spec->catfile( $app, $item ));
+
+	return $f;
+    }
+    File::Spec->catfile( File::HomeDir->my_data,
+			 "." . lc( $app),
+			 defined($item) ? $item : (),
+		       );
+}
+
+sub std_config {
+    my ( $app ) = @_;
+    eval { $app = $app->app };
+    lc($app) . ".conf";
+}
+
+sub std_config_alt {
+    "." . &std_config;
 }
 
 1;

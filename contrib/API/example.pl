@@ -6,8 +6,8 @@ my $RCS_Id = '$Id: example.pl,v 1.1 2006/07/19 08:54:04 jv Exp $ ';
 # Author          : Johan Vromans
 # Created On      : Sun Apr 13 17:25:07 2008
 # Last Modified By: Johan Vromans
-# Last Modified On: Mon Apr 14 16:51:47 2008
-# Update Count    : 79
+# Last Modified On: Wed Oct 28 23:43:40 2009
+# Update Count    : 82
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -28,12 +28,10 @@ our $dbh;			# data base
 
 # EekBoek modules.
 
-# Config structure setup. Note that this will preparse @ARGV for
-# -D and --define options, and load config files, if any.
+use EekBoek;
 # The name passed will be used for the config files,
 # e.g., Foo -> /etc/foo.conf, ~/.foo/foo.conf, ./.foo.conf
-use EB::Config 'EekBoek';
-
+use EB::Config ( $EekBoek::PACKAGE );
 use EB;				# common
 use EB::DB;			# database
 

@@ -1,12 +1,12 @@
 #! perl
 
-# Postgres.pm -- EekBoek driver for PostgreSQL dsatabase
-# RCS Info        : $Id: Postgres.pm,v 1.25 2008/02/17 16:47:49 jv Exp $
+# Postgres.pm -- EekBoek driver for PostgreSQL database
+# RCS Info        : $Id: Postgres.pm,v 1.27 2009/10/20 10:28:07 jv Exp $
 # Author          : Johan Vromans
 # Created On      : Tue Jan 24 10:43:00 2006
 # Last Modified By: Johan Vromans
-# Last Modified On: Sun Feb 17 17:37:54 2008
-# Update Count    : 171
+# Last Modified On: Mon Oct 19 22:47:05 2009
+# Update Count    : 173
 # Status          : Unknown, Use with caution!
 
 package main;
@@ -18,7 +18,7 @@ package EB::DB::Postgres;
 use strict;
 use warnings;
 
-our $VERSION = sprintf "%d.%03d", q$Revision: 1.25 $ =~ /(\d+)/g;
+our $VERSION = sprintf "%d.%03d", q$Revision: 1.27 $ =~ /(\d+)/g;
 
 use EB;
 use DBI;
@@ -30,7 +30,7 @@ my $dataset;
 my $trace = $cfg->val(__PACKAGE__, "trace", 0);
 
 # API: type  type of driver
-sub type { "Postgres" }
+sub type { "PostgreSQL" }
 
 sub _dsn {
     my $dsn = "dbi:Pg:dbname=" . shift;
@@ -72,7 +72,7 @@ sub create {
 	$self->disconnect;
     };
     return unless $@;
-    die($@) if $cfg->unicode && $@ =~ /UNICODE/;
+    die($@) if $@ =~ /UNICODE/;
 
     $dbname =~ s/^(?!=eekboek_)/eekboek_/;
 
@@ -114,19 +114,13 @@ sub connect {
       or die("?".__x("Database verbindingsprobleem: {err}",
 		     err => $DBI::errstr)."\n");
     $dataset = $dbname;
-    if ( $cfg->unicode ) {
-	my $enc = $dbh->selectall_arrayref("SHOW CLIENT_ENCODING")->[0]->[0];
-	if ( $enc !~ /^unicode|utf8$/i ) {
-	    warn("!".__x("Database {name} is niet in UTF-8 maar {enc}",
-			 name => $_[1], enc => $enc)."\n");
-	}
-	$dbh->do("SET CLIENT_ENCODING TO 'UNICODE'");
-	$dbh->{pg_enable_utf8} = 1;
+    my $enc = $dbh->selectall_arrayref("SHOW CLIENT_ENCODING")->[0]->[0];
+    if ( $enc !~ /^unicode|utf8$/i ) {
+	warn("!".__x("Database {name} is niet in UTF-8 maar {enc}",
+		     name => $_[1], enc => $enc)."\n");
     }
-    else {
-	$dbh->do("SET CLIENT_ENCODING TO 'LATIN1'");
-	$dbh->{pg_enable_utf8} = 0;
-    }
+    $dbh->do("SET CLIENT_ENCODING TO 'UNICODE'");
+    $dbh->{pg_enable_utf8} = 1;
     return $dbh;
 }
 

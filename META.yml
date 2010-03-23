@@ -1,6 +1,6 @@
 ---
 name: EekBoek
-version: 1.04.06.01
+version: 2.00.00
 author:
   - Johan Vromans (jvromans@squirrel.nl)
 abstract: Elementary Bookkeeping (for the Dutch/European market)
@@ -10,6 +10,8 @@ resources:
   homepage: http://www.eekboek.nl
   license: ~
 requires:
+  Archive::Zip: 1.16
+  DBD::SQLite: 1.13
   DBI: 1.40
   Getopt::Long: 2.13
   Term::ReadLine: 0
@@ -18,22 +20,19 @@ build_requires:
   IPC::Run3: 0.034
   Module::Build: 0.26
 recommends:
-  Archive::Zip: 1.16
   DBD::Pg: 1.41
-  DBD::SQLite: 1.13
   Getopt::Long: 2.32
   HTML::Entities: 1.35
 provides:
   EekBoek:
     file: lib/EekBoek.pm
     version: !!perl/hash:Module::Build::Version
-      original: 1.04.06.01
+      original: 2.00.00
       qv: 1
       version:
-        - 1
-        - 4
-        - 6
-        - 1
+        - 2
+        - 0
+        - 0
 generated_by: Module::Build version 0.32
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.2.html

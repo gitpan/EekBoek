@@ -1,11 +1,13 @@
-#! perl
+#! perl --			-*- coding: utf-8 -*-
 
-# RCS Id          : $Id: DeLuxe.pm,v 1.19 2008/03/02 15:22:25 jv Exp $
+use utf8;
+
+# RCS Id          : $Id: DeLuxe.pm,v 1.25 2010/02/08 13:58:39 jv Exp $
 # Author          : Johan Vromans
 # Created On      : Thu Jul  7 15:53:48 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Sun Mar  2 16:17:56 2008
-# Update Count    : 258
+# Last Modified On: Mon Feb  8 14:58:04 2010
+# Update Count    : 283
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -18,7 +20,7 @@ package EB::Shell::DeLuxe;
 
 use strict;
 
-our $VERSION = sprintf "%d.%03d", q$Revision: 1.19 $ =~ /(\d+)/g;
+our $VERSION = sprintf "%d.%03d", q$Revision: 1.25 $ =~ /(\d+)/g;
 
 use base qw(EB::Shell::Base);
 use EB;
@@ -37,6 +39,12 @@ sub new {
 	*{"histfile"} = sub {};
 	*{"print"}    = sub { shift; CORE::print @_ };
     }
+    else {
+	no strict 'refs';
+	*{"init_rl"}  = sub { shift->SUPER::init_rl(@_) };
+	*{"histfile"} = sub { shift->SUPER::histfile(@_) };
+	*{"print"}    = sub { shift->SUPER::print(@_) };
+    }
 
     my $self = $class->SUPER::new($opts);
     $self->{$_} = $opts->{$_} foreach keys(%$opts);
@@ -51,7 +59,6 @@ sub new {
 	$self->{readline} = sub { $self->readline_file(sub { <STDIN> }) };
     }
     $self->{inputstack} = [];
-    $self->{unicode} = $cfg->unicode;
     $self->{errexit} = $opts->{errexit};
     $self;
 }
@@ -65,13 +72,14 @@ use Encode;
 
 sub readline_file {
     my ($self, $rl) = @_;
-    # binmode($fd, ":utf8") conflicts with UNICODE checking.
-    #binmode($fd, ":encoding(utf8)") if $cfg->unicode;
     my $line;
     my $pre = "";
     while ( 1 ) {
 	$line = $rl->();
-	return unless $line;
+	unless ( $line ) {
+	    warn("?"._T("Vervolgregel ontbreekt in de invoer.")."\n") if $pre;
+	    return;
+	}
 
 	if ( $line =~ /^\# \s*
 		       content-type: \s*
@@ -79,15 +87,13 @@ sub readline_file {
                        charset \s* = \s* (\S+) \s* $/ix ) {
 
 	    my $charset = lc($1);
-	    if ( $charset =~ /^(?:latin[19]|iso-?8859[-.]15?)$/i ) {
-		$self->{unicode} = 0;
+	    if ( $charset =~ /^(?:utf-?8)$/i ) {
 		next;
 	    }
-	    if ( $charset =~ /^(?:unicode|utf-?8)$/i ) {
-		$self->{unicode} = 1;
-		next;
-	    }
+	    die("?"._T("Invoer moet Unicode (UTF-8) zijn.")."\n");
 	}
+
+=begin thismustbefixed
 
 	if ( $self->{unicode} xor $cfg->unicode  ) {
 	    my $s = $line;
@@ -106,6 +112,20 @@ sub readline_file {
 		next;
 	    }
 	}
+
+=cut
+
+	my $s = $line;
+	my $t = "".$line;
+	eval {
+	    $line = decode('utf8', $s, 1);
+	};
+	if ( $@ ) {
+	    warn("?".__x("Geen geldige UTF-8 tekens in regel {line} van de invoer",
+			 line => $.)."\n".$t."\n");
+	    next;
+	}
+
 	if ( $self->{echo} ) {
 	    my $pr = $self->{echo};
 	    $pr =~ s/\>/>>/ if $pre;
@@ -132,15 +152,13 @@ sub readline_file {
 
 sub attach_file {
     my ($self, $file) = @_;
-    push(@{$self->{inputstack}}, [$self->{readline}, $self->{unicode}]);
+    push( @{ $self->{inputstack} }, [ $self->{readline} ] );
     $self->{readline} = sub { shift->readline_file(sub { <$file> }) };
-    $self->{unicode} = $cfg->unicode;
 }
 
 sub attach_lines {
     my ($self, $lines) = @_;
-    push(@{$self->{inputstack}}, [$self->{readline}, $self->{unicode}]);
-    $self->{unicode} = $cfg->unicode;
+    push( @{ $self->{inputstack} }, [ $self->{readline} ] );
     my @lines = @$lines;
     $self->{readline} = sub {
 	shift->readline_file(sub {
@@ -168,7 +186,7 @@ sub readline {
     my $ret;
     while ( !defined($ret = $self->{readline}->($self, $prompt)) ) {
 	return unless @{$self->{inputstack}};
-	($self->{readline}, $self->{unicode}) = @{pop(@{$self->{inputstack}})};
+	( $self->{readline} ) = @{pop(@{$self->{inputstack}})};
     }
     # Command parsing gets stuck on leading blanks.
     $ret =~ s/^\s+//;
@@ -177,105 +195,3 @@ sub readline {
 }
 
 1;
-
-__END__
-
-=head1 NAME
-
-EB::Shell::DeLuxe - A generic class to build line-oriented command interpreters.
-
-=head1 SYNOPSIS
-
-  package My::Shell;
-
-  use base qw(EB::Shell::DeLuxe);
-
-  sub do_greeting {
-      return "Hello!"
-  }
-
-=head1 DESCRIPTION
-
-EB::Shell::DeLuxe is a base class designed for building command line
-programs.  It inherits from L<EB::Shell::Base>.
-
-=head2 Features
-
-EB::Shell::DeLuxe extends EB::Shell::Base with the following features:
-
-=over 4
-
-=item Reading commands from files
-
-This implements batch processing in the style of "sh < commands.sh".
-
-All commands are read from the standard input, and processing
-terminates after the last command has been read.
-
-Commands read this way can be backslash-continued.
-
-=item Single command execution
-
-This implements command execution in the style of "sh -c 'command'".
-
-One single command is executed.
-
-=back
-
-=head1 METHODS
-
-=over 4
-
-=item new
-
-The constructor is called C<new>.  C<new> should be called with a
-reference to a hash of name => value parameters:
-
-  my $opts = { OPTION_1 => $one,
-	       OPTION_2 => $two };
-
-  my $shell = EB::Shell::DeLuxe->new($opts);
-
-EB::Shell::DeLuxe extends the options of EB::Shell::Base with:
-
-=over 4
-
-=item interactive
-
-Controls whether this instance is interactive, i.e, uses ReadLine to
-read commands.
-
-Defaults to true unless the standard input is not a terminal.
-
-=item command
-
-Controls whether this instance executes a single command, that is
-contained in @ARGV;
-
-  @ARGV = ( "exec", "this", "command" );
-  my $opts = { command => 1 };
-  my $shell = EB::Shell::DeLuxe->new($opts);
-  $shell->run;
-
-=item prompt
-
-The prompt for commands.
-
-=item echo
-
-If true, commands read from the standard input are echoed with the
-value of this option as a prefix. Valid for non-interactive use only.
-
-=back
-
-=head1 AUTHOR
-
-Johan Vromans E<lt>jvromans@squirrel.nl<gt>
-
-=head1 COPYRIGHT
-
-Copyright (C) 2005,2006 Squirrel Consultancy. All Rights Reserved.
-
-This module is free software; you can redistribute it and/or
-modify it under the same terms as Perl itself.
-

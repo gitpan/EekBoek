@@ -1,12 +1,14 @@
-#! perl
+#! perl --			-*- coding: utf-8 -*-
+
+use utf8;
 
 # Einde.pm -- Eindejaarsverwerking
-# RCS Info        : $Id: Einde.pm,v 1.18.2.1 2009/12/28 11:36:29 jv Exp $
+# RCS Info        : $Id: Einde.pm,v 1.22 2009/11/04 22:24:03 jv Exp $
 # Author          : Johan Vromans
 # Created On      : Sun Oct 16 21:27:40 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Sun Dec 27 23:04:53 2009
-# Update Count    : 228
+# Last Modified On: Wed Nov  4 23:21:55 2009
+# Update Count    : 246
 # Status          : Unknown, Use with caution!
 
 package main;
@@ -19,7 +21,7 @@ package EB::Tools::Einde;
 use strict;
 use warnings;
 
-our $VERSION = sprintf "%d.%03d", q$Revision: 1.18.2.1 $ =~ /(\d+)/g;
+our $VERSION = sprintf "%d.%03d", q$Revision: 1.22 $ =~ /(\d+)/g;
 
 use EB;
 use EB::Format;
@@ -33,8 +35,6 @@ sub new {
     $class = ref($class) || $class;
     return bless {} => $class;
 }
-
-sub min($$) { $_[0] lt $_[1] ? $_[0] : $_[1] }
 
 sub perform {
     my ($self, $args, $opts) = @_;
@@ -54,14 +54,10 @@ sub perform {
     my $def = $opts->{definitief};
     my $eb;
     if ( $opts->{eb} ) {
-	unless ( open($eb, '>', $opts->{eb}) ) {
+	unless ( open($eb, '>:encoding(utf-8)', $opts->{eb}) ) {
 	    warn("?", __x("Fout tijdens het aanmaken van bestand {file}: {err}",
 			 file => $opts->{eb}, err => $!."")."\n");
 	    return;
-	}
-	if ( $cfg->unicode ) {
-	    require Encode;
-	    binmode($eb, ":encoding(utf8)");
 	}
 	$opts->{eb_handle} = $eb;
     }

@@ -1,11 +1,13 @@
-#! perl
+#! perl --			-*- coding: utf-8 -*-
 
-# RCS Id          : $Id: Schema.pm,v 1.57 2008/03/10 17:41:58 jv Exp $
+use utf8;
+
+# RCS Id          : $Id: Schema.pm,v 1.65 2010/01/25 17:36:59 jv Exp $
 # Author          : Johan Vromans
 # Created On      : Sun Aug 14 18:10:49 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Sun Mar  9 15:24:14 2008
-# Update Count    : 651
+# Last Modified On: Mon Jan 25 18:36:12 2010
+# Update Count    : 774
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -20,12 +22,12 @@ package EB::Tools::Schema;
 use strict;
 use warnings;
 
-our $VERSION = sprintf "%d.%03d", q$Revision: 1.57 $ =~ /(\d+)/g;
+our $VERSION = sprintf "%d.%03d", q$Revision: 1.65 $ =~ /(\d+)/g;
 
 our $sql = 0;			# load schema into SQL files
 my $trace = $cfg->val(__PACKAGE__, "trace", 0);
 
-my $RCS_Id = '$Id: Schema.pm,v 1.57 2008/03/10 17:41:58 jv Exp $ ';
+my $RCS_Id = '$Id: Schema.pm,v 1.65 2010/01/25 17:36:59 jv Exp $ ';
 
 # Package name.
 my $my_package = 'EekBoek';
@@ -66,10 +68,11 @@ sub create {
     }
 
     die("?".__x("Onbekend schema: {schema}", schema => $name)."\n") unless $file;
-    open(my $fh, "<$file") or die("?".__x("Toegangsfout schema data: {err}", err => $!)."\n");
+    open(my $fh, "<", $file)
+      or die("?".__x("Toegangsfout schema data: {err}", err => $!)."\n");
     $schema = $name;
     _create(undef, sub { <$fh> });
-    __x("Schema {schema} geïnitialiseerd", schema => $name);
+    __x("Schema {schema} geÃ¯nitialiseerd", schema => $name);
 }
 
 sub _create {
@@ -194,7 +197,7 @@ sub scan_btw {
 	    warn("!"._T("Gelieve BTW tariefgroep \"Geen\" te vervangen door \"Nul\"")."\n")
 	      if lc($1) eq "geen";
 	}
-	elsif ( $extra =~ m/^tariefgroep=priv(e|é)?$/i ) {
+	elsif ( $extra =~ m/^tariefgroep=priv(e|Ã©)?$/i ) {
 	    $groep = BTWTARIEF_PRIV;
 	}
 	elsif ( $extra =~ m/^tariefgroep=anders??$/i ) {
@@ -270,11 +273,13 @@ sub scan_balres {
 	error(__x("Rekening {id} heeft geen verdichting", id => $id)."\n") unless defined($cvdi);
 	my $debcrd;
 	my $kstomz;
-	if ( ($balres ? $flags =~ /^[dc]$/i : $flags =~ /^[kon]$/i)
+	my $dcfixed;
+	if ( ($balres ? $flags =~ /^[dc]\!?$/i : $flags =~ /^[kon]$/i)
 	     ||
 	     $flags =~ /^[dc][ko]$/i ) {
 	    $debcrd = $flags =~ /d/i;
 	    $kstomz = $flags =~ /k/i if $flags =~ /[ko]/i;
+	    $dcfixed = $flags =~ /\!/;
 	}
 	else {
 	    error(__x("Rekening {id}: onherkenbare vlaggetjes {flags}",
@@ -298,7 +303,7 @@ sub scan_balres {
 		    if ( $balres && /^(kosten|omzet)$/ ) {
 			$btw_ko = substr($1, 0, 1) eq "k";
 		    }
-		    elsif ( /^(hoog|laag|nul|priv(e|é)?|anders?)$/ ) {
+		    elsif ( /^(hoog|laag|nul|priv(e|Ã©)?|anders?)$/ ) {
 			$btw_type = substr($1, 0, 1);
 		    }
 		    elsif ( /^\d+$/ ) {
@@ -343,7 +348,7 @@ sub scan_balres {
 	}
 	$desc =~ s/\s+$//;
 	$kstomz = $btw_ko unless defined($kstomz);
-	$acc{$id} = [ $desc, $cvdi, $balres, $debcrd, $kstomz, $btw_type ];
+	$acc{$id} = [ $desc, $cvdi, $balres, $debcrd, $kstomz, $btw_type, $dcfixed ];
     }
     else {
 	0;
@@ -368,7 +373,6 @@ sub load_schema {
     $max_hvd = 9;
     $max_vrd = 99;
     my $uerr = 0;
-    my $unicode = $cfg->unicode;
 
     %std = map { $_ => 0 } qw(btw_ok btw_vh winst crd deb btw_il btw_vl btw_ih btw_vp btw_ip btw_va btw_ia);
     while ( $_ = $rl->() ) {
@@ -377,34 +381,22 @@ sub load_schema {
               text (?: \s* \/ \s* plain)? \s* ; \s*
               charset \s* = \s* (\S+) \s* $/ix ) {
 	    my $charset = lc($1);
-	    if ( $charset =~ /^(?:latin[19]|iso-?8859[-.]15?)$/i ) {
-		$unicode = 0;
+	    if ( $charset =~ /^(?:utf-?8)$/i ) {
 		next;
 	    }
-	    if ( $charset =~ /^(?:unicode|utf-?8)$/i ) {
-		$unicode = 1;
-		next;
-	    }
+	    error(_T("Invoer moet Unicode (UTF-8) zijn.")."\n");
 	}
 
-	if ( $unicode xor $cfg->unicode ) {
-	    my $s = $_;
-	    eval {
-		if ( $cfg->unicode ) {
-		    $_ = decode($unicode ? 'utf8' : 'latin1', $s, 1);
-		}
-		else {
-		    Encode::from_to($_, 'utf8', 'latin1', 1);
-		}
-	    };
-	    if ( $@ ) {
-		warn("?".__x("Geen geldige {cs} tekens in regel {line} van de invoer",
-			     cs => $unicode ? "UTF-8" : "Latin1",
-			     line => $.)."\n".$_."\n");
-		warn($@);
-		$fail++;
-		next;
-	    }
+	my $s = "".$_;
+	eval {
+	    $_ = decode('utf8', $s, 1);
+	};
+	if ( $@ ) {
+	    warn("?".__x("Geen geldige UTF-8 tekens in regel {line} van de invoer",
+			 line => $.)."\n".$s."\n");
+	    warn($@);
+	    $fail++;
+	    next;
 	}
 
 	next if /^\s*#/;
@@ -539,7 +531,7 @@ sub _tsv {
 
 sub sql_eekboek {
     my $f = findlib("schema/eekboek.sql");
-    open (my $fh, '<', $f)
+    open (my $fh, '<:encoding(utf-8)', $f)
       or die("?"._T("Installatiefout -- geen database schema")."\n");
 
     local $/;
@@ -590,7 +582,7 @@ sub sql_acc {
     my $out = <<ESQL;
 -- Grootboekrekeningen
 COPY Accounts
-     (acc_id, acc_desc, acc_struct, acc_balres, acc_debcrd,
+     (acc_id, acc_desc, acc_struct, acc_balres, acc_debcrd, acc_dcfixed,
       acc_kstomz, acc_btw, acc_ibalance, acc_balance)
      FROM stdin;
 ESQL
@@ -598,10 +590,12 @@ ESQL
     for my $i ( sort { $a <=> $b } keys(%acc) ) {
 	my $g = $acc{$i};
 	croak(__x("Geen BTW tariefgroep voor code {code}",
-		  code => $g->[5])) unless exists $btwmap{$g->[5]};
+		  code => $g->[5]))
+	  unless exists $btwmap{$g->[5]} || exists $btwmap{$g->[5]."-"};
 	$out .= _tsv($i, $g->[0], $g->[1],
 		     _tf($g->[2]),
 		     _tf($g->[3]),
+		     _tfn($g->[2] ? $g->[6] : undef),
 		     _tfn($g->[4]),
 		     defined($btwmap{$g->[5]}) ? $btwmap{$g->[5]} : "\\N",
 		     0, 0);
@@ -664,13 +658,18 @@ ESQL
     $out;
 }
 
+use Encode;
 sub gen_schema {
     foreach ( qw(eekboek vrd acc dbk btw std) ) {
-	warn('%'."Aanmaken $_.sql...\n");
-	open(my $f, ">$_.sql") or die("Cannot create $_.sql: $!\n");
+	warn('%'.__x("Aanmaken {sql}...",
+		     sql => "$_.sql")."\n");
+
+	# Careful. Data is utf8.
+	open(my $f, ">:encoding(utf-8)", "$_.sql")
+	  or die("Cannot create $_.sql: $!\n");
 	my $cmd = "sql_$_";
 	no strict 'refs';
-	print $f $cmd->();
+	print $f decode_utf8($cmd->());
 	close($f);
     }
 }
@@ -705,18 +704,17 @@ sub dump_schema {
 	  "# Aangemaakt door ", __PACKAGE__, " $my_version");
     my @t = localtime(time);
     printf {$fh} (" op %02d-%02d-%04d %02d:%02d:%02d\n", $t[3], 1+$t[4], 1900+$t[5], @t[2,1,0]);
-    printf {$fh} ("# Content-Type: text/plain; charset = %s\n",
-		  $cfg->unicode ? "UTF-8" : "ISO-8859.1");
+    print {$fh} ("# Content-Type: text/plain; charset = UTF-8\n");
     print {$fh}  <<EOD;
 
-# Dit bestand definiëert alle vaste gegevens van een administratie of
+# Dit bestand definiÃ«ert alle vaste gegevens van een administratie of
 # groep administraties: het rekeningschema (balansrekeningen en
 # resultaatrekeningen), de dagboeken en de BTW tarieven.
 #
 # Algemene syntaxregels:
 #
 # * Lege regels en regels die beginnen met een hekje # worden niet
-#   geïnterpreteerd.
+#   geÃ¯nterpreteerd.
 # * Een niet-ingesprongen tekst introduceert een nieuw onderdeel.
 # * Alle ingesprongen regels zijn gegevens voor dat onderdeel.
 
@@ -734,7 +732,7 @@ EOD
 print {$fh}  <<EOD;
 # REKENINGSCHEMA
 #
-# Het rekeningschema is hiërarchisch opgezet volgende de beproefde
+# Het rekeningschema is hiÃ«rarchisch opgezet volgende de beproefde
 # methode Bakker. De hoofdverdichtingen lopen van 1 t/m 9, de
 # verdichtingen t/m 99. De grootboekrekeningen zijn verdeeld in
 # balansrekeningen en resultaatrekeningen.
@@ -750,6 +748,8 @@ print {$fh}  <<EOD;
 #   :btw=nul
 #   :btw=hoog
 #   :btw=laag
+#   :btw=privÃ©
+#   :btw=anders
 #
 # Ook is het mogelijk aan te geven dat een rekening een koppeling
 # (speciale betekenis) heeft met :koppeling=xxx. De volgende koppelingen
@@ -761,6 +761,10 @@ print {$fh}  <<EOD;
 #   btw_il	idem, laag tarief
 #   btw_vh	idem, verkopen, hoog tarief
 #   btw_vl	idem, laag tarief
+#   btw_ph	idem, privÃ©, hoog tarief
+#   btw_pl	idem, laag tarief
+#   btw_ah	idem, anders, hoog tarief
+#   btw_al	idem, laag tarief
 #   btw_ok	rekening voor de betaalde BTW
 #   winst	rekening waarop de winst wordt geboekt
 #
@@ -825,16 +829,18 @@ EOD
 
 # BTW TARIEVEN
 #
-# Er zijn drie tariefgroepen: "hoog", "laag" en "nul". De tariefgroep
-# bepaalt het rekeningnummer waarop de betreffende boeking plaatsvindt.
+# Er zijn vijf tariefgroepen: "hoog", "laag", "nul", "privÃ©" en
+# "anders". De tariefgroep bepaalt het rekeningnummer waarop de
+# betreffende boeking plaatsvindt.
 # Binnen elke tariefgroep zijn meerdere tarieven mogelijk, hoewel dit
 # in de praktijk niet snel zal voorkomen.
 # In de eerste kolom wordt de (numerieke) code voor dit tarief
 # opgegeven. Deze kan o.m. worden gebruikt om expliciet een BTW tarief
-# op te geven bij het boeken. Voor elk tarief (behalve die van groep
-# "nul") moet het percentage worden opgegeven. Met de aanduiding
-# :exclusief kan worden opgegeven dat boekingen op rekeningen met deze
-# tariefgroep standaard het bedrag exclusief BTW aangeven.
+# op te geven bij het boeken. Voor elk gebruikt tarief (behalve die
+# van groep "nul") moet het percentage worden opgegeven. Met de
+# aanduiding :exclusief kan worden opgegeven dat boekingen op
+# rekeningen met deze tariefgroep standaard het bedrag exclusief BTW
+# aangeven.
 #
 # BELANGRIJK: Mutaties die middels de command line shell of de API
 # worden uitgevoerd maken gebruik van het geassocieerde BTW tarief van
@@ -876,7 +882,8 @@ sub dump_acc {
 	    print {$fh} ("# ".__x("VERDICHTING MOET TUSSEN {min} EN {max} (INCL.) LIGGEN",
 			   min => $max_hvd+1, max => $max_vrd)."\n")
 	      if $id <= $max_hvd || $id > $max_vrd;
-	    my $sth = $dbh->sql_exec("SELECT acc_id, acc_desc, acc_balres, acc_debcrd, acc_kstomz,".
+	    my $sth = $dbh->sql_exec("SELECT acc_id, acc_desc, acc_balres,".
+				     " acc_debcrd, acc_dcfixed, acc_kstomz,".
 				     " acc_btw, btw_tariefgroep, btw_incl".
 				     " FROM Accounts, BTWTabel ".
 				     " WHERE acc_struct = ?".
@@ -884,10 +891,11 @@ sub dump_acc {
 				     " OR btw_id = 0 AND acc_btw IS NULL)".
 				     " ORDER BY acc_id", $id);
 	    while ( my $rr = $sth->fetchrow_arrayref ) {
-		my ($id, $desc, $acc_balres, $acc_debcrd, $acc_kstomz, $btw_id, $btw, $btwincl) = @$rr;
+		my ($id, $desc, $acc_balres, $acc_debcrd, $acc_dcfixed, $acc_kstomz, $btw_id, $btw, $btwincl) = @$rr;
 		my $flags = "";
 		if ( $balres ) {
 		    $flags .= $acc_debcrd ? "D" : "C";
+		    $flags .= '!' if $acc_dcfixed;
 		}
 		else {
 		    $flags .= defined($acc_kstomz)
@@ -912,7 +920,7 @@ sub dump_acc {
 		    }
 		}
 		elsif ( $btw == BTWTARIEF_PRIV ) {
-		    $extra .= " :btw=privé";
+		    $extra .= " :btw=privÃ©";
 		    $extra .= ",excl" unless $btwincl;
 		    if ( $balres ) {
 			$extra .= ",kosten" if $acc_kstomz;
@@ -992,6 +1000,116 @@ sub dump_dbk {
 	$t =~ s/\s+$//;
 	print {$fh} ($t, "\n");
     }
+}
+
+################ API functions ################
+
+sub new {
+    bless \my $x, shift;
+}
+
+sub add_gbk {
+    my ($self, @args) = @_;
+
+    my $opts = pop(@args);	# currently unused
+    my $in_transaction;
+    my $anyfail;
+    my $ret = "";
+
+    while ( @args ) {
+	my ($gbk, $flags, $desc, $vrd) = splice( @args, 0, 4 );
+	if ( defined($flags) and defined($desc) and defined($vrd) ) {
+	    my ( $balres, $debcrd, $kstomz, $fixed );
+	    ( $flags, $fixed ) = ( $1, !!$2 ) if $flags =~ /^(.)(!)$/;
+	    $flags = lc($flags);
+
+	    my $t = $dbh->lookup($gbk, qw(Accounts acc_id acc_desc));
+	    if ( $t ) {
+		warn "?".
+		  __x("Grootboekrekening {gbk} ({desc}) bestaat reeds",
+		      gbk => $gbk, desc => $t)."\n";
+		$anyfail++;
+		next;
+	    }
+	    $balres = $dbh->lookup($vrd, qw(Verdichtingen vdi_id vdi_balres));
+	    unless ( defined $balres ) {
+		warn "?".__x("Onbekende verdichting: {vrd}",
+			     vrd => $vrd)."\n";
+		$anyfail++;
+		next;
+	    }
+	    if ( $balres ) {
+		if ( $flags =~ /^[dc]$/ ) {
+		    $debcrd = $flags eq 'd';
+		}
+		else {
+		    warn "?"._T("Ongeldig type voor balansrekening (alleen D / C toegestaan)")."\n";
+		    $anyfail++;
+		    next;
+		}
+	    }
+	    else {
+		if ( $flags =~ /^[kon]$/ ) {
+		    $kstomz = $flags eq 'k' ? 1 : $flags eq 'o' ? 0 : undef;
+		}
+		else {
+		    warn "?"._T("Ongeldig type voor resultaatrekening (alleen K / O / N toegestaan)")."\n";
+		    $anyfail++;
+		    next;
+		}
+	    }
+	    $dbh->begin_work unless $in_transaction++;
+	    $t = $dbh->sql_insert("Accounts",
+				  [qw(acc_id acc_desc acc_struct acc_balres
+				      acc_debcrd acc_dcfixed acc_kstomz
+				      acc_btw acc_ibalance acc_balance)],
+				  $gbk, $desc, $vrd,
+				  $balres,
+				  $debcrd,
+				  $fixed,
+				  $kstomz,
+				  undef, 0, 0);
+	    unless ( $t ) {
+		warn "?".__x("Fout tijdens het opslaan van grootboekrekening {gbk}",
+			     gbk => $gbk)."\n";
+		$anyfail++;
+		next;
+	    }
+	}
+
+	unless ( $anyfail ) {
+	    my $rr = $dbh->do("SELECT acc_desc, acc_balres, acc_debcrd,".
+			      "       acc_kstomz, acc_dcfixed, vdi_id, vdi_desc, vdi_struct".
+			      " FROM Accounts, Verdichtingen".
+			      " WHERE acc_id = ?".
+			      " AND acc_struct = vdi_id", $gbk);
+	    unless ( $rr ) {
+		warn "!".__x("Onbekende grootboekrekening: {gbk}",
+			     gbk => $gbk)."\n";
+		#$anyfail++;
+		next;
+	    }
+
+	    my $t = $dbh->lookup($rr->[7], qw(Verdichtingen vdi_id vdi_desc));
+	    $ret .=
+	      __x("{balres} {gbk} {debcrd}{fixed}{kstomz} ({desc});".
+		  " Verdichting {vrd} ({vdesc});".
+		  " Hoofdverdichting {hvrd} ({hdesc})",
+		  balres => ($rr->[1] ? "Balansrekening" : "Resultaatrekening"),
+		  gbk => $gbk, desc => $rr->[0],
+		  debcrd => ($rr->[1] ? ($rr->[2] ? "Debet" : "Credit") : ""),
+		  kstomz => ($rr->[1] ? "" : defined($rr->[3]) ? $rr->[3] ? " Kosten" : " Omzet" : " Neutraal"),
+		  fixed => $rr->[4] ? "!" : "",
+		  vrd => $rr->[5], vdesc => $rr->[6],
+		  hvrd => $rr->[7], hdesc => $t,
+		 )."\n";
+	}
+    }
+
+    if ( $in_transaction ) {
+	$anyfail ? $dbh->rollback : $dbh->commit;
+    }
+    return $ret;
 }
 
 1;
