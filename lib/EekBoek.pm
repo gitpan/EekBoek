@@ -12,7 +12,7 @@ use 5.008003;
 
 my $RCS_Id = '$Id: EekBoek.pm,v 1.99 2010/03/23 19:10:55 jv Exp $ ';
 our $PACKAGE = 'EekBoek';
-our $VERSION = '2.00.00';
+our $VERSION = '2.00.00.01';
 
 =head1 NAME
 

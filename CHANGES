@@ -1,6 +1,12 @@
 # $Id$
 
-2.00.00		
+2.00.01
+
+	* Fix probleem met Term::ReadLine::Perl. Gebruik in plaats
+          daarvan Term::ReadLine::Gnu.
+	  Meest relevant voor Windows en MacOSX.
+
+2.00.00	2010-03-23 20:59
 
 	* Release 2.00.00
 
