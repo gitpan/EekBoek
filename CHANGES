@@ -6,6 +6,13 @@
           daarvan Term::ReadLine::Gnu.
 	  Meest relevant voor Windows en MacOSX.
 
+	* Elimineer File::HomeDir.
+	  Relevant voor MacOSX, omdat de benodigde Mac::Files daar
+	  problematisch is en enkel in 32bit beschikbaar.
+
+	* Nieuwe packaging. Default is cli, gui is optioneel, contrib
+          verhuist naar de wiki.
+
 2.00.00	2010-03-23 20:59
 
 	* Release 2.00.00
