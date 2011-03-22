@@ -10,7 +10,7 @@ Name: EekBoek
 Summary: Bookkeeping software for small and medium-size businesses
 License: GPL+ or Artistic
 Group: Applications/Productivity
-Version: 2.00.02
+Version: 2.00.03
 Release: 1%{?dist}
 Source: http://www.eekboek.nl/dl/%{name}-%{version}.tar.gz
 URL: http://www.eekboek.nl
@@ -31,7 +31,6 @@ AutoReqProv: 0
 Requires: perl >= 5.8
 Requires: perl(Archive::Zip)
 Requires: perl(HTML::Parser)
-Requires: perl(File::HomeDir)
 Requires: perl(Term::ReadLine)
 Requires: perl(Term::ReadLine::Gnu)
 Requires: perl(DBI) >= 1.40
@@ -43,7 +42,6 @@ BuildRequires: perl(Module::Build) >= 0.32
 BuildRequires: perl(IPC::Run3)
 BuildRequires: perl(Archive::Zip)
 BuildRequires: perl(HTML::Parser)
-BuildRequires: perl(File::HomeDir)
 BuildRequires: perl(Term::ReadLine)
 BuildRequires: perl(Term::ReadLine::Gnu)
 BuildRequires: perl(DBI) >= 1.40
@@ -240,6 +238,9 @@ done
 %{ebshare}/lib/EB/DB/Postgres.pm
 
 %changelog
+* Tue Mar 22 2011 Johan Vromans <jvromans@squirrel.nl> - 2.00.03
+- Upgrade to upstream 2.00.03.
+
 * Thu May 06 2010 Johan Vromans <jvromans@squirrel.nl> - 2.00.02-1
 - Upgrade to upstream 2.00.02.
 
