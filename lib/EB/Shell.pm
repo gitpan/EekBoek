@@ -715,7 +715,7 @@ sub _do_btwaangifte {
 		 "noreport",
 		 "noround",
 	       ], $opts)
-      or goto &_help_btwaangifte;
+      or goto &help_btwaangifte;
 
     if ( @args && lc($args[-1]) eq "definitief" ) {
 	$opts->{close} = 1;

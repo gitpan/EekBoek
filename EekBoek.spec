@@ -10,7 +10,7 @@ Name: EekBoek
 Summary: Bookkeeping software for small and medium-size businesses
 License: GPL+ or Artistic
 Group: Applications/Productivity
-Version: 2.00.03
+Version: 2.00.04
 Release: 1%{?dist}
 Source: http://www.eekboek.nl/dl/%{name}-%{version}.tar.gz
 URL: http://www.eekboek.nl
@@ -96,8 +96,8 @@ This package contains the wxWidgets (GUI) extension for %{name}.
 
 # This package only contains the necessary module(s) for EekBoek
 # to use the PostgreSQL database.
-# Installing this package will pull in the core package and
-# the Perl PostgreSQL modules.
+# Installing this package will pull in the main package and
+# the Perl PostgreSQL modules, if necessary.
 # No %%doc required.
 
 Summary: PostgreSQL database driver for %{name}
@@ -238,7 +238,10 @@ done
 %{ebshare}/lib/EB/DB/Postgres.pm
 
 %changelog
-* Tue Mar 22 2011 Johan Vromans <jvromans@squirrel.nl> - 2.00.03
+* Fri Mar 09 2012 Johan Vromans <jvromans@squirrel.nl> - 2.00.04-1
+- Upgrade to upstream 2.00.04.
+
+* Tue Mar 22 2011 Johan Vromans <jvromans@squirrel.nl> - 2.00.03-1
 - Upgrade to upstream 2.00.03.
 
 * Thu May 06 2010 Johan Vromans <jvromans@squirrel.nl> - 2.00.02-1

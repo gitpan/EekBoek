@@ -1,6 +1,6 @@
 ---
 name: EekBoek
-version: 2.00.02
+version: 2.00.04
 author:
   - Johan Vromans (jvromans@squirrel.nl)
 abstract: Elementary Bookkeeping (for the Dutch/European market)
@@ -27,12 +27,12 @@ provides:
   EekBoek:
     file: lib/EekBoek.pm
     version: !!perl/hash:Module::Build::Version
-      original: 2.00.02
+      original: 2.00.04
       qv: 1
       version:
         - 2
         - 0
-        - 2
+        - 4
 generated_by: Module::Build version 0.32
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.2.html

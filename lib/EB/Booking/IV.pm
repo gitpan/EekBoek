@@ -13,8 +13,8 @@ package EB::Booking::IV;
 # Author          : Johan Vromans
 # Created On      : Thu Jul  7 14:50:41 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Wed Oct 14 23:08:11 2009
-# Update Count    : 307
+# Last Modified On: Fri Mar  9 08:30:41 2012
+# Update Count    : 309
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -263,9 +263,9 @@ sub perform {
 		    warn("?".__x("Onbekende BTW-code: {code}", code => $btw_id)."\n");
 		    return;
 		}
-		my $t = "btw_" . ($iv ? "i" : "v");
-		$t .= $tg == BTWTARIEF_HOOG ? 'h' : 'l';
-		$btw_acc = $dbh->std_acc($t);
+		my $tp = BTWTARIEVEN->[$tg];
+		my $t = qw(v i)[$iv] . lc(substr($tp, 0, 1));
+		$btw_acc = $dbh->std_acc("btw_$t");
 	    }
 	}
 	elsif ( $btw_id ) {
@@ -303,7 +303,7 @@ sub perform {
     $tot = -$tot if $iv;
     my $fail = defined($totaal) && $tot != $totaal;
     if ( $opts->{journal} ) {
-	warn("?"._T("Dit overicht is ter referentie, de boeking is niet uitgevoerd!")."\n") if $fail;
+	warn("?"._T("Dit overzicht is ter referentie, de boeking is niet uitgevoerd!")."\n") if $fail;
 	EB::Report::Journal->new->journal
 	    ({select => $bsk_id,
 	      d_boekjaar => $bky,

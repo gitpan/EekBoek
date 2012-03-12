@@ -1,11 +1,28 @@
-2.00.03
+2.00.04
+
+	* Fix bug 3499522.
+
+	  Een IV boeking waarbij een BTW tariefgroep Privé of Anders
+	  was betrokken, werd abusievelijk op de grootboekrekening
+	  voor BTW Laag geboekt. In geval van een verkoopboeking kwam
+	  het BTW bedrag niet in de juiste rubriek van de BTW aangifte
+	  terecht.
+
+	  (Voor inkoopboekingen was de impact op de BTW aangifte
+	  nihil.)
+
+	* Fix fout bij opvragen hulp voor BTW aangifte.
+
+	* Fix typo in enkele boodschappen (Issue #3477452).
+
+2.00.03	2011-03-22
 
 	* (schema) Fix probleem dat het gebruik van een
 	  ongedefinieerde BTW tariefgroep onopgemerkt bleef wanneer er
 	  wel een groep was gedefinieerd met een afwijkende
 	  exclusiviteit.
 
-2.00.02	  2010-05-06
+2.00.02	2010-05-06
 
 	* (ebwxshell, linux) Workaround voor het HTML rendering
           probleem met wxPerl versies 0.95 en 0.95.

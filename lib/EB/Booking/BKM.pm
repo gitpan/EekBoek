@@ -11,8 +11,8 @@ package EB::Booking::BKM;
 # Author          : Johan Vromans
 # Created On      : Thu Jul  7 14:50:41 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Fri Apr  3 12:09:00 2009
-# Update Count    : 527
+# Last Modified On: Fri Mar  9 08:31:03 2012
+# Update Count    : 528
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -573,7 +573,7 @@ sub perform {
     $dbh->store_journal($self->journalise($bsk_id));
 
     if ( $opts->{journal} ) {
-	warn("?"._T("Dit overicht is ter referentie, de boeking is niet uitgevoerd!")."\n") if $fail;
+	warn("?"._T("Dit overzicht is ter referentie, de boeking is niet uitgevoerd!")."\n") if $fail;
 	EB::Report::Journal->new->journal
 	    ({select => $bsk_id,
 	      d_boekjaar => $bky,
