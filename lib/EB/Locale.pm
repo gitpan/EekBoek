@@ -1,141 +1,107 @@
-#! perl --			-*- coding: utf-8 -*-
-
-use utf8;
+#! perl
 
 # Locale.pm -- EB Locale setup (core version)
-# RCS Info        : $Id: Locale.pm,v 1.15 2009/10/24 20:01:01 jv Exp $ 
 # Author          : Johan Vromans
 # Created On      : Fri Sep 16 20:27:25 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Sat Oct 24 22:00:58 2009
-# Update Count    : 117
+# Last Modified On: Tue Aug 14 12:28:39 2012
+# Update Count    : 165
 # Status          : Unknown, Use with caution!
 
 package EB::Locale;
 
+# IMPORTANT:
+#
+# This module is used (require-d) by module EB only.
+# No other modules should try to play localisation tricks.
+#
+# Note: Only _T must be defined. The rest is defined in EB::Utils.
+
 use strict;
-
-our $VERSION = sprintf "%d.%03d", q$Revision: 1.15 $ =~ /(\d+)/g;
-
-use base qw(Exporter);
 
 use constant COREPACKAGE => "ebcore";
 
-our @EXPORT_OK = qw(LOCALISER _T __x __n __nx __xn);
+use base qw(Exporter);
+
+our @EXPORT_OK = qw(_T);
 our @EXPORT = @EXPORT_OK;
 
 # This module supports three different gettext implementations.
 
-use POSIX qw(setlocale LC_MESSAGES);
+use POSIX qw(setlocale);
 
-my $gotone = 0;
+my $core_localiser;
+our $LOCALISER;			# for outside checking
 
-unless ( $gotone ) {
+sub LC_MESSAGES {
+    eval { POSIX::LC_MESSAGES() } || 5;
+}
+
+sub __init__ {
+    return if $core_localiser;
+
+    # Since EB is use-ing Locale, we cannot use the EB exported libfile yet.
+    my $dir = EB::libfile("locale");
+
+    # Use outer settings.
+    setlocale(LC_MESSAGES);
+
+    # Try Locale::gettext
     eval {
 	require Locale::gettext;
-	# Use outer settings.
-	setlocale(LC_MESSAGES, $ENV{EB_LANG}||"");
+	$core_localiser = Locale::gettext->domain(COREPACKAGE);
+	$core_localiser->dir($dir);
+	eval 'sub _T { $core_localiser->get($_[0]) }';
+	$LOCALISER = "Locale::gettext";
+    } and return;
 
-	our $core_localiser;
-	unless ( $core_localiser ) {
-	    $core_localiser = Locale::gettext->domain(COREPACKAGE);
-	    # Since EB is use-ing Locale, we cannot use the EB exported libfile yet.
-	    $core_localiser->dir(EB::libfile("locale"));
-	}
+    # Try Locale::Messages (part of libintl-perl).
+    eval {
+	require Locale::Messages;
+	Locale::Messages::bindtextdomain( COREPACKAGE, $dir );
+	Locale::Messages::textdomain(COREPACKAGE);
+	eval 'sub _T { package Locale::Messages; turn_utf_8_on(gettext($_[0])) }';
+	$LOCALISER = "Locale::Messages";
+    } and return;
+    return if $core_localiser;
 
-	eval 'sub _T($) {
-	    $core_localiser->get($_[0]);
-	}';
+    # Try Locale::gettext_xs (part of libintl-perl).
+    eval {
+	require Locale::gettext_xs;
+	Locale::gettext_xs::bindtextdomain( COREPACKAGE, $dir );
+	Locale::gettext_xs::textdomain(COREPACKAGE);
+	eval 'sub _T { Locale::gettext_xs::gettext($_[0]) }';
+	$LOCALISER = "Locale::gettext_xs";
+    } and return;
+    return if $core_localiser;
 
-	eval 'sub LOCALISER() { "Locale::gettext" }';
+    # Try Locale::gettext_pp (part of libintl-perl).
+    eval {
+	require Locale::gettext_pp;
+	Locale::gettext_pp::bindtextdomain( COREPACKAGE, $dir );
+	Locale::gettext_pp::textdomain(COREPACKAGE);
+	eval 'sub _T { Locale::gettext_pp::gettext($_[0]) }';
+	$LOCALISER = "Locale::gettext_pp";
+    } and return;
+    return if $core_localiser;
 
-	$gotone++;
+    # Fallback to none.
+    unless ( $core_localiser ) {
+	$core_localiser = "<dummy>";
+	eval 'sub _T { $_[0] };';
+	$LOCALISER = "";
     }
 }
 
-unless ( $gotone ) {
-
-    eval 'sub _T($) { $_[0] };';
-    eval 'sub LOCALISER() { "" }';
-
+sub get_language {
+    $ENV{LANG};
 }
 
-# Second alternative: Locale-gettext 1.05 (on CPAN).
-# Simple and light-weight.
-# It only provides the straight-forward translation, so we need
-# to add the utility routines __x __n __xn __nx.
-
-=begin later
-
-use Locale::gettext 1.05;
-use POSIX;     # Needed for setlocale()
-
-# Use outer settings.
-setlocale(LC_MESSAGES, $ENV{EB_LANG}||"");
-
-our $core_localiser;
-unless ( $core_localiser ) {
-    $core_localiser = Locale::gettext->domain(COREPACKAGE);
-    $core_localiser->dir( libfile("locale") );
+sub set_language {
+    # Set/change language.
+    setlocale( LC_MESSAGES, $ENV{LANG} = $_[1] );
 }
 
-sub _T($) {
-    $core_localiser->get($_[0]);
-}
-
-sub LOCALISER() { "Locale::gettext" }
-
-=cut
-
-# Variable expansion. See GNU gettext for details.
-sub __expand($%) {
-    my ($t, %args) = @_;
-    my $re = join('|', map { quotemeta($_) } keys(%args));
-    $t =~ s/\{($re)\}/defined($args{$1}) ? $args{$1} : "{$1}"/ge;
-    $t;
-}
-
-# Translation w/ variables.
-sub __x($@) {
-    my ($t, %vars) = @_;
-    __expand(_T($t), %vars);
-}
-
-# Translation w/ singular/plural handling.
-sub __n($$$) {
-    my ($sing, $plur, $n) = @_;
-    _T($n == 1 ? $sing : $plur);
-}
-
-# Translation w/ singular/plural handling and variables.
-sub __nx($$$@) {
-    my ($sing, $plur, $n, %vars) = @_;
-    __expand(__n($sing, $plur, $n), %vars);
-}
-
-# Make __xn a synonym for __nx.
-*__xn = \&__nx;
-
-=begin alternative
-
-# Third alternative: libintl-perl (GNU gettext) (on CPAN).
-#
-
-# This implementation provides a smart hash binding as well as object
-# references.
-# It also provides the utility routines __x __n __xn __nx and more.
-
-use Locale::TextDomain( COREPACKAGE, libfile("locale") );
-
-sub _T($) { $__->{$_[0]} }
-
-sub LOCALISER() { "Locale::TextDomain" }
-
-=cut
-
-# Perl magic.
-# *_=\&_T;
-
-# More Perl magic.
+__init__();
 
 1;

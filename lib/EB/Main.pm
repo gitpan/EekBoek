@@ -2,12 +2,11 @@
 
 use utf8;
 
-# RCS Id          : $Id: Main.pm,v 1.15 2010/01/16 22:37:58 jv Exp $
 # Author          : Johan Vromans
 # Created On      : Thu Jul  7 15:53:48 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Sat Jan 16 22:42:00 2010
-# Update Count    : 996
+# Last Modified On: Sat Aug 11 21:13:47 2012
+# Update Count    : 1009
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -24,7 +23,6 @@ use warnings;
 
 use EekBoek;
 use EB;
-use EB::Config ();
 use EB::DB;
 use Getopt::Long 2.13;
 
@@ -33,9 +31,11 @@ use Getopt::Long 2.13;
 sub run {
     my ( $pkg, $opts ) = @_;
     $opts = {} unless defined $opts;
-
     binmode(STDOUT, ":encoding(utf8)");
     binmode(STDERR, ":encoding(utf8)");
+
+    # Preliminary initialize config.
+    EB->app_init( { app => $EekBoek::PACKAGE } );
 
     # Command line options.
     $opts =
@@ -48,9 +48,9 @@ sub run {
 	#file,				# file voor in/export
 	#dir,				# directory voor in/export
 	#title,				# title for export
-	errexit	      => 0,		# disallow errors in batch
+	#errexit			# disallow errors in batch
 	verbose	      => 0,		# verbose processing
-	#bky,				# boekjaar
+	#boekjaar,			# boekjaar
 
 	# Development options (not shown with -help).
 	debug	     => 0,		# debugging
@@ -68,7 +68,7 @@ sub run {
     $opts->{trace} |= ($opts->{debug} || $opts->{test});
 
     # Initialize config.
-    EB::Config->init_config( { app => $EekBoek::PACKAGE, %$opts } );
+    EB->app_init( { app => $EekBoek::PACKAGE, %$opts } );
     if ( $opts->{printconfig} ) {
 	$cfg->printconf( \@ARGV );
 	exit;
@@ -86,8 +86,7 @@ sub run {
 	require EB::IniWiz;
 	EB::IniWiz->run($opts); # sets $opts->{runeb}
 	die("?"._T("Geen administratie geselecteerd")."\n") unless $opts->{runeb};
-	undef $cfg;
-	EB::Config->init_config( { app => $EekBoek::PACKAGE, %$opts } );
+	EB->app_init( { app => $EekBoek::PACKAGE, %$opts } );
       }
     }
 
@@ -144,13 +143,13 @@ sub run {
       ({ HISTFILE	   => $userdir."/history",
 	 command	   => $opts->{command},
 	 interactive	   => $opts->{interactive},
-	 errexit	   => $opts->{errexit},
+	 errexit	   => defined($opts->{errexit})?$opts->{errexit}:$cfg->val(qw(shell errexit),0),
 	 verbose	   => $opts->{verbose},
 	 trace		   => $opts->{trace},
 	 journal	   => $cfg->val(qw(preferences journal), 0),
 	 echo		   => $opts->{echo},
 	 prompt		   => lc($cfg->app),
-	 boekjaar	   => $opts->{bky},
+	 boekjaar	   => $opts->{boekjaar},
        });
 
     $| = 1;
@@ -201,7 +200,7 @@ sub app_options {
 		      'file=s',
 		      'interactive!',
 		      'wizard!',
-		      'errexit',
+		      'errexit!',
 		      'trace',
 		      'help|?',
 		      'debug',
@@ -227,13 +226,13 @@ sub app_usage {
     print STDERR __x(<<EndOfUsage, prog => $0);
 Gebruik: {prog} [options] [file ...]
 
-    --command  -c       voer de rest van de opdrachtregel uit als command
-    --echo  -e          toon ingelezen opdrachten
+    --command  -c	voer de rest van de opdrachtregel uit als command
+    --echo  -e		toon ingelezen opdrachten
     --boekjaar=XXX	specificeer boekjaar
-    --import            importeer een nieuwe administratie
-    --export            exporteer een administratie
-    --dir=XXX           directory voor im/export
-    --file=XXX          bestand voor im/export
+    --import		importeer een nieuwe administratie
+    --export		exporteer een administratie
+    --dir=XXX		directory voor im/export
+    --file=XXX		bestand voor im/export
     --titel=XXX		omschrijving voor export
     --init		(re)creëer administratie
     --help		deze hulpboodschap
@@ -242,12 +241,12 @@ Gebruik: {prog} [options] [file ...]
 
 Voor experts:
 
-    --config=XXX -f     specificeer configuratiebestand
-    --nostdconf -X      gebruik uitsluitend dit configuratiebestand
-    --define=XXX -D     definieer configuratiesetting
+    --config=XXX -f	specificeer configuratiebestand
+    --nostdconf -X	gebruik uitsluitend dit configuratiebestand
+    --define=XXX -D	definieer configuratiesetting
     --printconfig -P	print config waarden
-    --[no]interactive   forceer [non]interactieve modus
-    --errexit           stop direct na een fout in de invoer
+    --[no]interactive	forceer [non]interactieve modus
+    --[no]errexit	stop direct na een fout in de invoer
 EndOfUsage
     CORE::exit $exit if defined $exit && $exit != 0;
 }

@@ -2,12 +2,11 @@
 
 use utf8;
 
-# RCS Id          : $Id: Schema.pm,v 1.65 2010/01/25 17:36:59 jv Exp $
 # Author          : Johan Vromans
 # Created On      : Sun Aug 14 18:10:49 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Tue Mar 22 20:25:37 2011
-# Update Count    : 775
+# Last Modified On: Thu Sep  6 14:38:33 2012
+# Update Count    : 934
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -22,19 +21,8 @@ package EB::Tools::Schema;
 use strict;
 use warnings;
 
-our $VERSION = sprintf "%d.%03d", q$Revision: 1.65 $ =~ /(\d+)/g;
-
 our $sql = 0;			# load schema into SQL files
 my $trace = $cfg->val(__PACKAGE__, "trace", 0);
-
-my $RCS_Id = '$Id: Schema.pm,v 1.65 2010/01/25 17:36:59 jv Exp $ ';
-
-# Package name.
-my $my_package = 'EekBoek';
-# Program name and version.
-my ($my_name, $my_version) = $RCS_Id =~ /: (.+).pm,v ([\d.]+)/;
-# Tack '*' if it is not checked in into RCS.
-$my_version .= '*' if length('$Locker:  $ ') > 12;
 
 ################ The Process ################
 
@@ -48,6 +36,7 @@ use Encode;
 ################ Schema Loading ################
 
 my $schema;
+my %km;				# keyword map
 
 sub create {
     shift;			# singleton class method
@@ -71,15 +60,22 @@ sub create {
     open(my $fh, "<", $file)
       or die("?".__x("Toegangsfout schema data: {err}", err => $!)."\n");
     $schema = $name;
-    _create(undef, sub { <$fh> });
+    _create1(undef, sub { <$fh> });
+    seek( $fh, 0, 0 );
+    _create2(undef, sub { <$fh> });
     __x("Schema {schema} geïnitialiseerd", schema => $name);
 }
 
-sub _create {
+sub _create1 {			# 1st pass
     shift;			# singleton class method
     my ($rl) = @_;
     $dbh = EB::DB->new(trace => $trace) unless $sql;
-    load_schema($rl);
+    load_schema1($rl);
+}
+sub _create2 {			# 2nd pass
+    shift;			# singleton class method
+    my ($rl) = @_;
+    load_schema2($rl);
 }
 
 my @hvdi;			# hoofdverdichtingen
@@ -93,6 +89,8 @@ my %std;			# standaardrekeningen
 my %dbk;			# dagboeken
 my @dbk;			# dagboeken
 my @btw;			# btw tarieven
+my %btw;			# btw aliases
+my $btw_auto;			# btw auto code
 my %btwmap;			# btw type/incl -> code
 my $fail;			# any errors
 
@@ -108,8 +106,94 @@ sub init_vars {
     %dbk = ();			# dagboeken
     @dbk = ();			# dagboeken
     @btw = ();			# btw tarieven
+    %btw = ();			# btw aliases
+    $btw_auto = BTW_CODE_AUTO;	# btw auto code
     %btwmap = ();		# btw type/incl -> code
     undef $fail;		# any errors
+    init_kmap();
+}
+
+sub init_kmap {
+    %km = ();
+
+    ####FIXME: Use N__ and __XN and friends.
+
+    # BTW tariefgroepen.
+    $km{tg_hoog}	 = __xt("scm:tg:hoog");
+    $km{tg_laag}	 = __xt("scm:tg:laag");
+    $km{tg_nul}		 = __xt("scm:tg:nul");
+    $km{tg_geen}	 = __xt("scm:tg:geen");
+    $km{tg_privé}	 = __xt("scm:tg:privé");
+    $km{tg_anders}	 = __xt("scm:tg:anders");
+
+    # Koppelingen.
+    $km{winst}		 = __xt("scm:std:winst");
+    $km{crd}		 = __xt("scm:std:crd");
+    $km{deb}		 = __xt("scm:std:deb");
+    $km{btw_il}		 = __xt("scm:std:btw_il");
+    $km{btw_vl}		 = __xt("scm:std:btw_vl");
+    $km{btw_ih}		 = __xt("scm:std:btw_ih");
+    $km{btw_vp}		 = __xt("scm:std:btw_vp");
+    $km{btw_ip}		 = __xt("scm:std:btw_ip");
+    $km{btw_va}		 = __xt("scm:std:btw_va");
+    $km{btw_ia}		 = __xt("scm:std:btw_ia");
+    $km{btw_ok}		 = __xt("scm:std:btw_ok");
+    $km{btw_vh}		 = __xt("scm:std:btw_vh");
+
+    # Section headings.
+    $km{hdr_verdichting} = __xt("scm:hdr:Verdichting");
+    $km{hdr_balans}      = __xt("scm:hdr:Balansrekeningen");
+    $km{balans}		 = __xt("scm:balans");
+    $km{hdr_resultaat}   = __xt("scm:hdr:Resultaatrekeningen");
+    $km{result}		 = __xt("scm:result");
+    $km{hdr_dagboeken}	 = __xt("scm:hdr:Dagboeken");
+    $km{dagboeken}	 = __xt("scm:dagboeken");
+    $km{hdr_btwtarieven} = __xt("scm:hdr:BTW Tarieven");
+
+    # Daybook Types.
+    $km{inkoop}		 = __xt("scm:dbk:inkoop");
+    $km{verkoop}	 = __xt("scm:dbk:verkoop");
+    $km{bank}		 = __xt("scm:dbk:bank");
+    $km{kas}		 = __xt("scm:dbk:kas");
+    $km{memoriaal}	 = __xt("scm:dbk:memoriaal");
+
+    # Misc.
+    $km{inclusief}	 = __xt("scm:inclusief");
+    $km{exclusief}	 = __xt("scm:exclusief");
+    $km{incl}		 = __xt("scm:incl");
+    $km{excl}		 = __xt("scm:excl");
+    $km{btw}		 = __xt("scm:btw");
+    $km{vanaf}		 = __xt("scm:vanaf");
+    $km{tot}		 = __xt("scm:tot");
+    $km{kosten}		 = __xt("scm:kosten");
+    $km{kostenrekening}	 = __xt("scm:kostenrekening");
+    $km{omzet}		 = __xt("scm:omzet");
+    $km{omzetrekening}	 = __xt("scm:omzetrekening");
+    $km{koppeling}	 = __xt("scm:koppeling");
+    $km{type}		 = __xt("scm:type");
+    $km{rek}		 = __xt("scm:rek");
+    $km{rekening}	 = __xt("scm:rekening");
+    $km{percentage}	 = __xt("scm:percentage");
+    $km{perc}		 = __xt("scm:perc");
+    $km{tariefgroep}	 = __xt("scm:tariefgroep");
+}
+
+sub _xt {			# scm:btw -> scm:vat -> vat
+    my $t = _T(shift);
+    $t =~ s/^.*://;
+    $t;
+}
+
+sub _xtr {			# scm:vat -> scm:btw -> btw
+    my $t = shift;
+    (my $pfx, $t) = ( $1, $2 ) if $t =~ /^(.*):(.*)/;
+    keys(%km);			# reset iteration
+    while ( my ($k, $v) = each %km ) {
+	next unless $t eq $v;
+	return $1 if $k =~ /^tg_(.*)/;
+	return $k;
+    }
+    undef;
 }
 
 sub error { warn('?', @_); $fail++; }
@@ -130,17 +214,17 @@ sub scan_dagboeken {
     while ( $desc =~ /^(.+?)\s+:([^\s:]+)\s*$/ ) {
 	$desc = $1;
 	$extra = $2;
-	if ( $extra =~ m/^type=(\S+)$/i ) {
+	if ( $extra =~ m/^$km{type}=(\S+)$/i ) {
 	    my $t = DBKTYPES;
 	    for ( my $i = 0; $i < @$t; $i++ ) {
-		next unless lc($1) eq lc($t->[$i]);
+		next unless lc($1) eq lc(_xt("scm:dbk:".lc($t->[$i])));
 		$type = $i;
 		last;
 	    }
 	    error(__x("Dagboek {id} onbekend type \"{type}\"",
 		      id => $id, type => $1)."\n") unless defined($type);
 	}
-	elsif ( $extra =~ m/^rek(?:ening)?=(\d+)$/i ) {
+	elsif ( $extra =~ m/^(?:$km{rek}|$km{rekening})?=(\d+)$/i ) {
 	    $rek = $1;
 	}
 	elsif ( $extra =~ m/^dc$/i ) {
@@ -157,27 +241,50 @@ sub scan_dagboeken {
       if ( $type == DBKTYPE_KAS || $type == DBKTYPE_BANK ) && !$type;
     error(__x("Dagboek {id}: :dc is alleen toegestaan voor Kas en Bankboeken", id => $id)."\n")
       if $dcsplit && !( $type == DBKTYPE_KAS || $type == DBKTYPE_BANK );
-#    error(__x("Dagboek {id}: rekeningnummer enkel toegestaan voor Kas en Bankboeken", id => $id)."\n")
-#      if $rek && !($type == DBKTYPE_KAS || $type == DBKTYPE_BANK || $type == DBKTYPE_MEMORIAAL);
+
+    my $t = lc(_T($desc));
+    $t =~ s/\s+/_/g;
+    error(__x("Dagboek naam \"{dbk}\" is niet toegestaan.", dbk => $desc)."\n")
+      if $desc =~ /^adm[ _]/i || defined &{"EB::Shell::do_$t"};
+
 
     $dbk{$id} = $dbkid;
     $dbk[$dbkid] = [ $id, $desc, $type, $dcsplit, $rek||undef ];
 }
 
 sub scan_btw {
-    return 0 unless /^\s+(\d+)\s+(.*)/;
+    return 0 unless /^\s+(\w+-?)\s+(.*)/;
 
     my ($id, $desc) = ($1, $2);
-    error(__x("Dubbel: BTW tarief {id}", id => $id)."\n") if defined($btw[$id]);
+    my $id0 = $id;		# for messages
+    my $alias;
+
+    unless ( $id =~ /^\d+$/ ) {
+	error(__x("Ongeldige code voor BTW tarief: {id} (moet minstens twee tekens zijn)", id => $id0)."\n")
+	  if length($id) < 3;	# prevent clash with HK and such.
+	error(__x("Dubbel: BTW tarief {id}", id => $id0)."\n")
+	  if exists($btw{lc $id});
+	$btw_auto += 2;
+	$btw{lc $id} = $btw_auto;
+	$alias = lc $id;
+	$id = $btw_auto;
+    }
+    else {
+	error(__x("Ongeldige code voor BTW tarief: {id}", id => $id0)."\n")
+	  if $id > BTW_CODE_AUTO;
+    }
+    error(__x("Dubbel: BTW tarief {id}", id => $id0)."\n") if defined($btw[$id]);
 
     my $perc;
     my $groep = 0;
     my $incl = 1;
+    my $sdate;
+    my $edate;
     my $extra;
     while ( $desc =~ /^(.+?)\s+:([^\s:]+)\s*$/ ) {
 	$desc = $1;
 	$extra = $2;
-	if ( $extra =~ m/^perc(?:entage)?=(\S+)$/i ) {
+	if ( $extra =~ m/^(?:$km{perc}|$km{percentage})?=(\S+)$/i ) {
 	    $perc = amount($1);
 	    if ( AMTPRECISION > BTWPRECISION-2 ) {
 		$perc = substr($perc, 0, length($perc) - (AMTPRECISION - BTWPRECISION-2))
@@ -186,73 +293,84 @@ sub scan_btw {
 		$perc .= "0" x (BTWPRECISION-2 - AMTPRECISION);
 	    }
 	}
-	elsif ( $extra =~ m/^tariefgroep=hoog$/i ) {
+	elsif ( $extra =~ m/^$km{tariefgroep}=$km{tg_hoog}$/i ) {
 	    $groep = BTWTARIEF_HOOG;
 	}
-	elsif ( $extra =~ m/^tariefgroep=laag$/i ) {
+	elsif ( $extra =~ m/^$km{tariefgroep}=$km{tg_laag}$/i ) {
 	    $groep = BTWTARIEF_LAAG;
 	}
-	elsif ( $extra =~ m/^tariefgroep=(nul|geen)$/i ) {
+	elsif ( $extra =~ m/^$km{tariefgroep}=($km{tg_nul}|$km{tg_geen})$/i ) {
 	    $groep = BTWTARIEF_NUL;
 	    warn("!"._T("Gelieve BTW tariefgroep \"Geen\" te vervangen door \"Nul\"")."\n")
-	      if lc($1) eq "geen";
+	      if lc($1) eq $km{tg_geen};
 	}
-	elsif ( $extra =~ m/^tariefgroep=priv(e|é)?$/i ) {
+	elsif ( $extra =~ m/^$km{tariefgroep}=(prive|$km{tg_privé})$/i ) {
 	    $groep = BTWTARIEF_PRIV;
 	}
-	elsif ( $extra =~ m/^tariefgroep=anders??$/i ) {
+	elsif ( $extra =~ m/^$km{tariefgroep}=$km{tg_anders}$/i ) {
 	    $groep = BTWTARIEF_ANDERS;
 	}
-	elsif ( $extra =~ m/^incl(?:usief)?$/i ) {
+	elsif ( $extra =~ m/^(?:$km{incl}|$km{inclusief})$/i ) {
 	    $incl = 1;
 	}
-	elsif ( $extra =~ m/^excl(?:usief)?$/i ) {
+	elsif ( $extra =~ m/^(?:$km{excl}|$km{exclusief})$/i ) {
 	    $incl = 0;
+	}
+	elsif ( $extra =~ m/^(?:$km{vanaf})=(.+)$/i ) {
+	    $sdate = $1;
+	    error("Ongeldige datumaanduiding in {key}: {value}",
+		  key => $km{vanaf}, value => $sdate)
+	      unless $sdate =~ /^(\d{4}-\d\d-\d\d)$/;
+	    $sdate = parse_date($1)
+	      or error(__x("Ongeldige datumaanduiding in {key}: {value}",
+			   key => $km{vanaf}, value => $1));
+	}
+	elsif ( $extra =~ m/^(?:$km{tot})=(.+)$/i ) {
+	    $edate = $1;
+	    error("Ongeldige datumaanduiding in {key}: {value}",
+		  key => $km{tot}, value => $sdate)
+	      unless $edate =~ /^(\d{4}-\d\d-\d\d)$/;
+	    $edate = parse_date($1, undef, -1)
+	      or error(__x("Ongeldige datumaanduiding in {key}: {value}",
+			   key => $km{tot}, value => $1));
 	}
 	else {
 	    error(__x("BTW tarief {id}: onbekende info \"{info}\"",
-		      id => $id, info => $extra)."\n");
+		      id => $id0, info => $extra)."\n");
 	}
     }
 
     error(__x("BTW tarief {id}: geen percentage en de tariefgroep is niet \"{none}\"",
-	      id => $id, none => _T("geen"))."\n")
+	      id => $id0, none => _T("geen"))."\n")
       unless defined($perc) || $groep == BTWTARIEF_NUL;
 
-    $btw[$id] = [ $id, $desc, $groep, $perc, $incl ];
+    # Add the definition. Automatically add one for the non-$incl variant if it is named.
+    $btw[$id]   = [ $id,  $alias, $desc,
+		    $groep, $perc, $incl,  $sdate, $edate ];
+    $btw[$id+1] = [ $id+1, undef, $alias.($incl?'-':'+'),
+		    $groep, $perc, !$incl, $sdate, $edate ]
+      if $id > BTW_CODE_AUTO;
 
     if ( $groep == BTWTARIEF_NUL && !defined($btwmap{n}) ) {
 	$btwmap{n} = $id;
     }
-    elsif ( $incl ) {
-	if ( $groep == BTWTARIEF_HOOG && !defined($btwmap{h}) ) {
-	    $btwmap{h} = $id;
-	}
-	elsif ( $groep == BTWTARIEF_LAAG && !defined($btwmap{l}) ) {
-	    $btwmap{l} = $id;
-	}
-	elsif ( $groep == BTWTARIEF_PRIV && !defined($btwmap{p}) ) {
-	    $btwmap{p} = $id;
-	}
-	elsif ( $groep == BTWTARIEF_ANDERS && !defined($btwmap{a}) ) {
-	    $btwmap{a} = $id;
-	}
-    }
     else {
-	if ( $groep == BTWTARIEF_HOOG && !defined($btwmap{"h-"}) ) {
-	    $btwmap{"h-"} = $id;
+	my $pfx = $incl ? "" : "-";
+	if ( $groep == BTWTARIEF_HOOG && !defined($btwmap{"h$pfx"}) ) {
+	    $btwmap{"h$pfx"} = $id;
 	}
-	elsif ( $groep == BTWTARIEF_LAAG && !defined($btwmap{"l-"}) ) {
-	    $btwmap{"l-"} = $id;
+	elsif ( $groep == BTWTARIEF_LAAG && !defined($btwmap{"l$pfx"}) ) {
+	    $btwmap{"l$pfx"} = $id;
 	}
-	elsif ( $groep == BTWTARIEF_PRIV && !defined($btwmap{"p-"}) ) {
-	    $btwmap{"p-"} = $id;
+	elsif ( $groep == BTWTARIEF_PRIV && !defined($btwmap{"p$pfx"}) ) {
+	    $btwmap{"p$pfx"} = $id;
 	}
-	elsif ( $groep == BTWTARIEF_ANDERS && !defined($btwmap{"a-"}) ) {
-	    $btwmap{"a-"} = $id;
+	elsif ( $groep == BTWTARIEF_ANDERS && !defined($btwmap{"a$pfx"}) ) {
+	    $btwmap{"a$pfx"} = $id;
 	}
     }
     $btwmap{$id} = $id;
+    $btwmap{$alias} = $id if defined($alias) && $alias !~ /^\d+$/;
     1;
 }
 
@@ -293,28 +411,34 @@ sub scan_balres {
 	while ( $desc =~ /^(.+?)\s+:([^\s:]+)\s*$/ ) {
 	    $desc = $1;
 	    $extra = $2;
-	    if ( $extra =~ m/^btw=(.+)$/i ) {
+	    if ( $extra =~ m/^$km{btw}=(.+)$/i ) {
 		my $spec = $1;
 		my @spec = split(/,/, lc($spec));
 
 		my $btw_inex = 1;
 
 		foreach ( @spec ) {
-		    if ( $balres && /^(kosten|omzet)$/ ) {
-			$btw_ko = substr($1, 0, 1) eq "k";
+		    if ( $balres && /^($km{kosten}|$km{omzet})$/ ) {
+			$btw_ko = $1 eq $km{kosten};
 		    }
-		    elsif ( /^(hoog|laag|nul|priv(e|é)?|anders?)$/ ) {
-			$btw_type = substr($1, 0, 1);
+		    # elsif ( defined $btwmap{$_} ) {
+		    # 	$btw_type = $btwmap{$_};
+		    # }
+		    elsif ( /^($km{tg_hoog}|$km{tg_laag}|$km{tg_nul}|prive|$km{tg_privé}|$km{tg_anders})$/ ) {
+			$btw_type = substr(_xtr("scm:tg:$1"), 0, 1);
 		    }
 		    elsif ( /^\d+$/ ) {
 			$btw_type = $_;
+			warn("!".__x("Rekening {id}: gelieve BTW tariefcode {code} te vervangen door een tariefgroep",
+				    id => $id,
+				    code => $_)."\n")
 		    }
-		    elsif ( $_ eq "geen" ) {
+		    elsif ( $_ eq $km{tg_geen} ) {
 			$btw_type = 0;
 			$kstomz = $btw_ko = undef;
 		    }
-		    elsif ( /^(incl|excl)(usief)?$/ ) {
-			$btw_inex = substr($1, 1, 1) eq 'i';
+		    elsif ( /^($km{incl}|$km{excl}|$km{inclusief}|$km{exclusief})?$/ ) {
+			$btw_inex = $1 eq $km{incl} || $1 eq $km{inclusief};
 		    }
 		    else {
 			error(__x("Foutieve BTW specificatie: {spec}",
@@ -325,20 +449,21 @@ sub scan_balres {
 
 		$btw_type .= "-" unless $btw_inex;
 	    }
-	    elsif ( $extra =~ m/koppeling=(\S+)/i ) {
+	    elsif ( $extra =~ m/$km{koppeling}=(\S+)/i ) {
+		my $t = _xtr("scm:std:$1");
 		error(__x("Rekening {id}: onbekende koppeling \"{std}\"",
 			  id => $id, std => $1)."\n")
-		  unless exists($std{$1});
+		  unless exists($std{$t});
 		error(__x("Rekening {id}: extra koppeling voor \"{std}\"",
 			  id => $id, std => $1)."\n")
-		  if $std{$1};
-		$std{$1} = $id;
+		  if $std{$t};
+		$std{$t} = $id;
 	    }
 	}
 	if ( $btw_type ne 'n' ) {
 	    error(__x("Rekening {id}: BTW koppeling '{ko}' met een {acc} is niet toegestaan",
-		      id => $id, ko => qw(omzet kosten)[$btw_ko],
-		      acc => qw(omzetrekening kostenrekening)[$kstomz])."\n")
+		      id => $id, ko => ($km{omzet}, $km{kosten})[$btw_ko],
+		      acc => ($km{omzetrekening}, $km{kostenrekening})[$kstomz])."\n")
 	      if !$balres && defined($kstomz) && defined($btw_ko) && $btw_ko != $kstomz;
 	    error(__x("Rekening {id}: BTW koppeling met neutrale resultaatrekening is niet toegestaan",
 		      id => $id)."\n") unless defined($kstomz) || defined($btw_ko);
@@ -349,6 +474,7 @@ sub scan_balres {
 	$desc =~ s/\s+$//;
 	$kstomz = $btw_ko unless defined($kstomz);
 	$acc{$id} = [ $desc, $cvdi, $balres, $debcrd, $kstomz, $btw_type, $dcfixed ];
+	1;
     }
     else {
 	0;
@@ -365,16 +491,16 @@ sub scan_result {
     goto &scan_balres;
 }
 
-sub load_schema {
+sub scan_ignore { 1 }
+
+sub load_schema1 {
     my ($rl) = shift;
 
     init_vars();
     my $scanner;		# current scanner
-    $max_hvd = 9;
-    $max_vrd = 99;
-    my $uerr = 0;
 
-    %std = map { $_ => 0 } qw(btw_ok btw_vh winst crd deb btw_il btw_vl btw_ih btw_vp btw_ip btw_va btw_ia);
+    %std = map { $_ => 0 }
+      qw(btw_ok btw_vh winst crd deb btw_il btw_vl btw_ih btw_vp btw_ip btw_va btw_ia);
     while ( $_ = $rl->() ) {
 	if ( /^\# \s*
 	      content-type: \s*
@@ -403,25 +529,98 @@ sub load_schema {
 	next unless /\S/;
 
 	# Scanner selectie.
-	if ( /^balans/i ) {
-	    $scanner = \&scan_balans;
+	if ( /^($km{balans}|$km{hdr_balans})/i ) {
+	    $scanner = \&scan_ignore;
 	    next;
 	}
-	if ( /^result/i ) {
-	    $scanner = \&scan_result;
+	if ( /^($km{result}|$km{hdr_resultaat})/i ) {
+	    $scanner = \&scan_ignore;
 	    next;
 	}
-	if ( /^dagboeken/i ) {
-	    $scanner = \&scan_dagboeken;
+	if ( /^($km{dagboeken}|$km{hdr_dagboeken})/i ) {
+	    $scanner = \&scan_ignore;
 	    next;
 	}
-	if ( /^btw\s*tarieven/i ) {
+	if ( /^$km{hdr_btwtarieven}/i ) {
 	    $scanner = \&scan_btw;
 	    next;
 	}
 
 	# Overige settings.
-	if ( /^verdichting\s+(\d+)\s+(\d+)/i && $1 < $2 ) {
+	if ( /^$km{hdr_verdichting}\s+(\d+)\s+(\d+)/i && $1 < $2 ) {
+	    next;
+	}
+
+	# Anders: Scan.
+	if ( $scanner ) {
+	    chomp;
+	    $scanner->() or
+	      error(__x("Ongeldige invoer in schema bestand, regel {lno}:\n{line}",
+			line => $_, lno => $.)."\n");
+	    next;
+	}
+
+	error(__x("Ongeldige invoer in schema bestand, regel {lno}:\n{line}",
+		  line => $_, lno => $.)."\n");
+
+    }
+
+}
+
+sub load_schema2 {
+    my ($rl) = shift;
+
+    my $scanner;		# current scanner
+    $max_hvd = 9;
+    $max_vrd = 99;
+
+    while ( $_ = $rl->() ) {
+	if ( /^\# \s*
+	      content-type: \s*
+              text (?: \s* \/ \s* plain)? \s* ; \s*
+              charset \s* = \s* (\S+) \s* $/ix ) {
+	    my $charset = lc($1);
+	    if ( $charset =~ /^(?:utf-?8)$/i ) {
+		next;
+	    }
+	    error(_T("Invoer moet Unicode (UTF-8) zijn.")."\n");
+	}
+
+	my $s = "".$_;
+	eval {
+	    $_ = decode('utf8', $s, 1);
+	};
+	if ( $@ ) {
+	    warn("?".__x("Geen geldige UTF-8 tekens in regel {line} van de invoer",
+			 line => $.)."\n".$s."\n");
+	    warn($@);
+	    $fail++;
+	    next;
+	}
+
+	next if /^\s*#/;
+	next unless /\S/;
+
+	# Scanner selectie.
+	if ( /^($km{balans}|$km{hdr_balans})/i ) {
+	    $scanner = \&scan_balans;
+	    next;
+	}
+	if ( /^($km{result}|$km{hdr_resultaat})/i ) {
+	    $scanner = \&scan_result;
+	    next;
+	}
+	if ( /^($km{dagboeken}|$km{hdr_dagboeken})/i ) {
+	    $scanner = \&scan_dagboeken;
+	    next;
+	}
+	if ( /^$km{hdr_btwtarieven}/i ) {
+	    $scanner = \&scan_ignore;
+	    next;
+	}
+
+	# Overige settings.
+	if ( /^$km{hdr_verdichting}\s+(\d+)\s+(\d+)/i && $1 < $2 ) {
 	    $max_hvd = $1;
 	    $max_vrd = $2;
 	    next;
@@ -431,13 +630,18 @@ sub load_schema {
 	if ( $scanner ) {
 	    chomp;
 	    $scanner->() or
-	      error(__x("Ongeldige invoer: {line} (regel {lno})",
+	      error(__x("Ongeldige invoer in schema bestand, regel {lno}:\n{line}",
 			line => $_, lno => $.)."\n");
 	    next;
 	}
 
-	error("?"._T("Men beginne met \"Balansrekeningen\", \"Resultaatrekeningen\",".
-		     " \"Dagboeken\" of \"BTW Tarieven\"")."\n");
+	error(__x("Ongeldige invoer in schema bestand, regel {lno}:\n{line}",
+		  line => $_, lno => $.)."\n");
+
+	# This is here for historical reasons.
+	# If you weren't at the THE in 1977 this will mean nothing to you...
+	# error("?"._T("Men beginne met \"Balansrekeningen\", \"Resultaatrekeningen\",".#
+	#	     " \"Dagboeken\" of \"BTW Tarieven\"")."\n");
     }
 
     # Bekijk alle dagboeken om te zien of er inkoop/verkoop dagboeken
@@ -496,7 +700,7 @@ sub load_schema {
 	error(__x("Geen koppeling gevonden voor \"{std}\"", std => $k)."\n");
     }
 
-    die("?"._T("FOUTEN GEVONDEN, VERWERKING AFGEBROKEN")."\n") if $fail;
+    die("?"._T("FOUTEN GEVONDEN IN SCHEMA BESTAND, VERWERKING AFGEBROKEN")."\n") if $fail;
 
     if ( $sql ) {
 	gen_schema();
@@ -591,7 +795,8 @@ ESQL
 	my $g = $acc{$i};
 	croak(__x("Geen BTW tariefgroep voor code {code}",
 		  code => $g->[5]))
-	  unless exists $btwmap{$g->[5]};
+	  unless exists $btwmap{$g->[5]}
+	    || exists $btwmap{$g->[5]."-"};
 	$out .= _tsv($i, $g->[0], $g->[1],
 		     _tf($g->[2]),
 		     _tf($g->[3]),
@@ -617,17 +822,20 @@ ESQL
 sub sql_btw {
     my $out = <<ESQL;
 -- BTW Tarieven
-COPY BTWTabel (btw_id, btw_desc, btw_tariefgroep, btw_perc, btw_incl) FROM stdin;
+COPY BTWTabel (btw_id, btw_alias, btw_desc, btw_tariefgroep, btw_perc, btw_incl, btw_start, btw_end) FROM stdin;
 ESQL
 
     foreach ( @btw ) {
 	next unless defined;
-	if ( $_->[2] == BTWTARIEF_NUL ) {
-	    $_->[3] = 0;
-	    $_->[4] = "\\N";
+	$_->[1] = "\\N" unless defined($_->[1]);
+	$_->[6] = "\\N" unless defined($_->[6]);
+	$_->[7] = "\\N" unless defined($_->[7]);
+	if ( $_->[3] == BTWTARIEF_NUL ) {
+	    $_->[4] = 0;
+	    $_->[5] = "\\N";
 	}
 	else {
-	    $_->[4] = _tf($_->[4]);
+	    $_->[5] = _tf($_->[5]);
 	}
 	$out .= _tsv(@$_);
     }
@@ -697,15 +905,8 @@ sub dump_schema {
     my ($self, $fh) = @_;
     $fh ||= *STDOUT;
 
-    $dbh = EB::DB->new(trace => $trace);
-    $dbh->connectdb;		# can't wait...
-
-    print {$fh} ("# $my_package Rekeningschema voor ", $dbh->dbh->{Name}, "\n",
-	  "# Aangemaakt door ", __PACKAGE__, " $my_version");
-    my @t = localtime(time);
-    printf {$fh} (" op %02d-%02d-%04d %02d:%02d:%02d\n", $t[3], 1+$t[4], 1900+$t[5], @t[2,1,0]);
-    print {$fh} ("# Content-Type: text/plain; charset = UTF-8\n");
-    print {$fh}  <<EOD;
+    # Only generate comments when translated.
+    my $preamble = <<EOD;
 
 # Dit bestand definiëert alle vaste gegevens van een administratie of
 # groep administraties: het rekeningschema (balansrekeningen en
@@ -719,6 +920,29 @@ sub dump_schema {
 # * Alle ingesprongen regels zijn gegevens voor dat onderdeel.
 
 EOD
+    my $comment = $preamble ne ( $preamble = _T($preamble) );
+
+    $dbh = EB::DB->new(trace => $trace);
+    $dbh->connectdb;		# can't wait...
+    init_kmap();
+
+    my @t = localtime(time);
+    print {$fh} ( "# ",
+		  __x( "{pkg} Rekeningschema voor {db}",
+		       pkg => $EekBoek::PACKAGE,
+		       db => $dbh->dbh->{Name} ),
+		  "\n",
+		  "# ",
+		  __x( "Aangemaakt door {pkg} {version} op {ts}",
+		       pkg => $EekBoek::PACKAGE,
+		       version => $EekBoek::VERSION,
+		       ts => sprintf( "%02d-%02d-%04d %02d:%02d:%02d",
+				      $t[3], 1+$t[4], 1900+$t[5], @t[2,1,0] ),
+		     ),
+		  "\n",
+		  "# Content-Type: text/plain; charset = UTF-8\n" );
+
+    print {$fh} $preamble if $comment;
 
     my $sth = $dbh->sql_exec("SELECT * FROM Standaardrekeningen");
     my $rr = $sth->fetchrow_hashref;
@@ -729,7 +953,7 @@ EOD
 	$kopp{$v} = $k;
     }
 
-print {$fh}  <<EOD;
+print {$fh}  <<EOD if $comment;
 # REKENINGSCHEMA
 #
 # Het rekeningschema is hiërarchisch opgezet volgende de beproefde
@@ -781,7 +1005,7 @@ EOD
 $max_hvd = $dbh->do("SELECT MAX(vdi_id) FROM Verdichtingen WHERE vdi_struct IS NULL")->[0];
 $max_vrd = $dbh->do("SELECT MAX(vdi_id) FROM Verdichtingen WHERE NOT vdi_struct IS NULL")->[0];
 
-    print {$fh}  <<EOD;
+    print {$fh}  <<EOD if $comment;
 
 # Normaal lopen hoofdverdichtingen van 1 t/m 9, en verdichtingen
 # van 10 t/m 99. Indien daarvan wordt afgeweken kan dit worden opgegeven
@@ -789,11 +1013,12 @@ $max_vrd = $dbh->do("SELECT MAX(vdi_id) FROM Verdichtingen WHERE NOT vdi_struct 
 # nummer voor hoofdverdichtingen resp. verdichtingen.
 EOD
 
-    if ( $max_hvd > 9 || $max_vrd > 99 ) {
-	printf {$fh} ("\nVerdichting %d %d\n", $max_hvd, $max_vrd);
-    }
+    printf {$fh} ( "\n$km{hdr_verdichting} %d %d\n\n",
+		   ( $max_hvd > 9 || $max_vrd > 99 )
+		  ? ( $max_hvd, $max_vrd )
+		  : ( 9, 99 ) );
 
-    print {$fh}  <<EOD;
+    print {$fh}  <<EOD if $comment;
 # De nummers van de grootboekrekeningen worden geacht groter te zijn
 # dan de maximale verdichting. Daarvan kan worden afgeweken door
 # middels voorloopnullen de _lengte_ van het nummer groter te maken
@@ -805,7 +1030,7 @@ EOD
     dump_acc(1, $fh);		# Balansrekeningen
     dump_acc(0, $fh);		# Resultaatrekeningen
 
-print {$fh}  <<EOD;
+print {$fh}  <<EOD if $comment;
 
 # DAGBOEKEN
 #
@@ -825,7 +1050,7 @@ EOD
     dump_dbk($fh);			# Dagboeken
 
     if ( $dbh->does_btw ) {
-	print {$fh}  <<EOD;
+	print {$fh}  <<EOD if $comment;
 
 # BTW TARIEVEN
 #
@@ -850,16 +1075,16 @@ EOD
 
 	dump_btw($fh);			# BTW tarieven
     }
-print {$fh}  <<EOD;
 
-# Einde EekBoek schema
-EOD
+    print {$fh} ( "\n",
+		  "# ", __x( "Einde {pkg} schema",
+			     pkg => $EekBoek::PACKAGE ), "\n" );
 }
 
 sub dump_acc {
     my ($balres, $fh) = @_;
 
-    print {$fh} ("\n", $balres ? "Balans" : "Resultaat", "rekeningen\n");
+    print {$fh} ("\n", $balres ? $km{hdr_balans} : $km{hdr_resultaat}, "\n");
 
     my $sth = $dbh->sql_exec("SELECT vdi_id, vdi_desc".
 			     " FROM Verdichtingen".
@@ -904,47 +1129,47 @@ sub dump_acc {
 		}
 		my $extra = "";
 		if ( $btw == BTWTARIEF_HOOG ) {
-		    $extra .= " :btw=hoog";
-		    $extra .= ",excl" unless $btwincl;
+		    $extra .= " :$km{btw}=$km{tg_hoog}";
+		    $extra .= ",$km{excl}" unless $btwincl;
 		    if ( $balres ) {
-			$extra .= ",kosten" if $acc_kstomz;
-			$extra .= ",omzet"  if !$acc_kstomz;
+			$extra .= ",$km{kosten}" if $acc_kstomz;
+			$extra .= ",$km{omzet}"  if !$acc_kstomz;
 		    }
 		}
 		elsif ( $btw == BTWTARIEF_LAAG ) {
-		    $extra .= " :btw=laag";
-		    $extra .= ",excl" unless $btwincl;
+		    $extra .= " :$km{btw}=$km{tg_laag}";
+		    $extra .= ",$km{excl}" unless $btwincl;
 		    if ( $balres ) {
-			$extra .= ",kosten" if $acc_kstomz;
-			$extra .= ",omzet"  if !$acc_kstomz;
+			$extra .= ",$km{kosten}" if $acc_kstomz;
+			$extra .= ",$km{omzet}"  if !$acc_kstomz;
 		    }
 		}
 		elsif ( $btw == BTWTARIEF_PRIV ) {
-		    $extra .= " :btw=privé";
-		    $extra .= ",excl" unless $btwincl;
+		    $extra .= " :$km{btw}=$km{tg_privé}";
+		    $extra .= ",$km{excl}" unless $btwincl;
 		    if ( $balres ) {
-			$extra .= ",kosten" if $acc_kstomz;
-			$extra .= ",omzet"  if !$acc_kstomz;
+			$extra .= ",$km{kosten}" if $acc_kstomz;
+			$extra .= ",$km{omzet}"  if !$acc_kstomz;
 		    }
 		}
 		elsif ( $btw == BTWTARIEF_ANDERS ) {
-		    $extra .= " :btw=anders";
-		    $extra .= ",excl" unless $btwincl;
+		    $extra .= " :$km{btw}=$km{tg_anders}";
+		    $extra .= ",$km{excl}" unless $btwincl;
 		    if ( $balres ) {
-			$extra .= ",kosten" if $acc_kstomz;
-			$extra .= ",omzet"  if !$acc_kstomz;
+			$extra .= ",$km{kosten}" if $acc_kstomz;
+			$extra .= ",$km{omzet}"  if !$acc_kstomz;
 		    }
 		}
 		elsif ( $btw != BTWTARIEF_NUL ) {
-		    $extra .= " :btw=$btw_id";
+		    $extra .= " :$km{btw}=$btw_id";
 		}
 		else {
 		    if ( $balres && defined($acc_kstomz) ) {
-			$extra .= " :btw=kosten" if $acc_kstomz;
-			$extra .= " :btw=omzet"  if !$acc_kstomz;
+			$extra .= " :$km{btw}=$km{kosten}" if $acc_kstomz;
+			$extra .= " :$km{btw}=$km{omzet}"  if !$acc_kstomz;
 		    }
 		}
-		$extra .= " :koppeling=".$kopp{$id} if exists($kopp{$id});
+		$extra .= " :$km{koppeling}=".$km{$kopp{$id}} if exists($kopp{$id});
 		$desc =~ s/^\s+//;
 		$desc =~ s/\s+$//;
 		my $t = sprintf("         %-4s  %-2s  %-40.40s  %s",
@@ -963,20 +1188,30 @@ sub dump_acc {
 
 sub dump_btw {
     my $fh = shift;
-    print {$fh} ("\nBTW Tarieven\n\n");
-    my $sth = $dbh->sql_exec("SELECT btw_id, btw_desc, btw_perc, btw_tariefgroep, btw_incl".
+    print {$fh} ("\n$km{hdr_btwtarieven}\n\n");
+    my $sth = $dbh->sql_exec("SELECT btw_id, btw_alias, btw_desc, btw_perc, btw_tariefgroep,".
+			     "btw_incl, btw_start, btw_end".
 			     " FROM BTWTabel".
 			     " ORDER BY btw_id");
     while ( my $rr = $sth->fetchrow_arrayref ) {
-	my ($id, $desc, $perc, $btg, $incl) = @$rr;
+	my ($id, $alias, $desc, $perc, $btg, $incl, $start, $end) = @$rr;
 	my $extra = "";
-	$extra .= " :tariefgroep=" . lc(BTWTARIEVEN->[$btg]);
+	$extra .= " :$km{tariefgroep}=" . $km{"tg_".lc(BTWTARIEVEN->[$btg])};
 	if ( $btg != BTWTARIEF_NUL ) {
-	    $extra .= " :perc=".btwfmt($perc);
-	    $extra .= " :" . qw(exclusief inclusief)[$incl] unless $incl;
+	    $extra .= " :$km{perc}=".btwfmt($perc);
+	    $extra .= " :$km{exclusief}" unless $incl;
 	}
-	my $t = sprintf(" %3d  %-20s  %s",
-			$id, $desc, $extra);
+	$extra .= " :$km{vanaf}=$start" if $start;
+	$extra .= " :$km{tot}=".parse_date($end, undef, 1) if $end;
+	if ( $id >= BTW_CODE_AUTO ) {
+	    next unless $alias;
+	    $alias = sprintf("%-10s", $alias);
+	}
+	else {
+	    $alias = sprintf("%3d", $id);
+	}
+	my $t = sprintf("  %s  %-20s  %s",
+			$alias, $desc, $extra);
 	$t =~ s/\s+$//;
 	print {$fh} ($t, "\n");
     }
@@ -984,7 +1219,7 @@ sub dump_btw {
 
 sub dump_dbk {
     my $fh = shift;
-    print {$fh} ("\nDagboeken\n\n");
+    print {$fh} ("\n$km{hdr_dagboeken}\n\n");
     my $sth = $dbh->sql_exec("SELECT dbk_id, dbk_desc, dbk_type, dbk_dcsplit, dbk_acc_id".
 			     " FROM Dagboeken".
 			     " ORDER BY dbk_id");
@@ -993,8 +1228,8 @@ sub dump_dbk {
 	$acc_id = 0 if $type == DBKTYPE_INKOOP  && $dbh->std_acc("crd", 0) == $acc_id;
 	$acc_id = 0 if $type == DBKTYPE_VERKOOP && $dbh->std_acc("deb", 0) == $acc_id;
 	my $t = sprintf("  %-4s  %-20s  :type=%-10s %s",
-			$id, $desc, lc(DBKTYPES->[$type]),
-			($acc_id ? ":rekening=$acc_id" : "").
+			$id, $desc, _xt("scm:dbk:".lc(DBKTYPES->[$type])),
+			($acc_id ? ":$km{rekening}=$acc_id" : "").
 			($dc ? " :dc" : ""),
 		       );
 	$t =~ s/\s+$//;

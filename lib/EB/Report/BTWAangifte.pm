@@ -2,12 +2,11 @@
 
 use utf8;
 
-# RCS Id          : $Id: BTWAangifte.pm,v 1.50 2009/10/24 21:25:38 jv Exp $
 # Author          : Johan Vromans
 # Created On      : Tue Jul 19 19:01:33 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Fri Mar  9 08:24:20 2012
-# Update Count    : 643
+# Last Modified On: Thu Mar  8 15:32:24 2012
+# Update Count    : 648
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -21,8 +20,6 @@ package EB::Report::BTWAangifte;
 
 use strict;
 use warnings;
-
-our $VERSION = sprintf "%d.%03d", q$Revision: 1.50 $ =~ /(\d+)/g;
 
 use EB;
 use EB::Format;
@@ -229,7 +226,7 @@ sub periode {
     }
     elsif ( $p == 12 ) {
 	return __x("{month} {year}",
-		   month => $EB::Utils::month_names[$v-1],
+		   month => _T( $EB::Utils::month_names[$v-1] ),
 		   year => $year);
     }
     else {

@@ -1,10 +1,16 @@
 #! perl
 
+# Utils.pm -- 
+# Author          : Johan Vromans
+# Created On      : Wed Sep 21 13:09:01 2005
+# Last Modified By: Johan Vromans
+# Last Modified On: Fri Aug 31 22:08:52 2012
+# Update Count    : 126
+# Status          : Unknown, Use with caution!
+
 package EB::Utils;
 
 use strict;
-
-our $VERSION = sprintf "%d.%03d", q$Revision: 1.10 $ =~ /(\d+)/g;
 
 use base qw(Exporter);
 
@@ -17,15 +23,15 @@ use Time::Local;
 *_T = *EB::_T;
 
 # These are only used by the BTW Aangifte modules.
-# Hmm. Should use locale functions instead of _T strings...
+# Note these are translated using _T where appropriate.
 our @months =
-      split(" ", _T("Jan Feb Mrt Apr Mei Jun Jul Aug Sep Okt Nov Dec"));
+      split(" ", "Jan Feb Mrt Apr Mei Jun Jul Aug Sep Okt Nov Dec");
 our @month_names =
-      split(" ", _T("Januari Februari Maart April Mei Juni Juli Augustus September Oktober November December"));
+      split(" ", "Januari Februari Maart April Mei Juni Juli Augustus September Oktober November December");
 our @days =
-      split(" ", _T("Zon Maa Din Woe Don Vri Zat"));
+      split(" ", "Zon Maa Din Woe Don Vri Zat");
 our @day_names =
-      split(" ", _T("Zondag Maandag Dinsdag Woensdag Donderdag Vrijdag Zaterdag"));
+      split(" ", "Zondag Maandag Dinsdag Woensdag Donderdag Vrijdag Zaterdag");
 
 my $_i;
 
@@ -58,6 +64,7 @@ sub parse_date {
 	($d, $m, $y) = ($1, $2, $3);
     }
     elsif ( $date =~ /^(\d\d?)-(\d\d?)$/ ) {
+	return unless $default_year;
 	($d, $m, $y) = ($1, $2, $default_year);
     }
     elsif ( $date =~ /^(\d\d?) (\w+)$/ ) {
@@ -68,13 +75,26 @@ sub parse_date {
     else {
 	return;		# invalid format
     }
-    $y = $y + $delta_y if $delta_y;
-    $m = $m + $delta_m if $delta_m;
-    $m = 1, $y++ if $m > 12;
-    $m = 12, $y-- if $m < 0;
-    my $time = eval { timelocal(0, 0, 0, $d, $m-1, $y) };
+
+    # The date, as delivered, must be valid.
+    my $time = eval { timelocal(0, 0, 12, $d, $m-1, $y) };
     return unless $time;	# invalid date
+
+    # Handle deltas.
+    $y += $delta_y if $delta_y;
+    $m += $delta_m if $delta_m;
+    while ( $m > 12 ) { $m -= 12, $y++ }
+    while ( $m < 1  ) { $m += 12; $y-- }
+    $delta_d += $d - 1;
+
+    # New date, as of 1st of the month.
+    $time = eval { timelocal(0, 0, 12, 1, $m-1, $y) };
+    return unless $time;	# invalid date
+
+    # Apply delta.
     $time += $delta_d * 24*60*60 if $delta_d;
+
+    # Convert and return.
     my @tm = localtime($time);
     @tm = (1900 + $tm[5], 1 + $tm[4], $tm[3]);
     wantarray ? @tm : sprintf("%04d-%02d-%02d", @tm);
@@ -203,6 +223,57 @@ sub min { $_[0] < $_[1] ? $_[0] : $_[1] }
 sub max { $_[0] > $_[1] ? $_[0] : $_[1] }
 
 push( @EXPORT, qw(min max) );
+
+# Locale / Gettext.
+# Variable expansion. See GNU gettext for details.
+sub __expand($%) {
+    my ($t, %args) = @_;
+    my $re = join('|', map { quotemeta($_) } keys(%args));
+    $t =~ s/\{($re)\}/defined($args{$1}) ? $args{$1} : "{$1}"/ge;
+    $t;
+}
+
+# Translation w/ variables.
+sub __x($@) {
+    my ($t, %vars) = @_;
+    __expand(_T($t), %vars);
+}
+
+# Translation w/ singular/plural handling.
+sub __n($$$) {
+    my ($sing, $plur, $n) = @_;
+    _T($n == 1 ? $sing : $plur);
+}
+
+# Translation w/ singular/plural handling and variables.
+sub __nx($$$@) {
+    my ($sing, $plur, $n, %vars) = @_;
+    __expand(__n($sing, $plur, $n), %vars);
+}
+
+# Make __xn a synonym for __nx.
+*__xn = \&__nx;
+
+# And the dummy...
+sub N__($) { $_[0] };
+
+# This is for context sensitive translations, where e.g., cmd:btw
+# translates to cmd:vat and we deliver need the part after the colon.
+sub __xt {
+    my $t = _T($_[0]);
+    $t =~ s/^.*://;
+    $t;
+}
+
+# Same, without translating.
+# Basically, __xt is __XN(_T($_[0])).
+sub __XN {
+    my $t = $_[0];
+    $t =~ s/^.*://;
+    $t;
+}
+
+push( @EXPORT, qw( __x __n __nx __xn N__ __xt __XN )  );
 
 # ... more to come ...
 

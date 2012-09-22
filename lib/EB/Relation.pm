@@ -1,5 +1,13 @@
 #! perl
 
+# Relation.pm -- 
+# Author          : Johan Vromans
+# Created On      : Thu Jul 14 12:54:08 2005
+# Last Modified By: Johan Vromans
+# Last Modified On: Thu Jan 26 11:04:05 2012
+# Update Count    : 118
+# Status          : Unknown, Use with caution!
+
 package main;
 
 our $dbh;
@@ -8,8 +16,6 @@ package EB::Relation;
 
 use strict;
 use warnings;
-
-our $VERSION = sprintf "%d.%03d", q$Revision: 1.19 $ =~ /(\d+)/g;
 
 use EB;
 
@@ -84,8 +90,9 @@ sub add {
 
     my $dbcd = "acc_debcrd";
     if ( $acct =~ /^(\d+)([DC]$)/i) {
+	warn("!"._T("Waarschuwing: De toevoeging 'D' of 'C' aan het grootboeknummer wordt afgeraden! Gebruik de --dagboek optie indien nodig.")."\n");
 	$acct = $1;
-	$dbcd = uc($2) eq 'D' ? 1 : 0; # Note: D -> Crediteur
+	$dbcd = uc($2) eq 'D' ? 0 : 1; # Note: D -> Crediteur
 	if ( defined($debiteur) && $dbcd == $debiteur ) {
 	    warn("?".__x("Dagboek {dbk} implicieert {typ1} maar {acct} impliceert {typ2}",
 			 dbk => $ddesc,
@@ -109,7 +116,7 @@ sub add {
 		     acct => $acct, desc => $adesc)."\n");
 	return;
     }
-    $debcrd = defined($debiteur) ? $debiteur : 1 - $debcrd;
+    $debcrd = defined($debiteur) ? $debiteur : 0+!!$debcrd;
 
     unless ( $dbk ) {
 	my $sth = $dbh->sql_exec("SELECT dbk_id, dbk_desc".
@@ -138,8 +145,11 @@ sub add {
 		       $code, $desc, $debcrd, $bstate || 0, $dbk, $acct);
 
     $dbh->commit;
-    ($debcrd ? _T("Debiteur") : _T("Crediteur")) . " " . $code .
-      " -> $acct ($adesc), dagboek $ddesc";
+    $debcrd
+      ? __x("Debiteur {code} -> {acct} ({desc}), dagboek {dbk}",
+	    code => $code, acct => $acct, desc => $adesc, dbk => $ddesc)
+      : __x("Crediteur {code} -> {acct} ({desc}), dagboek {dbk}",
+	    code => $code, acct => $acct, desc => $adesc, dbk => $ddesc);
 }
 
 1;

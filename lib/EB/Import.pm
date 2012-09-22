@@ -3,12 +3,11 @@
 use utf8;
 
 # Import.pm -- Import EekBoek administratie
-# RCS Info        : $Id: Import.pm,v 1.11 2009/10/14 21:14:02 jv Exp $
 # Author          : Johan Vromans
 # Created On      : Tue Feb  7 11:56:50 2006
 # Last Modified By: Johan Vromans
-# Last Modified On: Wed Oct 14 23:06:21 2009
-# Update Count    : 89
+# Last Modified On: Wed May 30 16:07:58 2012
+# Update Count    : 110
 # Status          : Unknown, Use with caution!
 
 package main;
@@ -20,8 +19,6 @@ package EB::Import;
 
 use strict;
 use warnings;
-
-our $VERSION = sprintf "%d.%03d", q$Revision: 1.11 $ =~ /(\d+)/g;
 
 use EB;
 use EB::Format;			# needs to be setup before we can use Schema
@@ -58,12 +55,17 @@ sub do_import {
 	# To temporary suspend journaling.
 	my $jnl_state = $cfg->val(qw(preferences journal), undef);
 
+	# Delete daybook-associated shell functions.
+	$cmdobj->_forget_cmds;
+
 	# Create DB.
 	$dbh->cleardb if $opts->{clean};
 
 	# Schema.
 	EB::Tools::Schema->create("$dir/schema.dat");
 	$dbh->setup;
+
+	# Add daybook-associated shell functions.
 	$cmdobj->_plug_cmds;
 
 	# Relaties, Opening, Mutaties.
@@ -137,13 +139,20 @@ sub do_import {
 	    $_ = [ map { "$_\n" } split(/[\n\r]+/, $_) ];
 	}
 
-	eval {
+	# Delete daybook-associated shell functions.
+	$cmdobj->_forget_cmds;
+
+	eval {			#### TODO: Why eval?
 	    # Create DB.
 	    $dbh->cleardb if $opts->{clean};
 
 	    # Schema.
-	    EB::Tools::Schema->_create(sub { shift(@$d_schema) });
+	    my @s = @$d_schema;	# copy for 2nd pass
+	    EB::Tools::Schema->_create1(sub { shift(@$d_schema) });
+	    EB::Tools::Schema->_create2(sub { shift(@s) });
 	    $dbh->setup;
+
+	    # Add daybook-associated shell functions.
 	    $cmdobj->_plug_cmds;
 
 	    # Relaties, Opening, Mutaties. In reverse order.

@@ -7,20 +7,17 @@ our $dbh;
 
 package EB::Booking::BKM;
 
-# RCS Id	  : $Id: BKM.pm,v 1.72 2009/04/03 10:10:11 jv Exp $
 # Author          : Johan Vromans
 # Created On      : Thu Jul  7 14:50:41 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Fri Mar  9 08:31:03 2012
-# Update Count    : 528
+# Last Modified On: Mon Aug 27 13:24:53 2012
+# Update Count    : 547
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
 
 use strict;
 use warnings;
-
-our $VERSION = sprintf "%d.%03d", q$Revision: 1.72 $ =~ /(\d+)/g;
 
 # Dagboek type 3: Bank
 # Dagboek type 4: Kas
@@ -96,6 +93,7 @@ sub perform {
     my $nr = 1;
     my $bsk_id;
     my $gacct = $dbh->lookup($dagboek, qw(Dagboeken dbk_id dbk_acc_id));
+    my $btw_adapt = $cfg->val(qw(strategy btw_adapt), 0);
 
     if ( $gacct ) {
 	my $vsaldo = saldo_for($dagboek, $bsk_nr-1, $bky);
@@ -130,6 +128,7 @@ sub perform {
   ENTRY:
     while ( @$args ) {
 	my $type = shift(@$args);
+	my $bsr_ref;
 
 	if ( $type eq "std" ) {
 	    return "?"._T("Deze opdracht is onvolledig. Gebruik de \"help\" opdracht voor meer aanwijzingen.")."\n"
@@ -193,7 +192,9 @@ sub perform {
 
 	    my $bid;
 	    my $oamt = $amt;
-	    ($amt, $bid) = $does_btw ? $self->amount_with_btw($amt, undef) : amount($amt);
+	    my $btw_explicit;
+	    ($amt, $bid, $btw_explicit) =
+	      $does_btw ? $self->amount_with_btw($amt, undef) : amount($amt);
 	    unless ( defined($amt) ) {
 		warn("?".__x("Ongeldig bedrag: {amt}", amt => $oamt)."\n");
 		$fail++;
@@ -225,11 +226,68 @@ sub perform {
 		}
 	    }
 	    if ( $btw_id ) {
-		my $tg = $dbh->lookup($btw_id, qw(BTWTabel btw_id btw_tariefgroep));
+		my $res = $dbh->do( "SELECT btw_tariefgroep, btw_start, btw_end, btw_alias, btw_desc, btw_incl".
+				    " FROM BTWTabel".
+				    " WHERE btw_id = ?",
+				    $btw_id );
+		my $incl = $res->[5];
+
+		my $tg;
+		unless ( defined($res) && defined( $tg = $res->[0] ) ) {
+		    warn("?".__x("Onbekende BTW-code: {code}", code => $btw_id)."\n");
+		    return;
+		}
 		croak("INTERNAL ERROR: btw code $btw_id heeft tariefgroep $tg")
 		  unless $tg;
-		croak("INTERNAL ERROR: Onbekende tariefgroep $tg")
-		  unless my $tp = BTWTARIEVEN->[$tg];
+		if ( defined( $res->[1] ) && $res->[1] gt $dd ) {
+		    my $ok = 0;
+		    if ( $btw_adapt && !$btw_explicit ) {
+			my $rr = $dbh->do( "SELECT btw_id, btw_desc".
+					   " FROM BTWTabel".
+					   " WHERE btw_tariefgroep = ?".
+					   " AND btw_end >= ?".
+					   " AND " . ( $incl ? "" : "NOT " ) . "btw_incl".
+					   " ORDER BY btw_id",
+					   $tg, $dd );
+			if ( $rr && $rr->[0] ) {
+			    warn("%".__x("BTW-code: {code} aangepast naar {new} i.v.m. de boekingsdatum",
+					 code => $res->[3]||$res->[4]||$btw_id,
+					 new => $rr->[1]||$rr->[0],
+					)."\n");
+			    $btw_id = $rr->[0];
+			    $ok++;
+			}
+		    }
+		    unless ( $ok ) {
+			warn("!".__x("BTW-code: {code} is nog niet geldig op de boekingsdatum",
+				     code => $res->[3]||$res->[4]||$btw_id)."\n");
+		    }
+		}
+		if ( defined( $res->[2] ) && $res->[2] lt $dd ) {
+		    my $ok = 0;
+		    if ( $btw_adapt && !$btw_explicit ) {
+			my $rr = $dbh->do( "SELECT btw_id, btw_desc".
+					   " FROM BTWTabel".
+					   " WHERE btw_tariefgroep = ?".
+					   " AND btw_start <= ?".
+					   " AND " . ( $incl ? "" : "NOT " ) . "btw_incl".
+					   " ORDER BY btw_id",
+					   $tg, $dd );
+			if ( $rr && $rr->[0] ) {
+			    warn("%".__x("BTW-code: {code} aangepast naar {new} i.v.m. de boekingsdatum",
+					 code => $res->[3]||$res->[4]||$btw_id,
+					 new => $rr->[1]||$rr->[0],
+					)."\n");
+			    $btw_id = $rr->[0];
+			    $ok++;
+			}
+		    }
+		    unless ( $ok ) {
+			warn("!".__x("BTW-code: {code} is niet meer geldig op de boekingsdatum",
+				     code => $res->[3]||$res->[4]||$btw_id)."\n");
+		    }
+		}
+		my $tp = BTWTARIEVEN->[$tg];
 		my $t = qw(v i)[$kstomz] . lc(substr($tp, 0, 1));
 		$btw_acc = $dbh->std_acc("btw_$t");
 	    }
@@ -248,11 +306,11 @@ sub perform {
 	    $dbh->sql_insert("Boekstukregels",
 			     [qw(bsr_nr bsr_date bsr_bsk_id bsr_desc bsr_amount
 				 bsr_btw_id bsr_btw_acc bsr_btw_class bsr_type
-				 bsr_acc_id bsr_rel_code bsr_dbk_id)],
+				 bsr_acc_id bsr_rel_code bsr_dbk_id bsr_ref)],
 			     $nr++, $dd, $bsk_id, $desc, $orig_amount,
 			     $btw_id, $btw_acc,
 			     BTWKLASSE($does_btw ? defined($kstomz) : 0, BTWTYPE_NORMAAL, $kstomz||0),
-			     0, $acct, undef, undef);
+			     0, $acct, undef, undef, $bsr_ref);
 
 #	    warn("update $acct with ".numfmt(-$amt)."\n") if $trace_updates;
 #	    $dbh->upd_account($acct, -$amt);
@@ -304,6 +362,7 @@ sub perform {
 
 	    my ($rr, $sql, @sql_args);
 	    if ( $rel =~ /:/ ) {
+		$bsr_ref = $rel; # store in db
 		my ($id, $bsk, $err) = $dbh->bskid($rel, $bky);
 		unless ( defined($id) ) {
 		    warn("?$err\n");
@@ -357,7 +416,7 @@ sub perform {
 			      "  AND bsr_rel_code = ?".
 				" AND bsr_nr = 1".
 				  ( $delta ? " AND bsr_date <= ?" : "" ).
-				    " ORDER BY bsk_id";
+				    " ORDER BY bsr_date";
 		@sql_args = ( $debcrd ? DBKTYPE_VERKOOP : DBKTYPE_INKOOP,
 			      $rel, $delta ? $ddd : () );
 
@@ -491,7 +550,7 @@ sub perform {
 			  "  AND bsk_dbk_id = dbk_id".
 			    "  AND bsr_bsk_id = bsk_id".
 			      "  AND bsr_rel_code = ?".
-				" ORDER BY bsk_id";
+				" ORDER BY bsr_date";
 		@sql_args = ( $amt ? $amt : (),
 			       $debcrd ? DBKTYPE_VERKOOP : DBKTYPE_INKOOP,
 			      $rel);
@@ -513,9 +572,10 @@ sub perform {
 	    $dbh->sql_insert("Boekstukregels",
 			     [qw(bsr_nr bsr_date bsr_bsk_id bsr_desc bsr_amount
 				 bsr_btw_id bsr_type bsr_acc_id bsr_btw_class
-				 bsr_rel_code bsr_dbk_id bsr_paid)],
+				 bsr_rel_code bsr_dbk_id bsr_paid bsr_ref)],
 			     $nr++, $dd, $bsk_id, "*".$bsk_desc, -$amt, 0,
-			     $type eq "deb" ? 1 : 2, $acct, 0, $bsr_rel, $dbk_id, $bskid);
+			     $type eq "deb" ? 1 : 2, $acct, 0, $bsr_rel, $dbk_id,
+			     $bskid, $bsr_ref);
 	    $dbh->sql_exec("UPDATE Boekstukken".
 			   " SET bsk_open = bsk_open - ?".
 			   " WHERE bsk_id = ?",

@@ -8,12 +8,11 @@ our $config;
 
 package EB::Booking::Delete;
 
-# RCS Id	  : $Id: Delete.pm,v 1.13 2008/02/13 15:19:19 jv Exp $ 
 # Author          : Johan Vromans
 # Created On      : Mon Sep 19 22:19:05 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Wed Feb 13 16:13:19 2008
-# Update Count    : 85
+# Last Modified On: Thu Jun  7 13:58:47 2012
+# Update Count    : 88
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -21,13 +20,11 @@ package EB::Booking::Delete;
 use strict;
 use warnings;
 
-our $VERSION = sprintf "%d.%03d", q$Revision: 1.13 $ =~ /(\d+)/g;
-
 use EB;
 use base qw(EB::Booking);
 
 sub new {
-    return bless {};
+    return bless {}, shift;
 }
 
 sub perform {
@@ -108,7 +105,7 @@ sub perform {
 	# de saldi van bankrekeningen.
 	$sth = $dbh->sql_exec("SELECT jnl_acc_id, jnl_amount".
 			      " FROM Journal".
-			      " WHERE jnl_bsk_id = ? AND jnl_bsr_seq > 0", $bsk);
+			      " WHERE jnl_bsk_id = ? AND jnl_seq > 0", $bsk);
 	while ( my $rr = $sth->fetchrow_arrayref ) {
 	    $dbh->upd_account($rr->[0], -$rr->[1]);
 	}

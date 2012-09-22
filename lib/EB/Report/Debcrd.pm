@@ -7,20 +7,17 @@ our $dbh;
 
 package EB::Report::Debcrd;
 
-# RCS Id          : $Id: Debcrd.pm,v 1.17 2008/08/24 15:33:44 jv Exp $
 # Author          : Johan Vromans
 # Created On      : Wed Dec 28 16:08:10 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Sun Aug 24 17:33:29 2008
-# Update Count    : 186
+# Last Modified On: Sun Jun 24 22:23:55 2012
+# Update Count    : 188
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
 
 use strict;
 use warnings;
-
-our $VERSION = sprintf "%d.%03d", q$Revision: 1.17 $ =~ /(\d+)/g;
 
 ################ The Process ################
 
@@ -196,9 +193,11 @@ sub _perform {
 			      " AND bsr_type = 0".
 			      " AND bsr_nr = 1".
 			      " AND bsr_rel_code = ?".
+			      " AND dbk_type = ?".
 			      " ORDER BY bsk_date, bsk_nr",
 			      @{$rep->{periode}},
-			      $rel);
+			      $rel,
+			      $debcrd ? DBKTYPE_VERKOOP : DBKTYPE_INKOOP);
 
 	while ( my $rr = $sth->fetchrow_arrayref ) {
 	    my ($bsk_id, $bsk_desc, $bsk_date,

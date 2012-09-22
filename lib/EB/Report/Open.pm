@@ -10,16 +10,14 @@ package EB::Report::Open;
 # Author          : Johan Vromans
 # Created On      : Fri Sep 30 17:48:16 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Wed Mar 12 16:11:36 2008
-# Update Count    : 204
+# Last Modified On: Sun Jun 24 22:29:59 2012
+# Update Count    : 206
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
 
 use strict;
 use warnings;
-
-our $VERSION = sprintf "%d.%03d", q$Revision: 1.21 $ =~ /(\d+)/g;
 
 ################ The Process ################
 
@@ -119,6 +117,7 @@ sub perform {
 			amt  => numfmt($gtot),
 		      });
 	    $gtot = 0;
+	    $rtot = 0;
 	}
 
 	$bsk_amount = 0-$bsk_amount if $dbk_type == DBKTYPE_INKOOP;

@@ -3,12 +3,11 @@
 use utf8;
 
 # Config.pm -- Configuration files.
-# RCS Info        : $Id: Config.pm,v 1.33 2010/03/27 15:36:58 jv Exp $
 # Author          : Johan Vromans
 # Created On      : Fri Jan 20 17:57:13 2006
 # Last Modified By: Johan Vromans
-# Last Modified On: Sat Mar 27 16:36:56 2010
-# Update Count    : 237
+# Last Modified On: Fri Mar 18 20:31:19 2011
+# Update Count    : 251
 # Status          : Unknown, Use with caution!
 
 package main;
@@ -88,8 +87,8 @@ sub init_config {
     }
 
     $ENV{EB_LANG} = $cfg->val('locale','lang',
-			      $ENV{EB_LANG}||$ENV{LANG}||
-			      ($^O =~ /^(ms)?win/i ? "nl_NL.utf8" : "nl_NL"));
+                              $ENV{EB_LANG}||$ENV{LANG}||
+                              ($^O =~ /^(ms)?win/i ? "nl_NL.utf8" : "nl_NL"));
 
     $cfg->_plug(qw(locale       lang         EB_LANG));
     $ENV{LANG} = $cfg->val(qw(locale lang));
@@ -129,9 +128,8 @@ sub init_config {
 
 sub import {
     my ($self, $app) = @_;
-    my $opts = ref($app) ? { %$app } : { app => $app };
-    return if $cfg && $opts->{app} && $cfg->app eq lc($opts->{app});
-    $cfg = $self->init_config($opts);
+    return unless defined $app;
+    die("PROGRAM ERROR: EB::Config cannot import anything");
 }
 
 package EB::Config::Handler;
@@ -254,7 +252,11 @@ sub printconf {
 
 sub user_dir {
     my ( $app, $item ) = @_;
-    eval { $app = $app->app };
+    {
+	local $SIG{__WARN__};
+	local $SIG{__DIE__};
+	eval { $app = $app->app };
+    }
 
     if ( $^O =~ /^mswin/i ) {
 	my $f = File::Spec->catpath( $ENV{HOMEDRIVE}, $ENV{HOMEPATH},
@@ -270,7 +272,11 @@ sub user_dir {
 
 sub std_config {
     my ( $app ) = @_;
-    eval { $app = $app->app };
+    {
+	local $SIG{__WARN__};
+	local $SIG{__DIE__};
+	eval { $app = $app->app };
+    }
     lc($app) . ".conf";
 }
 

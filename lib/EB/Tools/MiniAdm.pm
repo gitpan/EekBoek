@@ -3,12 +3,11 @@
 use utf8;
 
 # MiniAdm.pm -- 
-# RCS Info        : $Id: MiniAdm.pm,v 1.7 2010/01/06 20:56:01 jv Exp $
 # Author          : Johan Vromans
 # Created On      : Sun Oct  4 15:11:05 2009
 # Last Modified By: Johan Vromans
-# Last Modified On: Wed Jan  6 21:07:54 2010
-# Update Count    : 97
+# Last Modified On: Fri May  6 13:44:19 2011
+# Update Count    : 111
 # Status          : Unknown, Use with caution!
 
 package main;
@@ -142,18 +141,23 @@ sub generate_config {
 
     return if exists $opts->{create_config} && !$opts->{create_config};
 
+    my $fmt = "%-10.10s = %s\n";
+
     $self->generate_file
       ( $cfg->std_config, undef, $opts,
 	sub {
 	    my ( $self, $fd ) = @_;
-	    print { $fd }
-	      ( "[database]\n",
-		"name   = ", $opts->{db_naam},   "\n",
-		"driver = ", $opts->{db_driver}, "\n",
-	      );
-	    print { $fd }
-	      ( "path   = ", $opts->{db_path}, "\n",
-	      ) if $opts->{db_path};
+	    if ( $opts->{lang} ) {
+		print { $fd } ("[locale]\n");
+		printf { $fd } ( $fmt, "lang", $opts->{lang} );
+		print { $fd } ("\n");
+	    }
+	    print { $fd } ("[database]\n");
+	    printf { $fd } ( $fmt, "name", $opts->{db_naam} );
+	    foreach ( qw( driver host port user password path ) ) {
+		next unless defined $opts->{"db_$_"};
+		printf { $fd } ( $fmt, $_, $opts->{"db_$_"} )
+	    }
 	  }
       );
 }
@@ -207,6 +211,8 @@ EOD
 #   :btw=nul
 #   :btw=hoog
 #   :btw=laag
+#   :btw=privé
+#   :btw=anders
 EOD
 	    }
 	    else {
@@ -237,7 +243,7 @@ EOD
 #   btw_il	idem, laag tarief
 #   btw_vh	idem, verkopen, hoog tarief
 #   btw_vl	idem, laag tarief
-#   btw_ph	idem, priv�, hoog tarief
+#   btw_ph	idem, privé, hoog tarief
 #   btw_pl	idem, laag tarief
 #   btw_ah	idem, anders, hoog tarief
 #   btw_al	idem, laag tarief
@@ -266,6 +272,9 @@ EOD
 # van 10 t/m 99. Indien daarvan wordt afgeweken kan dit worden opgegeven
 # met de opdracht "Verdichting". De twee getallen geven het hoogste
 # nummer voor hoofdverdichtingen resp. verdichtingen.
+
+Verdichting 9 99
+
 # De nummers van de grootboekrekeningen worden geacht groter te zijn
 # dan de maximale verdichting. Daarvan kan worden afgeweken door
 # middels voorloopnullen de _lengte_ van het nummer groter te maken
@@ -324,8 +333,12 @@ EOD
 		print { $fd } ( <<"EOD" );
          4200  C   BTW Verkoop Hoog                           :koppeling=btw_vh
          4210  C   BTW Verkoop Laag                           :koppeling=btw_vl
+         4212  C   BTW Verkoop Privé                          :koppeling=btw_vp
+         4214  C   BTW Verkoop Anders                         :koppeling=btw_va
          4220  D   BTW Inkoop Hoog                            :koppeling=btw_ih
          4230  D   BTW Inkoop Laag                            :koppeling=btw_il
+         4232  D   BTW Inkoop Privé                           :koppeling=btw_ip
+         4234  D   BTW Inkoop Anders                          :koppeling=btw_ia
          4290  C   Omzetbelasting betaald                     :koppeling=btw_ok
 EOD
 	    }
@@ -407,6 +420,9 @@ EOD
 # type het is. Voor dagboeken van het type Kas en Bank moet een
 # tegenrekening worden opgegeven, voor de overige dagboeken mag een
 # tegenrekening worden opgegeven.
+# De optie :dc kan worden gebruikt om aan te geven dat het journaal
+# voor dit dagboek de boekstuktotalen in gescheiden debet en credit
+# moet tonen.
 
 Dagboeken
 
@@ -439,16 +455,18 @@ EOD
 
 # BTW TARIEVEN
 #
-# Er zijn drie tariefgroepen: "hoog", "laag" en "nul". De tariefgroep
-# bepaalt het rekeningnummer waarop de betreffende boeking plaatsvindt.
+# Er zijn vijf tariefgroepen: "hoog", "laag", "nul", "privé" en
+# "anders". De tariefgroep bepaalt het rekeningnummer waarop de
+# betreffende boeking plaatsvindt.
 # Binnen elke tariefgroep zijn meerdere tarieven mogelijk, hoewel dit
 # in de praktijk niet snel zal voorkomen.
 # In de eerste kolom wordt de (numerieke) code voor dit tarief
 # opgegeven. Deze kan o.m. worden gebruikt om expliciet een BTW tarief
-# op te geven bij het boeken. Voor elk tarief (behalve die van groep
-# "nul") moet het percentage worden opgegeven. Met de aanduiding
-# :exclusief kan worden opgegeven dat boekingen op rekeningen met deze
-# tariefgroep standaard het bedrag exclusief BTW aangeven.
+# op te geven bij het boeken. Voor elk gebruikt tarief (behalve die
+# van groep "nul") moet het percentage worden opgegeven. Met de
+# aanduiding :exclusief kan worden opgegeven dat boekingen op
+# rekeningen met deze tariefgroep standaard het bedrag exclusief BTW
+# aangeven.
 #
 # BELANGRIJK: Mutaties die middels de command line shell of de API
 # worden uitgevoerd maken gebruik van het geassocieerde BTW tarief van
@@ -462,6 +480,8 @@ BTW Tarieven
    2  BTW 19% excl.          :tariefgroep=hoog :perc=19,00 :exclusief
    3  BTW 6,0% incl.         :tariefgroep=laag :perc=6,00
    4  BTW 6,0% excl.         :tariefgroep=laag :perc=6,00 :exclusief
+   5  BTW Privé 12% incl.    :tariefgroep=privé :perc=12,00
+   6  BTW Privé 12% ex.	     :tariefgroep=privé :perc=12,00 :exclusief
 EOD
 	    }
 	    print { $fd } ( <<"EOD" );

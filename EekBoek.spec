@@ -10,7 +10,7 @@ Name: EekBoek
 Summary: Bookkeeping software for small and medium-size businesses
 License: GPL+ or Artistic
 Group: Applications/Productivity
-Version: 2.00.04
+Version: 2.02.00
 Release: 1%{?dist}
 Source: http://www.eekboek.nl/dl/%{name}-%{version}.tar.gz
 URL: http://www.eekboek.nl
@@ -85,7 +85,6 @@ AutoReqProv: 0
 
 Requires: %{name} = %{version}-%{release}
 Requires: perl(Wx) >= 0.89
-Requires: perl(Wx::Perl::ProcessStream) >= 0.11
 Requires: wxGTK >= 2.8.8
 Requires: gettext
 
@@ -121,7 +120,6 @@ chmod 0664 MANIFEST
 
 # Remove some library modules since we Require them.
 %{__rm} -fr lib/EB/CPAN/Carp
-%{__rm} -fr lib/EB/CPAN/File
 %{__rm} -fr lib/EB/CPAN/Wx
 %{__perl} -ni~ -e 'print unless m;^lib/EB/CPAN/;;' MANIFEST
 
@@ -130,13 +128,8 @@ chmod 0664 MANIFEST
 %{__perl} Build
 
 # Move some files into better places.
-mv blib/lib/EB/examples .
-( cd examples;
-  %{__mv} ../eekboek-mode.el .;
-  %{__rm} -f ../blib/lib/EB/schema/sampledb.ebz;
-  ( echo "Dataset sampledb.ebz aangemaakt door rpmbuild EekBoek %{version}"
-    echo "Omschrijving: EekBoek voorbeeldadministratie" ) |
-  %{__zip} -qz ../blib/lib/EB/schema/sampledb.ebz *.eb schema.dat )
+%{__mkdir} examples
+%{__mv} emacs/eekboek-mode.el examples
 
 %install
 %{__rm} -rf %{buildroot}
@@ -150,17 +143,17 @@ mv blib/lib/EB/examples .
 %{__mkdir_p} %{buildroot}%{_bindir}
 
 # Install the default, system-wide config file.
-%{__install} -p -m 0644 examples/%{lcname}.conf %{buildroot}%{ebconf}/%{lcname}.conf
+%{__install} -p -m 0644 blib/lib/EB/examples/%{lcname}.conf %{buildroot}%{ebconf}/%{lcname}.conf
 
 # Install locales.
-for lang in blib/lib/EB/mo/*
+for lang in blib/lib/EB/res/locale/*
 do
   l=`basename ${lang}`
   %{__mkdir_p} %{buildroot}%{_datadir}/locale/${l}/LC_MESSAGES
-  %{__mv} blib/lib/EB/mo/${l}/* %{buildroot}%{_datadir}/locale/${l}/LC_MESSAGES
-  %{__rmdir} blib/lib/EB/mo/${l}
+  %{__mv} blib/lib/EB/res/locale/${l}/* %{buildroot}%{_datadir}/locale/${l}/LC_MESSAGES
+  %{__rmdir} blib/lib/EB/res/locale/${l}
 done
-%{__rmdir} blib/lib/EB/mo
+%{__rmdir} blib/lib/EB/res/locale
 
 # Create lib dirs and copy files.
 %{__find} blib/lib -type d -printf "%{__mkdir} %{buildroot}%{ebshare}/lib/%%P\n" | sh -x
@@ -179,20 +172,17 @@ do
   %{__mkdir_p} %{buildroot}%{_mandir}/man1
   pod2man blib/script/${script} > %{buildroot}%{_mandir}/man1/${script}.1
 
-  # And the localisations.
-  # %find_lang ${script}
-
 done
 
 # Handle localisations separately since we are not complete yet.
-for script in ebwxshell
+for script in ebcore
 do
   %find_lang ${script}
 done
 
 # Desktop file, icons, ...
 %{__mkdir_p} %{buildroot}%{_datadir}/pixmaps
-%{__install} -p -m 0664 lib/EB/Wx/icons/ebicon.png %{buildroot}%{_datadir}/pixmaps/
+%{__install} -p -m 0664 lib/EB/res/Wx/icons/ebicon.png %{buildroot}%{_datadir}/pixmaps/
 for script in ebwxshell
 do
   desktop-file-install --delete-original \
@@ -212,7 +202,7 @@ done
 %clean
 %{__rm} -rf %{buildroot}
 
-%files
+%files -f ebcore.lang
 %defattr(-,root,root,-)
 %doc CHANGES README examples/ doc/html/ TODO
 %dir %{_sysconfdir}/%{lcname}
@@ -223,7 +213,7 @@ done
 %{_bindir}/ebshell
 %{_mandir}/man1/ebshell*
 
-%files -f ebwxshell.lang gui
+%files gui
 %defattr(-,root,root,-)
 %doc README.gui
 %{ebshare}/lib/EB/Wx
@@ -238,11 +228,11 @@ done
 %{ebshare}/lib/EB/DB/Postgres.pm
 
 %changelog
-* Fri Mar 09 2012 Johan Vromans <jvromans@squirrel.nl> - 2.00.04-1
-- Upgrade to upstream 2.00.04.
+* Thu Sep 13 2012 Johan Vromans <jvromans@squirrel.nl> - 2.01.06-1
+- Upgrade to upstream 2.01.06.
 
-* Tue Mar 22 2011 Johan Vromans <jvromans@squirrel.nl> - 2.00.03-1
-- Upgrade to upstream 2.00.03.
+* Fri Jul 09 2010 Johan Vromans <jvromans@squirrel.nl> - 2.00.02-2
+- Adjust emacs support files.
 
 * Thu May 06 2010 Johan Vromans <jvromans@squirrel.nl> - 2.00.02-1
 - Upgrade to upstream 2.00.02.

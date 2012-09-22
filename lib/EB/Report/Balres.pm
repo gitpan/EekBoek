@@ -7,20 +7,17 @@ our $dbh;
 
 package EB::Report::Balres;
 
-# RCS Id          : $Id: Balres.pm,v 1.27 2009/10/09 15:33:58 jv Exp $
 # Author          : Johan Vromans
 # Created On      : Sat Jun 11 13:44:43 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Wed Oct  7 11:36:20 2009
-# Update Count    : 400
+# Last Modified On: Wed Jun  9 22:19:50 2010
+# Update Count    : 423
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
 
 use strict;
 use warnings;
-
-our $VERSION = sprintf "%d.%03d", q$Revision: 1.27 $ =~ /(\d+)/g;
 
 ################ The Process ################
 
@@ -117,6 +114,25 @@ sub perform {
 	$rep->start($balans ? _T("Balans") : _T("Verlies/Winst"));
     }
 
+    my $sql = "SELECT acc_id, acc_desc, acc_balance, acc_ibalance, acc_debcrd, acc_dcfixed".
+      " FROM ${table}";
+    if ( $balans ) {
+	$sql .= " WHERE acc_balres".
+	  " AND acc_balance <> 0";
+	$sql .= " AND acc_struct = ?" if $detail >= 0;
+    }
+    else {
+	$sql .= ",Journal".
+	  " WHERE acc_id = jnl_acc_id".
+	    " AND jnl_date >= '$begin' AND jnl_date <= '$end'".
+	      " AND NOT acc_balres".
+		" AND acc_balance <> acc_ibalance";
+	$sql .= " AND acc_struct = ?" if $detail >= 0;
+	$sql =~ /SELECT\s+(.*)\s+FROM/;
+	$sql .= " GROUP BY $1";
+    }
+    $sql .= " ORDER BY acc_id";
+
     if ( $detail >= 0 ) {	# Verdicht
 	my @vd;
 	my @hvd;
@@ -148,12 +164,7 @@ sub perform {
 	    my $cstot = 0;
 	    foreach my $vd ( @{$hvd->[2]} ) {
 		my $did_vd = 0;
-		$sth = $dbh->sql_exec("SELECT acc_id, acc_desc, acc_balance, acc_debcrd, acc_dcfixed".
-				      " FROM ${table}".
-				      " WHERE".($balans ? "" : " NOT")." acc_balres".
-				      "  AND acc_struct = ?".
-				      "  AND acc_balance <> 0".
-				      " ORDER BY acc_id", $vd->[0]);
+		$sth = $dbh->sql_exec($sql, $vd->[0]);
 
 		my $dsstot = 0;
 		my $csstot = 0;
@@ -168,7 +179,8 @@ sub perform {
 				desc => $vd->[1]
 			      })
 		      unless $detail < 2 || $did_vd++;
-		    my ($acc_id, $acc_desc, $acc_balance, $acc_debcrd, $acc_dcfixed) = @$rr;
+		    my ($acc_id, $acc_desc, $acc_balance, $acc_ibalance,
+			$acc_debcrd, $acc_dcfixed) = @$rr;
 		    $acc_balance = -$acc_balance if $acc_dcfixed && !$acc_debcrd;
 		    if ( $acc_dcfixed ? $acc_debcrd : ($acc_balance >= 0) ) {
 			$dsstot += $acc_balance;
@@ -217,14 +229,12 @@ sub perform {
 
     }
     else {			# Op Grootboek
-	$sth = $dbh->sql_exec("SELECT acc_id, acc_desc, acc_debcrd, acc_dcfixed, acc_balance, acc_ibalance".
-			      " FROM ${table}".
-			      " WHERE".($balans ? "" : " NOT")." acc_balres".
-			      "  AND acc_balance <> 0".
-			      " ORDER BY acc_id");
+	$sth = $dbh->sql_exec($sql);
 
 	while ( $rr = $sth->fetchrow_arrayref ) {
-	    my ($acc_id, $acc_desc, $acc_debcrd, $acc_dcfixed, $acc_balance, $acc_ibalance) = @$rr;
+	    my ($acc_id, $acc_desc, $acc_balance, $acc_ibalance,
+		$acc_debcrd, $acc_dcfixed) = @$rr;
+#warn("|", join("|", @$rr), "|\n");
 	    $acc_balance -= $acc_ibalance unless $opts->{balans};
 	    $acc_balance = -$acc_balance if $acc_dcfixed && !$acc_debcrd;
 	    if ( $acc_dcfixed ? $acc_debcrd : ($acc_balance >= 0) ) {

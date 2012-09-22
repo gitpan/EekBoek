@@ -7,12 +7,11 @@ our $config;
 
 package EB::Booking::Decode;
 
-# RCS Id          : $Id: Decode.pm,v 1.25 2008/02/07 12:12:39 jv Exp $
 # Author          : Johan Vromans
 # Created On      : Tue Sep 20 15:16:31 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Thu Feb  7 13:12:37 2008
-# Update Count    : 172
+# Last Modified On: Tue May 29 14:38:52 2012
+# Update Count    : 182
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -20,14 +19,12 @@ package EB::Booking::Decode;
 use strict;
 use warnings;
 
-our $VERSION = sprintf "%d.%03d", q$Revision: 1.25 $ =~ /(\d+)/g;
-
 use EB;
 use EB::Format;
 use EB::Booking;		# for norm_btw()
 
 sub new {
-    return bless {};
+    return bless {}, shift;
 }
 
 my @bsr_types =
@@ -84,7 +81,7 @@ sub decode {
 	    $cmd =~ s/[^[:alnum:]]/_/g;
 	    $cmd .= ":$bsk_bky" if $ex_bky;
 	    $cmd .= ":$bsk_nr" if $ex_bsknr;
-	    $cmd .= " --ref=" . _quote($bsk_ref) if defined $bsk_ref;
+	    $cmd .= " --".__xt("cmo:boeking:ref")."=" . _quote($bsk_ref) if defined $bsk_ref;
 	    $cmd .= " ".datefmt_full($bsk_date)." ";
 	    if ( $dbktype == DBKTYPE_INKOOP || $dbktype == DBKTYPE_VERKOOP ) {
 		$cmd .= $no_ivbskdesc ? _quote($rel_code) : _quote($bsk_desc, $rel_code);
@@ -93,11 +90,11 @@ sub decode {
 		$cmd .= _quote($bsk_desc);
 	    }
 	    else {
-		$cmd .= " --totaal=" . numfmt_plain($dbktype == DBKTYPE_INKOOP ? 0-$bsk_amount : $bsk_amount)
+		$cmd .= " --".__xt("cmo:boeking:totaal")."=" . numfmt_plain($dbktype == DBKTYPE_INKOOP ? 0-$bsk_amount : $bsk_amount)
 		  if $ex_tot && $acct;
 	    }
-	    $cmd .= " --beginsaldo=" . numfmt_plain($bsk_isaldo) if $ex_tot && defined $bsk_isaldo;
-	    $cmd .= " --saldo=" . numfmt_plain($bsk_saldo) if $ex_tot && defined $bsk_saldo;
+	    $cmd .= " --".__xt("cmo:boeking:beginsaldo")."=" . numfmt_plain($bsk_isaldo) if $ex_tot && defined $bsk_isaldo;
+	    $cmd .= " --".__xt("cmo:boeking:saldo")."=" . numfmt_plain($bsk_saldo) if $ex_tot && defined $bsk_saldo;
 	}
 	else {
 	    $cmd = "Boekstuk $bsk_id, nr $bsk_nr, dagboek " .
@@ -126,7 +123,7 @@ sub decode {
 
     my $sth = $dbh->sql_exec("SELECT bsr_nr, bsr_date, ".
 			     "bsr_desc, bsr_amount, bsr_btw_id, bsr_btw_class, ".
-			     "bsr_type, bsr_acc_id, bsr_rel_code, bsr_paid ".
+			     "bsr_type, bsr_acc_id, bsr_rel_code, bsr_paid, bsr_ref ".
 			     " FROM Boekstukregels".
 			     " WHERE bsr_bsk_id = ?".
 			     " ORDER BY bsr_nr", $bsk);
@@ -140,7 +137,7 @@ sub decode {
 
     while ( $rr ) {
 	my ($bsr_nr, $bsr_date, $bsr_desc, $bsr_amount, $bsr_btw_id,
-	    $bsr_btw_class, $bsr_type, $bsr_acc_id, $bsr_rel_code, $bsr_paid) = @$rr;
+	    $bsr_btw_class, $bsr_type, $bsr_acc_id, $bsr_rel_code, $bsr_paid, $bsr_ref) = @$rr;
 	if ( $bsr_nr == 1) {
 	    $setup->($bsr_rel_code);
 	}
@@ -180,12 +177,22 @@ sub decode {
 
 	# Refactor later.
 	if ( $bsr_btw_class & BTWKLASSE_BTW_BIT ) {
+	    my $alias = $bsr_btw_id;
+	    if ( $bsr_btw_id > BTW_CODE_AUTO ) {
+		if ( $bsr_btw_id & 1 ) {
+		    $alias = $dbh->lookup($bsr_btw_id, qw(BTWTabel btw_id btw_desc));
+		}
+		else {
+		    $alias = $dbh->lookup($bsr_btw_id, qw(BTWTabel btw_id btw_alias));
+		    $alias .= qw( - + )[$dbh->lookup($bsr_btw_id, qw(BTWTabel btw_id btw_incl))];
+		}
+	    }
 	    my $ko = $bsr_btw_class & BTWKLASSE_KO_BIT ? 1 : 0;
 	    if ( $ex_btw ) {
-		$btw = $bsr_btw_id . qw(O K)[$ko];
+		$btw = $alias . qw(O K)[$ko];
 	    }
 	    else {
-		$btw .= $bsr_btw_id
+		$btw .= $alias
 		  if btw_code($bsr_acc_id) != $bsr_btw_id
 		    || ($bsr_type == 0 && $dbktype == DBKTYPE_MEMORIAAL);
 		$btw .= qw(O K)[$ko]
@@ -221,6 +228,12 @@ sub decode {
 		$cmd .= "std$dd " . _quote($bsr_desc) . " " .
 		  numfmt_plain($bsr_amount) . $btw . " " .
 		    $bsr_acc_id;
+	    }
+	    elsif ( $bsr_ref && ( $bsr_type == 1 || $bsr_type == 2 ) ) {
+		my $type = $bsr_type == 1 ? "deb" : "crd";
+		$cmd .= $single ? " " : " \\\n\t";
+		$cmd .= "$type$dd " . _quote($bsr_ref) . " " .
+		  numfmt_plain($bsr_amount);
 	    }
 	    elsif ( $bsr_type == 1 || $bsr_type == 2 ) {
 		my $type = $bsr_type == 1 ? "deb" : "crd";

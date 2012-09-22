@@ -1,5 +1,13 @@
 #! perl
 
+# Format.pm -- 
+# Author          : Johan Vromans
+# Created On      : Thu Jul 14 12:54:08 2005
+# Last Modified By: Johan Vromans
+# Last Modified On: Tue Mar  8 20:26:23 2011
+# Update Count    : 102
+# Status          : Unknown, Use with caution!
+
 package main;
 
 our $cfg;
@@ -8,8 +16,6 @@ our $dbh;
 package EB::Format;
 
 use strict;
-
-our $VERSION = sprintf "%d.%03d", q$Revision: 1.41 $ =~ /(\d+)/g;
 
 use EB;
 
@@ -89,7 +95,7 @@ sub numround_bankers {
     $sign * POSIX::floor($x + $_half);
 }
 
-sub _setup  {
+sub init_formats  {
 
     assert( NUMGROUPS != AMTPRECISION, "NUMGROUPS != AMTPRECISION" );
 
@@ -357,7 +363,5 @@ push( @EXPORT,
       qw($amount_width numfmt numfmt_plain),
       qw($date_width datefmt datefmt_full datefmt_plain),
     );
-
-_setup();
 
 1;

@@ -3,12 +3,11 @@
 use utf8;
 
 # Booking.pm -- Base class for Bookings.
-# RCS Info        : $Id: Booking.pm,v 1.22 2009/10/14 21:14:02 jv Exp $
 # Author          : Johan Vromans
 # Created On      : Sat Oct 15 23:36:51 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Wed Oct 14 23:04:44 2009
-# Update Count    : 141
+# Last Modified On: Fri Aug 31 19:07:41 2012
+# Update Count    : 208
 # Status          : Unknown, Use with caution!
 
 package main;
@@ -20,8 +19,6 @@ package EB::Booking;
 
 use strict;
 use warnings;
-
-our $VERSION = sprintf "%d.%03d", q$Revision: 1.22 $ =~ /(\d+)/g;
 
 use EB;
 use EB::Format;
@@ -129,11 +126,13 @@ sub in_bky {
 
 sub amount_with_btw {
     my ($self, $amt, $btw_spec) = @_;
+    my $explicit;
     if ( $amt =~ /^(.+)\@(.+)$/ ) {
 	$amt = $1;
 	$btw_spec = $2;
+	$explicit = $btw_spec !~ /^[hlgn]?[-+]?[ko]?$/i;
     }
-    return (amount($amt), $btw_spec);
+    return (amount($amt), $btw_spec, $explicit);
 }
 
 sub parse_btw_spec {
@@ -145,40 +144,101 @@ sub parse_btw_spec {
     if ( $spec =~ /^([gn])$/ ) {
 	return (0, undef);
     }
-    # Strip off trailing K|O.
-    elsif ( $spec =~ /^(.*)([ko])(.*)$/ ) {
-	$kstomz = $2 eq 'k';
-	$spec = $1.$3;
+    # Quickie for K/O.
+    elsif ( $spec =~ /^([ko])$/ ) {
+	return ($btw_id, $1 eq 'k');
     }
-    elsif ( $spec =~ /^(.*)([iv])(.*)$/ ) {
+    # Strip off trailing K|O.
+    elsif ( $spec =~ /^([hl]|\d+)([-+]?)([ko])$/ || $spec =~ /^(\w+)([-+])([ko])$/ ) {
+	$kstomz = $3 eq 'k';
+	$spec = $1.$2;
+    }
+
+=begin deprecated
+
+    # Deprecated since several years...
+    elseif ( $spec =~ /^(.*)([iv])(.*)$/ ) {
 	$kstomz = $2 eq 'i';
 	$spec = $1.$3;
 	warn("!".__x("BTW specificatie {spec}: Gebruik K of O in plaats van I of V",
 		     spec => $_[0])."\n");
     }
 
+=cut
+
     # Examine rest. Numeric -> BTW id.
-    if ( $spec =~ /^(\d+)$/ ) {
+    if ( $spec =~ /^(\d+)([-+])?$/ ) {
 	$btw_id = $1;
+	if ( defined $2 ) {
+	    my $excl = $2 eq '-';
+	    my $res = $dbh->do("SELECT btw_perc, btw_tariefgroep FROM BTWTabel".
+			       " WHERE btw_id = ?",
+			       $btw_id);
+	    return unless $res;
+	    $res = $dbh->do("SELECT btw_id FROM BTWTabel".
+			    " WHERE btw_perc = ? AND btw_tariefgroep = ?".
+			    "  AND ".($excl?"NOT ":"")."btw_incl",
+			    $res->[0], $res->[1]);
+	    return unless $res;
+	    $btw_id = $res->[0];
+	}
     }
     # H L H- L- H+ L+
     elsif ( $spec =~ /^([hl])([-+])?$/ ) {
 	$btw_id = $1;
 	my $excl;
 	$excl = $2 eq '-' if defined $2;
-	$btw_id = $dbh->do("SELECT btw_id FROM BTWTabel".
+	my $res = $dbh->da("SELECT btw_id, btw_alias, btw_desc FROM BTWTabel".
 			   " WHERE btw_tariefgroep = ?".
-			   " AND ".($excl?"NOT ":"")."btw_incl",
-			   $btw_id eq "h" ? BTWTARIEF_HOOG : BTWTARIEF_LAAG)->[0];
+			   " AND ".($excl?"NOT ":"")."btw_incl".
+			   " ORDER BY btw_id ASC",
+			   $btw_id eq "h" ? BTWTARIEF_HOOG : BTWTARIEF_LAAG);
+	warn("!".__x("BTW aanduiding \"{spec}\" kent meerdere tariefcodes: {list} (code {code} \"{desc}\" is gebruikt)",
+		     spec => $spec,
+		     list => join(" ", map { defined($_->[1]) ? $_->[1] : $_->[0] } @$res),
+		     code => $res->[0]->[0],
+		     desc => $res->[0]->[2],
+		    )."\n") if @$res != 1;
+	$btw_id = $res->[0]->[0];
+    }
+    # alias
+    elsif ( $spec =~ /^(\w\w+)([-+])?$/ ) {
+	# warn("SPEC: $spec\n"); $dbh->trace(1);
+	my $res = $dbh->do("SELECT btw_id, btw_perc, btw_tariefgroep FROM BTWTabel".
+			   " WHERE btw_alias = ?",
+			   lc $1);
+	# $dbh->trace(0);
+	return unless $res;
+
+	$btw_id = $res->[0];
+	if ( defined $2 ) {
+	    my $excl = $2 eq '-';
+	    # $dbh->trace(1);
+	    $res = $dbh->do("SELECT btw_id FROM BTWTabel".
+			    " WHERE btw_perc = ? AND btw_tariefgroep = ?".
+			    "  AND ".($excl?"NOT ":"")."btw_incl",
+			    $res->[1], $res->[2]);
+	    # $dbh->trace(0);
+	    return unless $res;
+	    $btw_id = $res->[0];
+	}
+	# warn("SPEC: $spec => $btw_id\n");
     }
     # + -
     elsif ( $spec =~ /^([-+])$/ && $btw_id ) {
-	$btw_id = $dbh->do("SELECT btw_id FROM BTWTabel".
+	my $res = $dbh->da("SELECT btw_id, btw_desc FROM BTWTabel".
 			   " WHERE btw_tariefgroep =".
 			   " ( SELECT btw_tariefgroep FROM BTWTabel".
 			   " WHERE btw_id = ? )".
 			   " AND ".($1 eq '-'?"NOT ":"")."btw_incl",
-			   $btw_id)->[0];
+			   $btw_id);
+	warn("!".__x("BTW aanduiding \"{spec}\" kent meerdere tariefcodes: {list} (code {code} \"{desc}\" is gebruikt)",
+		     spec => $spec,
+		     list => join(" ", map { $_->[0] } @$res),
+		     code => $res->[0]->[0],
+		     desc => $res->[0]->[1],
+		    )."\n") if @$res != 1;
+	$btw_id = $res->[0]->[0];
     }
     elsif ( $spec ne '' ) {
 	return;
@@ -229,11 +289,11 @@ sub journalise {
 
     # date  bsk_id  bsr_seq(0)   dbk_id  (acc_id) amount debcrd desc(bsk) (rel)
     # date (bsk_id) bsr_seq(>0) (dbk_id)  acc_id  amount debcrd desc(bsr) rel(acc=1200/1600)
-    my ($jnl_date, $jnl_bsk_id, $jnl_bsr_seq, $jnl_dbk_id, $jnl_acc_id,
+    my ($jnl_date, $jnl_bsk_id, $jnl_dbk_id, $jnl_acc_id,
 	$jnl_amount, $jnl_desc, $jnl_rel);
 
     my $rr = $::dbh->do("SELECT bsk_nr, bsk_desc, bsk_dbk_id, bsk_date, bsk_ref".
-		      " FROM boekstukken".
+		      " FROM Boekstukken".
 		      " WHERE bsk_id = ?", $bsk_id);
     my ($bsk_nr, $bsk_desc, $bsk_dbk_id, $bsk_date, $bsk_ref) = @$rr;
 
@@ -275,14 +335,14 @@ sub journalise {
 	$tot += $bsr_amount;
 	$dtot += $bsr_amount if $bsr_amount < 0;
 	$ctot += $bsr_amount if $bsr_amount > 0;
-
-	push(@$ret, [$bsk_date, $bsk_dbk_id, $bsk_id, $bsr_date, $nr++,
-		     $bsr_acc_id,
+	my $btwtag = _T("BTW ");
+	push(@$ret, [$bsk_date, $bsk_dbk_id, $bsk_id, $bsr_date, $bsr_nr, $nr++,
+		     0, $bsr_acc_id,
 		     $bsr_amount - $btw, undef, $bsr_desc,
 		     $bsr_type ? ($bsr_rel_code, $bsr_rel_dbk) : (undef, undef), undef]);
-	push(@$ret, [$bsk_date,  $bsk_dbk_id, $bsk_id, $bsr_date, $nr++,
-		     $bsr_btw_acc,
-		     $btw, undef, "BTW ".$bsr_desc,
+	push(@$ret, [$bsk_date,  $bsk_dbk_id, $bsk_id, $bsr_date, $bsr_nr, $nr++,
+		     1, $bsr_btw_acc,
+		     $btw, undef, $btwtag.$bsr_desc,
 		     undef, undef, undef]) if $btw;
     }
 
@@ -300,11 +360,9 @@ sub journalise {
 		#warn("=> [$k] $v->{btw} <-> $t\n");
 		# Corrigeer het totaal, en maak een correctieboekstukregel.
 		$tot -= $v->{btw} - $t;
-		push(@$ret, [$bsk_date,  $bsk_dbk_id, $bsk_id, $bsk_date, $nr++,
-			     $k,
-			     $t - $v->{btw},
-			     undef,
-			     "BTW Afr. ".$bsk_desc,
+		push(@$ret, [$bsk_date,  $bsk_dbk_id, $bsk_id, $bsk_date, undef, $nr++,
+			     1, $k,
+			     $t - $v->{btw}, undef, _T("BTW Afr. ").$bsk_desc,
 			     undef, undef, undef]);
 		warn("!".__x("BTW rek. nr. {acct}, correctie van {amt} uitgevoerd",
 			     acct => $k, amt => numfmt($t-$v->{btw}))."\n");
@@ -314,16 +372,18 @@ sub journalise {
 
     if ( $dbk_acc_id ) {
 	if ( $dbkdcsplit ) {
-	    push(@$ret, [$bsk_date,  $bsk_dbk_id, $bsk_id, $bsk_date, $nr++, $dbk_acc_id,
+	    push(@$ret, [$bsk_date,  $bsk_dbk_id, $bsk_id, $bsk_date, undef, $nr++,
+			 0, $dbk_acc_id,
 			 -$tot, -$dtot, $bsk_desc, undef, undef, undef]);
 	}
 	else {
-	    push(@$ret, [$bsk_date,  $bsk_dbk_id, $bsk_id, $bsk_date, $nr++, $dbk_acc_id,
+	    push(@$ret, [$bsk_date,  $bsk_dbk_id, $bsk_id, $bsk_date, undef, $nr++,
+			 0, $dbk_acc_id,
 			 -$tot, undef, $bsk_desc, undef, undef, undef]);
 	}
     }
 
-    unshift(@$ret, [$bsk_date, $bsk_dbk_id, $bsk_id, $bsk_date, 0, undef,
+    unshift(@$ret, [$bsk_date, $bsk_dbk_id, $bsk_id, $bsk_date, undef, 0, 0, undef,
 		    undef, undef, $bsk_desc, $g_bsr_rel_code, undef, $bsk_ref]);
 
     $ret;

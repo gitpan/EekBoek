@@ -18,10 +18,11 @@ use EB;
 use EB::Tools::MiniAdm;
 use File::Basename;
 use Encode;
+use File::Glob qw(:glob);
 
 my @adm_dirs;
 my @adm_names;
-my $runeb;
+my $default = _T("--standaard--");
 
 sub getadm {			# STATIC
     my ( $pkg, $opts ) = @_;
@@ -60,7 +61,10 @@ sub getadm {			# STATIC
 			  @adm_dirs > 1 ? "..".scalar(@adm_dirs) : "",
 			  _T(", of N om een nieuwe administratie aan te maken>"),
 			  ": " );
-	    chomp( my $ans = <STDIN> );
+	    my $ans = <STDIN>;
+	    $ans = '', print STDERR "\n" unless defined $ans;
+	    return unless $ans;
+	    chomp($ans);
 	    return -1 if lc($ans) eq 'n';
 	    next unless $ans =~ /^\d+$/;
 	    next unless $ans && $ans <= @adm_dirs;
@@ -76,32 +80,41 @@ sub getadm {			# STATIC
 sub run {
     my ( $self, $opts ) = @_;
     my $admdir = $opts->{admdir} || $cfg->val(qw(general admdir), $cfg->user_dir("admdir"));
-    $runeb = 1;
     $admdir =~ s/\$([A-Z_]+)/$ENV{$1}/ge;
-    if ( $admdir ) {
-	mkdir($admdir) unless -d $admdir;
-	die("No admdir $admdir: $!") unless -d $admdir;
-    }
+    mkdir($admdir) unless -d $admdir;
+    die("No admdir $admdir: $!") unless -d $admdir;
     $opts->{admdir} = $admdir;
-    $runeb = 0;
 
-    my $ret = EB::IniWiz->getadm($opts) if $admdir;
+    my $ret = EB::IniWiz->getadm($opts);
 
-    $ret = EB::IniWiz->runwizard($opts) if $ret < 0;
-
-    $opts->{runeb} = $ret >= 0;
-
+    if ( defined $ret ) {
+	$ret = EB::IniWiz->runwizard($opts) if $ret < 0;
+	$opts->{runeb} = $ret >= 0;
+    }
 }
 
 sub find_db_drivers {
     my %drivers;
+
+    if ( $Cava::Packager::PACKAGED ) {
+	# Trust packager.
+	unless ( $Cava::Packager::PACKAGED ) {
+	    # Ignored, but force packaging.
+	    require EB::DB::Postgres;
+	    require EB::DB::Sqlite;
+	}
+	return
+	  { sqlite   => "SQLite",
+	    postgres => "PostgreSQL",
+	  };
+    }
 
     foreach my $lib ( @INC ) {
 	next unless -d "$lib/EB/DB";
 	foreach my $drv ( glob("$lib/EB/DB/*.pm") ) {
 	    open( my $fd, "<", $drv ) or next;
 	    while ( <$fd> ) {
-		if ( /sub\s+type\s*{\s*"([^"]+)"\s*;?\s*}/ ) {
+		if ( /sub\s+type\s*{\s*\"([^\"]+)\"\s*;?\s*}/ ) {
 		    my $s = $1;
 		    my $t = substr($drv,length("$lib/EB/DB/"));
 		    $t =~ s/\.pm$//;
@@ -131,24 +144,30 @@ sub runwizard {
 
     my $year = 1900 + (localtime(time))[5];
 
-    my @ebz = glob( libfile("schema/*.ebz") );
-    my @ebz_desc = ( "Lege administratie" );
+    my $dir = dirname( findlib( "templates.txt", "templates" ) );
+    my @ebz = map { [ $_, "" ] } glob( "$dir/*.ebz" );
+    my @ebz_desc = ( _T("Lege administratie") );
 
     my $i = 0;
+    my $dp = quotemeta( _T("Omschrijving").": " );
     foreach my $ebz ( @ebz ) {
 	require Archive::Zip;
 	my $zip = Archive::Zip->new();
-	next unless $zip->read($ebz) == 0;
+	next unless $zip->read($ebz->[0]) == 0;
 	my $desc = $zip->zipfileComment;
-	if ( $desc =~ /omschrijving:\s+(.*)/i ) {
+	if ( $desc =~ /flags:\s*(.*)/i ) {
+	    $ebz->[1] = $1;
+	}
+	if ( $desc =~ /^$dp\s*(.*)$/m ) {
 	    $desc = $1;
 	}
 	elsif ( $desc =~ /export van (.*) aangemaakt door eekboek/i ) {
-	    $desc = $1;
+	    $desc = _T($1);
 	}
 	else {
-	    $desc = $1 if $ebz =~ m/([^\\\/]+)\.ebz$/i;
+	    $desc = $1 if $ebz->[0] =~ m/([^\\\/]+)\.ebz$/i;
 	}
+	$desc =~ s/[\n\r]+$//; # can't happen? think again...
 	push( @ebz_desc, $desc);
 	$i++;
     }
@@ -160,33 +179,44 @@ sub runwizard {
     foreach ( sort keys %$drivers ) {
 	push( @db_drivers, $_ );
     }
+    my $db_default = findchoice( "sqlite", \@db_drivers );
 
-    my @btw = qw( qw(Maand Kwartaal Jaar) );
+    my @btw = ( _T("Maand"), _T("Kwartaal"), _T("Jaar") );
+    my @noyes = ( _T("Nee"), _T("Ja") );
 
     my $answers = {
-		   admname    => "Mijn eerste EekBoek",
+		   admname    => _T("Mijn eerste EekBoek"),
 		   begindate  => $year,
 		   admbtw     => 1,
-		   btwperiod  => findchoice( "kwartaal", \@btw ),
-		   template   => findchoice( "eekboek voorbeeldadministratie", \@ebz_desc ),
-		   dbdriver   => findchoice( "sqlite", \@db_drivers ),
+		   btwperiod  => findchoice( _T("Kwartaal"), \@btw ),
+		   template   => findchoice( _T("EekBoek Voorbeeldadministratie"), \@ebz_desc ),
+		   dbdriver   => $db_default,
 		   dbcreate   => 1,
 		  };
+
+    $answers->{dbhost}     = $ENV{EB_DB_HOST} || $default;
+    $answers->{dbport}     = $ENV{EB_DB_PORT} || $default;
+    $answers->{dbuser}     = $ENV{EB_DB_USER} || $default;
+    $answers->{dbpassword} = $ENV{EB_DB_PASSWORD} || "";
+
+    $answers->{dbcr_config}   = 1;
+    $answers->{dbcr_admin}    = 1;
+    $answers->{dbcr_database} = 1;
 
     my $queries;
     $queries    = [
 		   { code => "admname",
-		     text => <<EOD,
+		     text => _T(<<EOD),
 Geef een unieke naam voor de nieuwe administratie. Deze wordt gebruikt
 voor rapporten en dergelijke.
 EOD
 		     type => "string",
-		     prompt => "Naam",
+		     prompt => _T("Naam"),
 		     post => sub {
 			 my $c = shift;
 			 foreach ( @adm_names ) {
 			     next unless lc($_) eq lc($c);
-			     warn("Er bestaat al een administratie met deze naam.\n");
+			     warn(_T("Er bestaat al een administratie met deze naam.")."\n");
 			     return;
 			 }
 			 $c = lc($c);
@@ -197,11 +227,11 @@ EOD
 		     },
 		   },
 		   { code => "begindate",
-		     text => <<EOD,
-Geef het boekjaar voor deze administatie. De administatie
+		     text => _T(<<EOD),
+Geef het boekjaar voor deze administratie. De administratie
 begint op 1 januari van het opgegeven jaar.
 EOD
-		     prompt => "Begindatum",
+		     prompt => _T("Begindatum"),
 		     type => "int",
 		     range => [ $year-20, $year+10 ],
 		     post => sub {
@@ -212,13 +242,13 @@ EOD
 		     },
 		   },
 		   { code => "admcode",
-		     text => <<EOD,
+		     text => _T(<<EOD),
 Geef een unieke code voor de administratie. Deze wordt gebruikt als
 interne naam voor de database en administratiefolders.
 De standaardwaarde is afgeleid van de administratienaam en de begindatum.
 EOD
 		     type => "string",
-		     prompt => "Code",
+		     prompt => _T("Code"),
 		     pre => sub {
 			 return if $answers->{admcode};
 			 my $c = $answers->{admname};
@@ -232,29 +262,41 @@ EOD
 			 my $c = shift;
 			 foreach ( @adm_dirs ) {
 			     next unless lc($_) eq lc($c);
-			     warn("Er bestaat al een administratie met code \"$c\".\n");
+			     warn(__x("Er bestaat al een administratie met code \"{code}\"", code => $c)."\n");
 			     return;
 			 }
 			 return 1;
 		     },
 		   },
 		   { code => "template",
-		     text => <<EOD,
+		     text => _T(<<EOD),
 U kunt een van de meegeleverde sjablonen gebruiken voor uw
 administratie.
 EOD
 		     type => "choice",
-		     prompt => "Sjabloon",
+		     prompt => _T("Sjabloon"),
 		     choices => \@ebz_desc,
 		     post => sub {
 			 my $c = shift;
-			 $queries->[4]->{skip} = $c != 0;
-			 $queries->[5]->{skip} = $c != 0;
+			 if ( $c == 0 ) {
+			     $queries->[4]->{skip} = 0;
+			     $queries->[5]->{skip} = 0;
+			 }
+			 elsif ( $ebz[$c]->[1] =~ /\B-btw\b/i ) {
+			     $answers->{admbtw} = 0;
+			     $queries->[4]->{skip} = 1;
+			     $queries->[5]->{skip} = 1;
+			 }
+			 else {
+			     $answers->{admbtw} = 1;
+			     $queries->[4]->{skip} = 1;
+			     $queries->[5]->{skip} = 0;
+			 }
 			 return 1;
 		     },
 		   },
 		   { code => "admbtw",
-		     prompt => "Moet BTW worden toegepast in deze administratie",
+		     prompt => _T("Moet BTW worden toegepast in deze administratie"),
 		     type => "bool",
 		     post => sub {
 			 my $c = shift;
@@ -263,24 +305,60 @@ EOD
 		     },
 		   },
 		   { code => "btwperiod",
-		     prompt => "Aangifteperiode voor de BTW",
+		     prompt => _T("Aangifteperiode voor de BTW"),
 		     type => "choice",
 		     choices => \@btw,
 		   },
 		   { code => "dbdriver",
-		     text => <<EOD,
+		     text => _T(<<EOD),
 Kies het type database dat u wilt gebruiken voor deze
 administratie.
 EOD
 		     type => "choice",
-		     prompt => "Database",
+		     prompt => _T("Database"),
 		     choices => \@db_drivers,
+		     post => sub {
+			 my $c = shift;
+			 $queries->[$_]->{skip} = $c == $db_default
+			   for ( 7 .. 10 );
+			 return 1;
+		     }
+		   },
+		   { code => "dbhost",
+		     prompt => _T("Database server host, indien niet lokaal"),
+		     type => "string",
+		     skip => 1,
+		   },
+		   { code => "dbport",
+		     prompt => _T("Database server netwerk poort, indien niet standaard"),
+		     type => "int",
+		     skip => 1,
+		   },
+		   { code => "dbuser",
+		     prompt => _T("Usernaam voor de database"),
+		     type => "string",
+		     skip => 1,
+		   },
+		   { code => "dbpassword",
+		     prompt => _T("Password voor de database user"),
+		     type => "string",
+		     skip => 1,
+		   },
+		   { code => "dbcr_config",
+		     prompt => _T("Moet het configuratiebestand worden aangemaakt"),
+		     type => "bool",
+		   },
+		   { code => "dbcr_admin",
+		     prompt => _T("Moeten de administratiebestanden worden aangemaakt"),
+		     type => "bool",
+		   },
+		   { code => "dbcr_database",
+		     prompt => _T("Moet de database worden aangemaakt"),
+		     type => "bool",
 		   },
 		   { code => "dbcreate",
-		     text => <<EOD,
-Gereed om de administratieve bestanden en de database aan te maken.
-EOD
-		     prompt => "Doorgaan",
+		     text => _T("Gereed om de bestanden aan te maken."),
+		     prompt => _T("Doorgaan"),
 		     type => "bool",
 		   },
 		  ];
@@ -316,7 +394,7 @@ EOD
 			   $q->{type} eq 'choice'
 			   ? $answers->{$code}+1
 			   : $q->{type} eq 'bool'
-			     ? qw(Nee Ja)[$answers->{$code}]
+			     ? $noyes[$answers->{$code}]
 			     : $answers->{$code},
 			   "]" )
 	      if defined $answers->{$code};
@@ -345,8 +423,12 @@ EOD
 		elsif ( $a =~ /^(ja?|ne?e?)$/i ) {
 		    $a = $a =~ /^j/i ? 1 : 0;
 		}
+		#### FIXME
+		elsif ( $a =~ /^(ye?s?|no?)$/i ) {
+		    $a = $a =~ /^y/i ? 1 : 0;
+		}
 		else {
-		    warn("Antwoordt 'ja' of 'nee' a.u.b.");
+		    warn( _T("Antwoordt 'ja' of 'nee' a.u.b.") );
 		    redo QQ;
 		}
 	    }
@@ -361,16 +443,21 @@ EOD
 			$q->{range}
 			&& ( $a < $q->{range}->[0]
 			     || $a > $q->{range}->[1] ) ) {
-		    warn("Ongeldig antwoord, het moet een getal",
-			 $q->{range} ? " tussen $q->{range}->[0] en $q->{range}->[1]" : "",
-			 " zijn\n");
+		    if ( $q->{range} ) {
+			warn(__x("Ongeldig antwoord, het moet een getal tussen {first} en {last} zijn",
+				 first => $q->{range}->[0],
+				 last => $q->{range}->[1]) . "\n");
+		    }
+		    else {
+			warn(_T("Ongeldig antwoord, het moet een getal zijn")."\n");
+		    }
 		    redo QQ;
 		}
 		$a-- if $q->{type} eq 'choice';
 	    }
 
 	    else {
-		die("Unhandled request type: ", $q->{type}, "\n");
+		die("PROGRAM ERROR: Unhandled request type: ", $q->{type}, "\n");
 	    }
 
 	    if ( $q->{post} ) {
@@ -384,23 +471,39 @@ EOD
     return -1 unless $answers->{dbcreate};
 
     my %opts;
+
+    $opts{lang} = $ENV{EB_LANG} || $ENV{LANG};
+    $opts{lang} =~ s/\..*//;	# strip .utf8
+
     $opts{adm_naam} = $answers->{admname};
     $opts{adm_code} = $answers->{admcode};
     $opts{adm_begindatum} = $answers->{begindate};
 
     $opts{db_naam} = $answers->{admcode};
     $opts{db_driver} = $db_drivers[$answers->{dbdriver}];
+    unless ( $answers->{dbdriver} == $db_default ) {
+	$opts{db_host} = $answers->{dbhost}
+	  if $answers->{dbhost} && $answers->{dbhost} ne $default;
+	$opts{db_port} = $answers->{dbport}
+	  if $answers->{dbport} && $answers->{dbport} ne $default;
+	$opts{db_user} = $answers->{dbuser}
+	  if $answers->{dbuser} && $answers->{dbuser} ne $default;
+	$opts{db_password} = $answers->{dbpassword}
+	  if $answers->{dbpassword} && $answers->{dbpassword} ne "";
+    }
     $opts{"has_$_"} = 1
 	foreach qw(debiteuren crediteuren kas bank);
     $opts{has_btw} = $answers->{admbtw};
 
-    $opts{"create_$_"} = 1
-	foreach qw(config schema relaties opening mutaties database);
+    $opts{"create_$_"} = $answers->{dbcr_admin}
+	foreach qw(schema relaties opening mutaties);
+    $opts{"create_$_"} = $answers->{"dbcr_$_"}
+	foreach qw(config database);
 
     $opts{adm_btwperiode} = @btw[ $answers->{btwperiod} ]
 	if $opts{has_btw};
 
-    $opts{template} = @ebz[ $answers->{template} ];
+    $opts{template} = $ebz[ $answers->{template} ]->[0];
 
     if ( $opts{adm_code} ) {
 	mkdir($opts{adm_code}) unless -d $opts{adm_code};
@@ -411,32 +514,37 @@ EOD
 
 # warn Dumper \%opts;
 
-    foreach my $c ( qw(config schema relaties opening mutaties database) ) {
-	if ( $c eq "database" ) {
-	    my $ret;
-	    if ( 0 ) {
-		my @cmd = ( $^X, "-S", "ebshell", "--init" );
-		$ret = system(@cmd);
-	    }
-	    else {
-		undef $cfg;
-		EB::Config->init_config( { app => $EekBoek::PACKAGE, %opts } );
-		require EB::Main;
-		local @ARGV = qw( --init );
-		$ret = EB::Main->run;
-	    }
+    my @req = qw(config schema relaties opening mutaties database);
+    my $req = @req;
 
+    foreach my $c ( @req ) {
+	if ( $c eq "database" ) {
+	    next unless $opts{create_database};
+	    $req--;
+	    my $ret;
+	    undef $cfg;
+	    EB->app_init( { app => $EekBoek::PACKAGE, %opts } );
+	    require EB::Main;
+	    local @ARGV = qw( --init );
+	    $ret = EB::Main->run;
 	    die(_T("Er is een probleem opgetreden. Raadplaag uw systeembeheerder.")."\n")
 	      if $ret;
 
 	}
 	else {
+	    $req--;
 	    my $m = "generate_". $c;
 	    EB::Tools::MiniAdm->$m(\%opts);
 	}
     }
 
-    print STDERR ("\n", _T("De administratie is aangemaakt."),
+    if ( $req ) {
+	print STDERR ("\n", _T("De gewenste bestanden zijn aangemaakt."),
+		      "\n\n");
+	return -1;
+    }
+
+    print STDERR ("\n", _T("De gewenste bestanden zijn aangemaakt."),
 		  " ", _T("U kunt meteen aan de slag.")."\n\n");
 
     return 0;

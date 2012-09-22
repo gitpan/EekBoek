@@ -1,12 +1,11 @@
 #! perl
 
 # Sqlite.pm -- EekBoek driver for SQLite database
-# RCS Info        : $Id: Sqlite.pm,v 1.12 2009/12/20 21:41:14 jv Exp $
 # Author          : Johan Vromans
 # Created On      : Sat Oct  7 10:10:36 2006
 # Last Modified By: Johan Vromans
-# Last Modified On: Sun Dec 20 19:32:13 2009
-# Update Count    : 159
+# Last Modified On: Mon Mar  7 23:09:44 2011
+# Update Count    : 163
 # Status          : Unknown, Use with caution!
 
 package main;
@@ -17,8 +16,6 @@ package EB::DB::Sqlite;
 
 use strict;
 use warnings;
-
-our $VERSION = sprintf "%d.%03d", q$Revision: 1.12 $ =~ /(\d+)/g;
 
 use EB;
 use DBI;
@@ -157,6 +154,11 @@ sub setup {
     }
 
     # Clone Accounts table into TAccounts.
+    # This table has the purpose of copying the data from Accounts, so that
+    # data from already completed financial years can be corrected when
+    # creating overviews, such as Balance statements and Result accounts.
+    # This way no backdated calculations need to be made when transitions
+    # to previous financial years are involved.
     unless ( $dbh->selectrow_arrayref("SELECT name".
 				      " FROM sqlite_master".
 				      " WHERE name like 'taccounts'".

@@ -2,12 +2,11 @@
 
 use utf8;
 
-# RCS Id          : $Id: Main.pm,v 1.8 2010/03/22 13:07:20 jv Exp $
 # Author          : Johan Vromans
 # Created On      : Sun Jul 31 23:35:10 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Mon Mar 22 14:00:08 2010
-# Update Count    : 415
+# Last Modified On: Sat Aug  4 21:33:04 2012
+# Update Count    : 438
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -25,23 +24,25 @@ use warnings;
 
 use EekBoek;
 use EB;
-use EB::Config ();
 use Getopt::Long 2.13;
 
 ################ The Process ################
-
-use Wx 0.74 qw[:everything];
-use Wx::Locale;
-#use File::Basename ();
 
 my $app_dir;
 
 use base qw(Wx::App);
 
+use Wx qw[
+	  wxBITMAP_TYPE_ANY
+	  wxCONFIG_USE_LOCAL_FILE
+	  wxDefaultPosition
+	  wxDefaultSize
+	  wxICON_ERROR
+	  wxOK
+       ];
+
 sub OnInit {
     my( $self ) = shift;
-
-
     return 1;
 }
 
@@ -54,6 +55,9 @@ sub run {
 
     binmode(STDOUT, ":encoding(utf8)");
     binmode(STDERR, ":encoding(utf8)");
+
+    # Preliminary initialize config.
+    EB->app_init( { app => $EekBoek::PACKAGE } );
 
     # Command line options.
     $opts =
@@ -80,7 +84,7 @@ sub run {
     $opts->{trace} |= ($opts->{debug} || $opts->{test});
 
     # Initialize config.
-    EB::Config->init_config( { app => $EekBoek::PACKAGE, %$opts } );
+    EB->app_init( { app => $EekBoek::PACKAGE, %$opts } );
 
     if ( $opts->{printconfig} ) {
 	$cfg->printconf( \@ARGV );
@@ -93,9 +97,9 @@ sub run {
     Wx::InitAllImageHandlers();
 
     #### WHAT THE ***** IS GOING ON HERE????
-    *Fcntl::O_NOINHERIT = sub() { 0 };
-    *Fcntl::O_EXLOCK = sub() { 0 };
-    *Fcntl::O_TEMPORARY = sub() { 0 };
+    #*Fcntl::O_NOINHERIT = sub() { 0 };
+    #*Fcntl::O_EXLOCK = sub() { 0 };
+    #*Fcntl::O_TEMPORARY = sub() { 0 };
 
     if ( ( defined($opts->{wizard}) ? $opts->{wizard} : 1 )
 	 && !$opts->{config}
@@ -103,22 +107,17 @@ sub run {
 	require EB::Wx::IniWiz;
 	EB::Wx::IniWiz->run($opts); # sets $opts->{runeb}
 	return unless $opts->{runeb};
-	undef $cfg;
-	EB::Config->init_config( { app => $EekBoek::PACKAGE, %$opts } );
+	EB->app_init( { app => $EekBoek::PACKAGE, %$opts } );
     }
 
     my $app = EB::Wx::Shell::Main->new();
     $app->SetAppName($EekBoek::PACKAGE);
     $app->SetVendorName("Squirrel Consultancy");
 
-    my $locale;
-
     if ( $^O =~ /^mswin/i ) {
-	$locale = Wx::Locale->new( wxLANGUAGE_DUTCH );
 	Wx::ConfigBase::Get->SetPath("/ebwxshell");
     }
     else {
-	$locale = Wx::Locale->new( Wx::Locale::GetSystemLanguage );
 	Wx::ConfigBase::Set
 	    (Wx::FileConfig->new
 	     ( $app->GetAppName() ,
@@ -129,11 +128,6 @@ sub run {
 	     ));
     }
 
-
-    if ( my $prefix = findlib("mo") ) {
-	$locale->AddCatalogLookupPathPrefix($prefix);
-    }
-    $locale->AddCatalog("ebwxshell");
     my $histfile = $cfg->user_dir("history");
 
     require EB::Wx::Shell::MainFrame;
@@ -181,12 +175,20 @@ use warnings 'redefine';
 
 sub app_options {
     my ( $opts ) = @_;
-    my $help = 0;		# handled locally
-    my $ident = 0;		# handled locally
+
+    # Filter psn arguments (Mac OSX).
+    @ARGV = grep { ! /psn_\d_\d+/ } @ARGV;
 
     # Process options, if any.
     # Make sure defaults are set before returning!
     return unless @ARGV > 0;
+
+    # Store valid & trap invalid option warnings
+    my @optionerrors;
+    local $SIG{__WARN__} = sub {
+	my $warning = shift;
+	push(@optionerrors, $warning);
+    };
 
     Getopt::Long::Configure(qw(no_ignore_case));
 
@@ -198,31 +200,40 @@ sub app_options {
 		      'open=s',
 		      'wizard!',
 		      'printconfig|P',
-		      'ident'	=> \$ident,
+		      'ident',
 		      'verbose',
 		      'trace!',
 		      'help|?',
 		      'debug',
-		    ) or $help )
+		    ) or $opts->{help} )
     {
-	app_usage(2);
+	app_usage();
     }
-    app_usage(2) if @ARGV && !$opts->{printconfig};
-    app_ident() if $ident;
+    app_usage() if @ARGV && !$opts->{printconfig};
+    app_ident() if $opts->{ident};
+    return unless @optionerrors;
+    my $d = Wx::MessageDialog->new ( undef,
+				     join("\n", @optionerrors),
+				     "Opstartregelfouten",
+				     wxICON_ERROR|wxOK,
+				     wxDefaultPosition );
+    $d->ShowModal;
+    $d->Destroy;
+    CORE::exit(2);
 }
 
 sub app_ident {
     return;
-    print STDERR (__x("This is {pkg} [{name} {version}]",
-		      pkg     => $EekBoek::PACKAGE,
-		      name    => "WxShell",
-		      version => $EekBoek::VERSION) . "\n");
+    warn(__x("Dit is {pkg} [{name} {version}]",
+	     pkg     => $EekBoek::PACKAGE,
+	     name    => "WxShell",
+	     version => $EekBoek::VERSION) . "\n");
 }
 
 sub app_usage {
     my ($exit) = @_;
     app_ident();
-    warn <<EndOfUsage;
+    warn _T(<<EndOfUsage);
 Gebruik: {prog} [options] [file ...]
 
     --config=XXX -f     specificeer configuratiebestand

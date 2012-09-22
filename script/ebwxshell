@@ -1,6 +1,12 @@
 #! perl
 
-# $Id: ebwxshell,v 1.4 2010/05/06 10:01:46 jv Exp $
+# ebwxshell -- Main script for EekBoek GUI shell
+# Author          : Johan Vromans
+# Created On      : Fri Dec 18 21:54:24 2009
+# Last Modified By: Johan Vromans
+# Last Modified On: Sat Aug  4 21:29:18 2012
+# Update Count    : 113
+# Status          : Unknown, Use with caution!
 
 use strict;
 use utf8;
@@ -13,24 +19,31 @@ use warnings;
 use File::Spec;
 use File::Basename;
 
-use Wx qw( :everything  );;
+use Wx qw[
+	  wxDefaultPosition
+	  wxICON_ERROR
+	  wxICON_EXCLAMATION
+	  wxICON_INFORMATION
+	  wxOK
+       ];
 # If we get here, we have Wx :)
 
+use FindBin;
+our $bin = $FindBin::Bin;
+
 # Common case when run from unpacked dist.
-my $script = $0;
-my $dir = dirname($script);
-my $lib = File::Spec->catfile( dirname($dir), "lib" );
+my $lib = File::Spec->catfile( dirname($bin), "lib" );
 if ( -s File::Spec->catfile( $lib, "EekBoek.pm" ) ) {
     # Need abs paths since we're going to chdir later.
     unshift( @INC, File::Spec->rel2abs($lib) );
     my $sep = $ENV{PATH} =~ m?;??q:;::q;:;;;; # just for fun
-    $ENV{PATH} = File::Spec->rel2abs($dir) . $sep . $ENV{PATH};
+    $ENV{PATH} = File::Spec->rel2abs($lib) . $sep . $ENV{PATH};
 }
 
-check_install( "EekBoek", "EekBoek.pm", "EB.pm", "EB/schema/eekboek.sql" );
+check_install( "EekBoek", "EekBoek.pm", "EB.pm", "EB/res/schema/eekboek.sql" );
 
 require EekBoek;
-check_version( "EekBoek", $EekBoek::VERSION, "2.00.04" );
+check_version( "EekBoek", $EekBoek::VERSION, "2.01.00" );
 
 check_install( "De EekBoek WxShell", "EB/Wx/Shell/Main.pm", "EB/Wx/IniWiz.pm" );
 
@@ -44,6 +57,8 @@ if ( ( $Wx::VERSION =~ /^0[.,]9[56]$/ )
      ( not exists($ENV{PAR_0}) )
      &&
      !$PerlApp::VERSION
+     &&
+     !$Cava::Packager::PACKAGED
    ) {
     no warnings;
     *Wx::load_dll = sub {
@@ -53,7 +68,20 @@ if ( ( $Wx::VERSION =~ /^0[.,]9[56]$/ )
     };
 }
 
+# We currently support wxWidgets 2.8 and 2.9.
 check_version( "wxWidgets", $Wx::wxVERSION, "2.008" );
+
+$ENV{LANG} ||= "";
+unless ( $ENV{LANG} =~ /^nl/i ) {
+    require POSIX;
+    for ( qw( nl_NL nl_NL.utf8 nl_NL.utf-8 nl_NL.UTF8 nl_NL.UTF-8) ) {
+	if ( POSIX::setlocale( POSIX::LC_ALL(), $_ ) ) {
+	    $ENV{LANG} = $_;
+	    warn("WAARSCHUWING: Uw taalinstelling is niet Nederlands en wordt genegeerd.\nEekBoek gebruikt nu $_.\n");
+	    last;
+	}
+    }
+}
 
 require EB::Wx::Shell::Main;
 EB::Wx::Shell::Main->run;
@@ -62,6 +90,8 @@ EB::Wx::Shell::Main->run;
 
 sub findfile {
     my ( $file ) = @_;
+    return if $Cava::Packager::PACKAGED;
+
     foreach ( @INC ) {
 	my $f = File::Spec->catfile( $_, $file );
 	return $f if -s $f;
@@ -70,6 +100,9 @@ sub findfile {
 }
 
 sub check_install {
+    # Trust packager.
+    return 1 if $Cava::Packager::PACKAGED;
+
     my ( $what, @checks ) = @_;
     foreach ( @checks ) {
 	next if findfile( $_ );

@@ -2,12 +2,11 @@
 
 use utf8;
 
-# RCS Info        : $Id: GenBase.pm,v 1.29 2009/10/14 21:14:02 jv Exp $
 # Author          : Johan Vromans
 # Created On      : Sat Oct  8 16:40:43 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Wed Oct 14 23:09:31 2009
-# Update Count    : 160
+# Last Modified On: Mon Jan 16 15:56:26 2012
+# Update Count    : 176
 # Status          : Unknown, Use with caution!
 
 package main;
@@ -20,10 +19,9 @@ package EB::Report::GenBase;
 use strict;
 use EB;
 
-our $VERSION = sprintf "%d.%03d", q$Revision: 1.29 $ =~ /(\d+)/g;
-
 use IO::File;
 use EB::Format;
+use File::Glob qw(:glob);	# glob that allows space (for Windows);
 
 sub new {
     my ($class, $opts) = @_;
@@ -79,7 +77,11 @@ sub backend {
     $pkg .= ".pm";
 
     # Try to load backend. Gives user the opportunity to override.
-    eval { require $pkg } unless $ENV{AUTOMATED_TESTING};
+    eval {
+	local $SIG{__WARN__};
+	local $SIG{__DIE__};
+	require $pkg;
+    } unless $ENV{AUTOMATED_TESTING};
     if ( ! _loaded($class) ) {
 	my $err = $@;
 	if ( $err =~ /^can't locate /i ) {
@@ -96,8 +98,13 @@ sub backend {
 	  or die("?".__x("Fout tijdens aanmaken {file}: {err}",
 			 file => $opts->{output}, err => $!)."\n");
     }
-    else {
+    elsif ( fileno(STDOUT) > 0 ) {
+	# Normal file.
 	$be->{fh} = IO::File->new_from_fd(fileno(STDOUT), "w");
+    }
+    else {
+	# In-memory.
+	$be->{fh} = bless \*STDOUT , 'IO::Handle';
     }
     binmode($be->{fh}, ":encoding(utf8)");
 
@@ -154,7 +161,7 @@ sub backend {
     }
 
     # Sanity.
-    my $opendate = $dbh->do("SELECT min(bky_begin) FROM boekjaren WHERE NOT bky_code = ?",
+    my $opendate = $dbh->do("SELECT min(bky_begin) FROM Boekjaren WHERE NOT bky_code = ?",
 			    BKY_PREVIOUS)->[0];
 
     if ( $be->{per_begin} gt $be->{now} ) {
@@ -197,19 +204,39 @@ sub backend_options {
     foreach my $std ( qw(text html csv) ) {
 	$be{$std} = 1 if _loaded($package . "::" . ucfirst($std));
     }
-    my @opts = qw(output=s page=i);
 
-    # Find files.
-    foreach my $lib ( @INC ) {
-	my @files = glob("$lib/$pkg/*.pm");
-	next unless @files;
-	# warn("=> be_opt: found ", scalar(@files), " files in $lib/$pkg\n");
-	foreach ( @files ) {
-	    next unless m;/([^/]+)\.pm$;;
-	    # Actually, we should check whether the class implements the
-	    # GenBase API, but we can't do that without preloading all
-	    # backends.
-	    $be{lc($1)}++;
+    #### FIXME: options dest is uncontrollable!!!!
+    #### DO NOT TRANSLATE UNTIL FIXED !!!!
+
+    my @opts = ( __xt("cmo:report:output")."=s",
+		 __xt("cmo:report:page")."=i" );
+
+    if ( $Cava::Packager::PACKAGED ) {
+	$be{wxhtml}++;
+	unless ( $be{wxhtml} ) {
+	    # Ignored, but forces the packager to include these modules.
+	    require EB::Report::BTWAangifte::Wxhtml;
+	    require EB::Report::Balres::Wxhtml;
+	    require EB::Report::Debcrd::Wxhtml;
+	    require EB::Report::Grootboek::Wxhtml;
+	    require EB::Report::Journal::Wxhtml;
+	    require EB::Report::Open::Wxhtml;
+	    require EB::Report::Proof::Wxhtml;
+	}
+    }
+    else {
+	# Find files.
+	foreach my $lib ( @INC ) {
+	    my @files = glob("$lib/$pkg/*.pm");
+	    next unless @files;
+	    # warn("=> be_opt: found ", scalar(@files), " files in $lib/$pkg\n");
+	    foreach ( @files ) {
+		next unless m;/([^/]+)\.pm$;;
+		# Actually, we should check whether the class implements the
+		# GenBase API, but we can't do that without preloading all
+		# backends.
+		$be{lc($1)}++;
+	    }
 	}
     }
 
@@ -217,7 +244,9 @@ sub backend_options {
     foreach ( qw(html csv text) ) {
 	push(@opts, $_) if $be{$_};
     }
-    push(@opts, "style=s", "title|titel=s") if $be{html};
+    push(@opts,
+	 __xt("cmo:report:style")."=s",
+	 __xt("cmo:report:title|titel")."=s") if $be{html};
 
     # Explicit --gen-XXX for all backends.
     push(@opts, map { +"gen-$_"} keys %be);

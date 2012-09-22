@@ -1,4 +1,4 @@
-# $Id: 10_basic.t,v 1.9 2009/10/28 22:43:05 jv Exp $  -*-perl-*-
+#! perl
 
 use strict;
 use Test::More tests => 11;
@@ -6,8 +6,10 @@ use Test::More tests => 11;
 # Some basic tests.
 
 BEGIN {
-    use_ok("EB::Config", { app => "Test", nostdconf => 1 } );
+    $ENV{LANG} = "nl_NL";
     use_ok("EB");
+    EB->app_init( { app => "Test", nostdconf => 1 } );
+    ok( $::cfg, "Got config" );
     use_ok("EB::Format");
     use_ok("EB::Booking::IV");
     use_ok("EB::Booking::BKM");
@@ -21,7 +23,7 @@ foreach ( qw(eekboek.sql) ) {
 }
 
 foreach ( qw(schema.dat bvnv.dat) ) {
-    my $t = findlib("examples/$_");
+    my $t = findlib($_, "examples");
     ok(-s $t, $t);
 }
 

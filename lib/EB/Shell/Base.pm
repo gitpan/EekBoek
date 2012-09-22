@@ -1,5 +1,9 @@
 #! perl
 
+package main;
+
+our $cfg;
+
 package EB::Shell::Base;
 
 # ----------------------------------------------------------------------
@@ -54,14 +58,73 @@ sub new {
         HISTFILE    => undef,           # history file
         PROMPT      => "eb> ",          # default prompt
         TERM        => undef,           # Term::ReadLine instance
+	RL_DEBUG    => $cfg->val(qw(readline debug), 0),
     } => $class;
 
+    $self->init_cm($args);
     $self->init_rl($args);
     $self->init_completions($args);
     $self->init_help($args);
     $self->init($args);
 
     return $self;
+}
+
+# ----------------------------------------------------------------------
+# init_km(\%args)
+#
+# Initialize command name maps for translation.
+# ----------------------------------------------------------------------
+sub init_cm {
+    my ($self, $args) = @_;
+
+    # See EB::Utils for __XN, __xt and N__ .
+    my %cm = map { __XN($_) => __xt($_) }
+	# Opening.
+	N__("cmd:adm_balans"),
+	N__("cmd:adm_balanstotaal"),
+	N__("cmd:adm_begindatum"),
+	N__("cmd:adm_boekjaarcode"),
+	N__("cmd:adm_btwperiode"),
+	N__("cmd:adm_naam"),
+	N__("cmd:adm_open"),
+	N__("cmd:adm_relatie"),
+
+	# Globale settings.
+	N__("cmd:boekjaar"),
+
+	# Rapporten.
+	N__("cmd:balans"),
+	N__("cmd:btwaangifte"),
+	N__("cmd:crediteuren"),
+	N__("cmd:debiteuren"),
+	N__("cmd:grootboek"),
+	N__("cmd:journaal"),
+	N__("cmd:openstaand"),
+	N__("cmd:proefensaldibalans"),
+	N__("cmd:result"),
+
+	# Informatie.
+	N__("cmd:dagboeken"),
+	N__("cmd:database"),
+	N__("cmd:periodes"),
+	N__("cmd:rapporten"),
+
+	# Bewerkingen.
+	N__("cmd:export"),
+	N__("cmd:import"),
+	N__("cmd:jaareinde"),
+	N__("cmd:relatie"),
+	N__("cmd:schema"),
+	N__("cmd:toon"),
+	N__("cmd:verwijder"),
+
+	# Diversen.
+	N__("cmd:include"),
+	N__("cmd:sql"),
+	;
+
+    $self->{cm} = \%cm;
 }
 
 # ----------------------------------------------------------------------
@@ -74,30 +137,33 @@ sub init_rl {
     my ($self, $args) = @_;
     my ($term, $attr);
 
+    $ENV{PERL_READLINE_NOWARN} = 1 unless $self->{RL_DEBUG};
     require Term::ReadLine;
-    $self->term($term = Term::ReadLine->new(ref $self));
-
-    if ( -t STDIN && $term->ReadLine ne 'Term::ReadLine::Gnu' ) {
-	warn("%Voor meer gebruiksgemak tijdens het typen kunt u de module Term::ReadLine::Gnu installeren.\n");
-
-	# Some systems do not have Term::ReadLine::Gnu but provide
-	# Term::ReadLine::Perl instead. However, the latter is far too
-	# incapable.
-	if ( $term->ReadLine eq 'Term::ReadLine::Perl' ) {
-	    $self->term($term = Term::ReadLine::Stub->new(ref $self));
-	}
-    }
-
-    binmode( $term->Attribs->{'outstream'}, 'utf8' );
+    warn("\%Trying: ReadLine (", $ENV{PERL_RL}||"default", ")\n") if $self->{RL_DEBUG};
+    $term = Term::ReadLine->new(ref $self);
+    warn("\%Using: ", $term->ReadLine, "\n") if $self->{RL_DEBUG};
+    $self->term($term);
 
     # Setup default tab-completion function.
+    # Note that this will be overridden by EB::Shell->new.
     $attr = $term->Attribs;
     $attr->{completion_function} = sub { $self->complete(@_) };
 
     if (my $histfile = $args->{ HISTFILE }) {
+	# Should use $term->Features->{addhistory} .
         $self->histfile($histfile);
-        $term->ReadHistory($histfile)
-	  if $term->can("ReadHistory");
+	if ( $term->can("ReadHistory") ) {
+	    $term->ReadHistory($histfile);
+	}
+	elsif ( open( my $fd, '<:encoding(utf8)', $histfile ) ) {
+	    $self->{_history} = [];
+	    while ( <$fd> ) {
+		chomp;
+		$term->addhistory($_);
+		push( @{ $self->{_history} }, $_, "\n" );
+	    }
+	    close($fd);
+	}
     }
 
     return $self;
@@ -118,10 +184,22 @@ sub init_help {
     no strict qw(refs);
     $self->helps(
         grep { ++$uniq{$_} == 1 }
-        map { s/^help_//; $_ }
+        map { s/^help_//; $self->{cm}->{$_}||$_ }
         grep /^help_/,
         map({ %{"$_\::"} } @{"$class\::ISA"}),
         keys  %{"$class\::"});
+}
+
+sub _xtr {
+    my ( $self, $t ) = @_;
+    (my $pfx, $t) = ( $1, $2 ) if $t =~ /^(.*):(.*)/;
+    keys( %{$self->{cm}} );			# reset iteration
+    while ( my ($k, $v) = each %{$self->{cm}} ) {
+	next unless $t eq $v;
+	return $1 if $k =~ /^tg_(.*)/;
+	return $k;
+    }
+    undef;
 }
 
 # ----------------------------------------------------------------------
@@ -141,7 +219,7 @@ sub init_completions {
         sort 
         "help",
         grep { ++$uniq{$_} == 1 }
-        map { s/^(do|pp)_//; $_ }
+        map { s/^(do|pp)_//; $self->{cm}->{$_}||$_ }
         grep /^(do|pp)_/,
         map({ %{"$_\::"} } @{"$class\::ISA"}),
         keys  %{"$class\::"});
@@ -216,7 +294,7 @@ sub run {
             return $self->quit($anyfail?1:0);
         }
         else {
-	    my $meth = "pp_$cmd";
+	    my $meth = "pp_".lc($self->_xtr("cmd:$cmd")||$cmd);
 	    if ( $self->can($meth) ) {
 		eval {
 		    ($cmd, @args) = $self->$meth($cmd, @args);
@@ -228,7 +306,8 @@ sub run {
 		    next;
 		}
 	    }
-	    $meth = "do_".lc($cmd);
+	    $meth = "do_".lc($self->_xtr("cmd:".lc($cmd))||$cmd);
+	    $meth =~ s/\s+/_/g;
 	    if ( $self->can($meth) ) {
 		eval {
 		    # Check warnings for ? (errors).
@@ -259,7 +338,7 @@ sub run {
 		}
 	    }
 	    else {
-		warn("?"._T("Onbekende opdracht. \"help\" geeft een lijst van mogelijke opdrachten.")."\n");
+		warn("?".__x("Onbekende opdracht \"{cmd}\".\n\"help\" geeft een lijst van mogelijke opdrachten.", cmd => $cmd)."\n");
 		undef($output);
 		return $self->quit(1) if $self->{errexit};
 	    }
@@ -270,6 +349,12 @@ sub run {
 	    $output =~ s/\n*$//;
 	    chomp $output;
 	    $self->print("$output\n") if $output;
+	}
+
+	# Make sure we're not in a pending transaction.
+	if ( $::dbh->in_transaction ) {
+	    warn("?INTERNAL ERROR: Command failed but did not rollback.\n");
+	    $::dbh->rollback;
 	}
 
         # In case someone modified the prompt, we recollect it before
@@ -287,9 +372,16 @@ sub run {
 # as a separate method within Shell::Base so that subclasses which
 # do not want to use Term::ReadLine don't have to.
 # ----------------------------------------------------------------------
-sub readline {
+sub __orig_readline {
     my ($self, $prompt) = @_;
     return $self->term->readline($prompt);
+}
+
+sub readline {
+    my ($self, $prompt) = @_;
+    my $line = $self->term->readline($prompt);
+    push( @{ $self->{_history} }, $line."\n" ) if $line =~ /\S/;
+    return $line;
 }
 
 # ----------------------------------------------------------------------
@@ -299,11 +391,16 @@ sub readline {
 # stream without having to do silly things like tie STDOUT (although
 # they still can if they want, by overriding this method).
 # ----------------------------------------------------------------------
-sub print {
+sub __orig_print {
     my ($self, @stuff) = @_;
     my $OUT = $self->term->Attribs->{'outstream'};
     $OUT ||= *STDOUT;
     CORE::print $OUT @stuff;
+}
+
+sub print {
+    my ($self, @stuff) = @_;
+    CORE::print STDOUT @stuff;
 }
 
 # ----------------------------------------------------------------------
@@ -317,8 +414,13 @@ sub quit {
 
     if (my $h = $self->histfile) {
         # XXX Can this be better encapsulated?
-        $self->term->WriteHistory($h)
-	  if $self->term->can("WriteHistory");
+	if ( $self->term->can("WriteHistory") ) {
+	    $self->term->WriteHistory($h);
+	}
+	elsif ( open( my $fd, '>:encoding(utf8)', $h ) ) {
+	    print { $fd } @{ $self->{_history} };
+	    close($fd);
+	}
     }
 
     return $status;
@@ -429,8 +531,11 @@ sub help {
     my @ret;
 
     if ($topic) {
-        if (my $sub = $self->can("help_$topic")) {
+        if (my $sub = $self->can("help_".
+				 ($self->_xtr("cmd:".lc($topic))||lc($topic)))) {
             push @ret,  $self->$sub(@_);
+	    push(@ret, _T("Opdrachtnamen zijn hoofdletterongevoelig.") )
+	      unless $topic eq lc($topic);
         }
         else {
             push @ret,
@@ -441,9 +546,11 @@ sub help {
     else {
         my @helps = $self->helps;
         if (@helps) {
-	    my $t = _T("Hulp is beschikbaar voor de volgende onderwerpen");
-            push @ret, $t;
-	    $t = "=" x length($t);
+	    push( @ret,
+		  _T("Hulp is beschikbaar voor de volgende onderwerpen."),
+		  _T("Typ 'help [onderwerp]' voor meer gedetailleerde informatie."),
+		  _T("Opdrachtnamen zijn hoofdletterongevoelig.") );
+	    my $t = "=" x max( length($ret[-1]), length($ret[-2]) );
 	    push(@ret, $t, map({ "  * $_" } sort @helps), $t);
         }
         else {

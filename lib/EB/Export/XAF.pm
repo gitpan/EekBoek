@@ -4,8 +4,8 @@
 # Author          : Johan Vromans
 # Created On      : Sun Apr 13 17:25:07 2008
 # Last Modified By: Johan Vromans
-# Last Modified On: Tue Oct 13 21:29:10 2009
-# Update Count    : 238
+# Last Modified On: Thu Jun  7 13:59:14 2012
+# Update Count    : 241
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -19,8 +19,6 @@ package EB::Export::XAF;
 
 use strict;
 use warnings;
-
-our $VERSION = sprintf "%d.%03d", q$Revision: 1.3 $ =~ /(\d+)/g;
 
 use EB;
 use EB::Format;
@@ -190,7 +188,7 @@ sub transactions {
 		 " WHERE jnl_amount > 0".
 		 " AND jnl_date >= ?".
 		 " AND jnl_date <= ?".
-		 " AND jnl_bsr_seq != 0",
+		 " AND jnl_seq != 0",
 		 $self->{begin}, $self->{end})};
     my ($ccnt, $camt) =
       @{$dbh->do("SELECT count (*), sum(jnl_amount)".
@@ -198,7 +196,7 @@ sub transactions {
 		 " WHERE jnl_amount < 0".
 		 " AND jnl_date >= ?".
 		 " AND jnl_date <= ?".
-		 " AND jnl_bsr_seq != 0",
+		 " AND jnl_seq != 0",
 		 $self->{begin}, $self->{end})};
 
     my $entries = $dcnt + $ccnt;
@@ -217,7 +215,7 @@ sub transactions {
     $self->xml_elt("totalDebit",    _numfmt($damt));
     $self->xml_elt("totalCredit",   _numfmt(-$camt));
 
-    # Get the list of batches (dagboeken).
+    # Get the list of daybooks (dagboeken).
     my $sth = $dbh->sql_exec
       ("SELECT dbk_id, dbk_desc, dbk_type".
        " FROM Dagboeken".
@@ -228,7 +226,7 @@ sub transactions {
 	push(@dbk, [@$rr]);
     }
 
-    # Process the batches (dagboeken).
+    # Process the daybooks (dagboeken).
     foreach my $dbk ( @dbk ) {
 
 	$self->xml_elt_open("journal");
@@ -258,7 +256,7 @@ sub transactions {
 
 	# Fetch transactions from journal.
 	$sth = $dbh->sql_exec
-	  ("SELECT jnl_date, bsk_nr, jnl_bsr_seq,".
+	  ("SELECT jnl_date, bsk_nr, jnl_seq,".
 	   " jnl_acc_id, jnl_rel, jnl_desc, ".
 	   " jnl_amount, jnl_damount".
 	   " FROM Journal, Boekstukken".
@@ -266,11 +264,11 @@ sub transactions {
 	   " AND jnl_bsk_id = bsk_id".
 	   " AND jnl_date >= ?".
 	   " AND jnl_date <= ?".
-	   " ORDER BY bsk_nr, jnl_date, jnl_bsk_id, jnl_bsr_seq",
+	   " ORDER BY bsk_nr, jnl_date, jnl_bsk_id, jnl_seq",
 	   $dbk->[0], $self->{begin}, $self->{end});
 
 	$sth->bind_columns
-	  (\my ($jnl_date, $bsk_nr, $jnl_bsr_seq, $jnl_acc_id,
+	  (\my ($jnl_date, $bsk_nr, $jnl_seq, $jnl_acc_id,
 		$jnl_rel, $jnl_desc, $jnl_amount, $jnl_damount));
 
       FETCH: while ( $sth->fetch ) {
@@ -283,7 +281,7 @@ sub transactions {
 	    my $rel = $jnl_rel;	# save relation
 
 	    while ( $sth->fetch ) {
-		if ( $jnl_bsr_seq == 0 ) {
+		if ( $jnl_seq == 0 ) {
 		    # Close current transaction, proceed with next.
 		    $self->xml_elt_close("transaction");
 		    redo FETCH;
@@ -292,7 +290,7 @@ sub transactions {
 		$jnl_amount -= $jnl_damount if $jnl_damount;
 
 		$self->xml_elt_open("line");
-		  $self->xml_elt("recordID", $jnl_bsr_seq);
+		  $self->xml_elt("recordID", $jnl_seq);
 		  $self->xml_elt("accountID", $jnl_acc_id);
 		  $self->xml_elt("custSupID", $rel);
 		  $self->xml_elt("documentID", $bsk_nr);
@@ -322,7 +320,7 @@ sub printi {
 
 sub _numfmt {
     my ($v) = @_;
-    my $t = numfmt($v);
+    my $t = numfmt_plain($v);
     $t =~ s/,/./;
     $t;
 }

@@ -1,4 +1,4 @@
-#! perl --			-*- coding: utf-8 -*-
+#! perl
 
 package EekBoek;
 
@@ -10,9 +10,11 @@ use utf8;
 # Minimal version to prevent many Unicode bugs.
 use 5.008003;
 
-my $RCS_Id = '$Id: EekBoek.pm,v 1.101 2010/05/06 10:03:08 jv Exp $ ';
+require EB::Version;
+
 our $PACKAGE = 'EekBoek';
-our $VERSION = '2.00.04';
+
+our $VERSION = $EB::Version::VERSION;
 
 =head1 NAME
 
@@ -62,5 +64,3 @@ GNU General Public License or the Artistic License for more details.
 =cut
 
 1;
-
-# $Id: EekBoek.pm,v 1.101 2010/05/06 10:03:08 jv Exp $ 

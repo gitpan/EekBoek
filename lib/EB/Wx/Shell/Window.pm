@@ -1,7 +1,5 @@
 #! perl
 
-# $Id: Window.pm,v 1.1 2009/12/23 21:27:56 jv Exp $
-
 package main;
 
 our $cfg;
@@ -14,7 +12,12 @@ package EB::Wx::Shell::Window;
 use strict;
 use warnings;
 
-use Wx qw(:everything);
+use Wx qw[
+	  wxACCEL_CTRL
+	  wxACCEL_NORMAL
+	  wxID_CLOSE
+	  wxTHICK_FRAME
+       ];
 
 sub sizepos_save {
     my ($self, $posonly) = @_;
@@ -25,7 +28,9 @@ sub sizepos_save {
     $config->WriteInt( "windows/".$self->{mew}."/ypos", $y );
 
     unless ( $posonly ) {
-	($x, $y) = $self->GetSizeWH;
+	($x, $y) = ( Wx::wxMAC )
+	           ? $self->GetClientSizeWH
+	           : $self->GetSizeWH ;
 	$config->WriteInt( "windows/".$self->{mew}."/xwidth", $x );
 	$config->WriteInt( "windows/".$self->{mew}."/ywidth", $y );
     }
@@ -43,7 +48,14 @@ sub sizepos_restore {
     unless ( $posonly ) {
 	$x = $config->ReadInt( "windows/".$self->{mew}."/xwidth", -1 );
 	$y = $config->ReadInt( "windows/".$self->{mew}."/ywidth", -1 );
-	$self->SetSize( $x, $y ) if $x >= 0 && $y >= 0;
+	if ( $x >= 0 && $y >= 0 ) {
+	    $self->SetSize( $x, $y );
+	    $self->SetClientSize([$x, $y]) if Wx::wxMAC();
+	}
+	else {
+	    $self->SetSize(0, 0, $self->GetSizeWH);
+	    $self->Center;
+	}
     }
 
     # For convenience: CLOSE on Ctrl-W and Esc.
@@ -65,7 +77,8 @@ sub init {
 sub refresh {
 }
 
-# wxGlade insists on generating this.
-sub Wx::wxTHICK_FRAME() { 0 }
+# wxGlade insists on generating these.
+sub Wx::wxTHICK_FRAME() { 0 }		# removed 2.x
+sub Wx::wxADJUST_MINSIZE() { 0 }	# bogus 2.8, removed in 2.9
 
 1;

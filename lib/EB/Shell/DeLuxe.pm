@@ -2,15 +2,18 @@
 
 use utf8;
 
-# RCS Id          : $Id: DeLuxe.pm,v 1.26 2010/05/06 09:26:28 jv Exp $
 # Author          : Johan Vromans
 # Created On      : Thu Jul  7 15:53:48 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Thu May  6 11:25:42 2010
-# Update Count    : 287
+# Last Modified On: Sat Aug 25 22:48:50 2012
+# Update Count    : 294
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
+
+################ WARNING: This file crashes xgettext.
+# Translateable strings should be maintained in DeLuxe_Fake.pm as well.
+################
 
 package main;
 
@@ -19,8 +22,6 @@ our $cfg;
 package EB::Shell::DeLuxe;
 
 use strict;
-
-our $VERSION = sprintf "%d.%03d", q$Revision: 1.26 $ =~ /(\d+)/g;
 
 use base qw(EB::Shell::Base);
 use EB;
@@ -59,13 +60,13 @@ sub new {
 	$self->{readline} = sub { $self->readline_file(sub { <STDIN> }) };
     }
     $self->{inputstack} = [];
-    $self->{errexit} = $opts->{errexit};
+    $self->{errexit} = -t STDIN ? 0 : $opts->{errexit};
     $self;
 }
 
 sub readline_interactive {
     my ($self, $prompt) = @_;
-    return $self->term->readline($prompt);
+    return $self->SUPER::readline($prompt);
 }
 
 use Encode;

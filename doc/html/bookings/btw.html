@@ -119,6 +119,36 @@
 </table>
 </div>
 
+      <div class="social">
+
+<table border='0' cellpadding='2' cellspacing='0'>
+  <tr>
+    <td><a href="http://www.twitter.com/EekBoek" target='_blank'>
+	<img border="0"
+	     src="../images/twitter-mini.png"
+	     alt="Volg EekBoek op Twitter"
+	     title="Volg EekBoek op Twitter"/></a>
+    </td>
+    <td><a href="http://www.linkedin.com/groups?gid=3649028" target='_blank'>
+	<img border="0"
+	     src="../images/linkedin-mini.png"
+	     alt="EekBoek op LinkedIn"
+	     title="EekBoek op LinkedIn"/></a>
+    </td>
+    <td><a href="http://www.youtube.com/EekBoek" target='_blank'>
+	<img border="0" src="../images/youtube-mini.png"
+	     alt="Bekijk video's op het YouTube kanaal van EekBoek"
+             title="Bekijk video's op het YouTube kanaal van EekBoek"/></a>
+    </td>
+    <td><a href="http://identi.ca/eekboek" target='_blank'>
+	<img border="0" src="../images/identi-ca-mini.png"
+	     alt="EekBoek op Identi.ca"
+             title="EekBoek op Identi.ca"/></a>
+    </td>
+  </tr>
+</table>
+</div>
+
     </td>
     <td>
       <h2>BTW (Omzetbelasting)</h2>
@@ -161,48 +191,102 @@ grootboekrekening gebruiken.</p>
 
 <p>Een BTW-specificatie wordt toegevoegd aan het te boeken bedrag in de
 vorm &lsquo;<code>@<var>XX</var></code>&rsquo;.
-<code><var>XX</var></code> bestaat uit drie tekens, die elk mogen
+<code><var>XX</var></code> bestaat uit drie onderdelen, die elk mogen
 ontbreken.</p>
 
-<table border="1" cellpadding="5">
+<h3>1. Het toe te passen BTW tarief</h3>
+
+<table border="1" cellpadding="5" width="100%">
   <tr valign="top">
-    <td><code>N</code><br><code>H</code><br><code>L</code><br><code>0</code><br><code><var>n</var></code></td>
-    <td>(Neutraal) Pas geen BTW toe.
-	<br>(Hoog) Pas het hoge BTW tarief toe.
-	<br>(Laag) Pas het lage BTW tarief toe.
-	<br>(Het cijfer nul) BTW 0% toepassen.
-	<br>Pas de BTW toe volgens de BTW code
-	<code><var>n</var></code>.
-	<hr>Standaard wordt het BTW-tarief toegepast dat aan de
-	betreffende grootboekrekening is toegekend.
-    </td>
+    <td width="50"><code>N</code></td>
+    <td>(Neutraal) Pas geen BTW toe.</td>
   </tr>
   <tr valign="top">
-    <td><code>-</code><br><code>+</code></td>
-    <td>Het opgegeven bedrag is <em>exclusief</em> BTW.
-    <br>Het opgegeven bedrag is <em>inclusief</em> BTW.
-	<hr>Het standaardgedrag wordt afgeleid van het BTW-type van de
-	betreffende grootboekrekening.
-	<br>Deze aanduiding kan niet worden gebruikt indien
-	voorafgaand een BTW code is opgegeven.
-    </td>
+    <td><code>H</code></td><td>(Hoog) Pas het hoge BTW tarief toe.</td>
   </tr>
   <tr valign="top">
-    <td><code>K</code><br><code>O</code></td>
-    <td>De boeking betreft <em>Kosten</em>.
-    <br>(De letter O) De boeking betreft <em>Omzet</em>.
-	<hr>Standaard wordt de kosten/omzet indeling van de betreffende
-	grootboekrekening gebruikt. Deze aanduiding <em>moet</em> worden opgegeven indien BTW moet
-	worden toegepast bij boeking op een balansrekening, of op een
-	neutrale resultaatrekening.
-	<br>Voor boekingen in inkoop- en verkoopdagboeken, alsmede
-	boekingen gekoppeld aan een debiteuren of crediteurenbetaling
-	maakt het niet uit of kosten of omzet wordt aangegeven, in
-	deze gevallen bepaalt de debiteuren- of crediteurenrekening
-	altijd de aard van de boeking.
+    <td><code>L</code></td><td>(Laag) Pas het lage BTW tarief toe.</td>
+  </tr>
+  <tr valign="top">
+    <td><code>0</code></td><td>(Het cijfer nul) BTW 0% toepassen.</td>
+  </tr>
+  <tr valign="top">
+    <td><code><var>naam</var></code></td><td>Pas de BTW toe volgens
+         de BTW code <code><var>naam</var></code>.</td>
+  </tr>
+  <tr valign="top">
+    <td><code><var>n</var></code></td><td>Pas de BTW toe volgens de
+	numerieke BTW code <code><var>n</var></code>.<br>
+	Het gebruik hiervan wordt afgeraden.
     </td>
   </tr>
 </table>
+
+<p>Standaard wordt het BTW-tarief toegepast dat aan de betreffende
+grootboekrekening is toegekend.
+
+<p>Indien het tarief wordt opgegeven als &lsquo;<code>H</code>&rsquo;
+of &lsquo;<code>L</code>&rsquo; en er zijn in het schema meerdere
+tarieven opgegeven die daaraan voldoen, dan wordt vanaf versie 2.02
+een waarschuwing gegeven en de numeriek laagste tariefcode gebruikt.
+
+<h3>2. Inclusief/exclusief</h3>
+
+<table border="1" cellpadding="5" width="100%">
+  <tr valign="top">
+    <td width="50"><code>-</code></td><td>Het opgegeven bedrag is <em>exclusief</em> BTW.</td>
+  </tr>
+  <tr valign="top">
+    <td><code>+</code></td><td>Het opgegeven bedrag is <em>inclusief</em> BTW.</td>
+  </tr>
+</table>
+
+<p>Het standaardgedrag wordt afgeleid van het BTW-type van de
+betreffende grootboekrekening.
+<p>(t/m versie 2.00) Deze aanduiding kan niet worden gebruikt
+indien voorafgaand een numerieke BTW code is opgegeven.
+
+<h3>3. Kosten/Omzet</h3>
+
+<table border="1" cellpadding="5" width="100%">
+  <tr valign="top">
+    <td width="50"><code>K</code></td><td>De boeking betreft <em>Kosten</em>.</td>
+  </tr>
+  <tr valign="top">
+    <td><code>O</code></td><td>(De letter O) De boeking betreft <em>Omzet</em>.</td>
+  </tr>
+</table>
+
+<p>Standaard wordt de kosten/omzet indeling van de betreffende
+grootboekrekening gebruikt. Deze aanduiding <em>moet</em> worden
+opgegeven indien BTW moet worden toegepast bij boeking op een
+balansrekening, of op een neutrale resultaatrekening.
+<br>Voor boekingen in inkoop- en verkoopdagboeken, alsmede
+boekingen gekoppeld aan een debiteuren of crediteurenbetaling
+maakt het niet uit of kosten of omzet wordt aangegeven, in
+deze gevallen bepaalt de debiteuren- of crediteurenrekening
+altijd de aard van de boeking.
+
+<h3>Voorbeelden</h3>
+
+<blockquote class="code">inkoop 31-01 LCIER "Materiaal" 100,00</blockquote>
+<p>Standaardboeking. Het toegepaste BTW tarief is het tarief dat is
+gekoppeld aan de grootboekrekening die is gekoppeld aan deze relatie.
+Dit tarief bepaalt tevens of het opgegeven bedrag inclusief of
+exclusief BTW is.</p>
+
+<blockquote class="code">inkoop 31-01 LCIER "Materiaal" 100,00@+</blockquote>
+<p>Het opgegeven bedrag is inclusief BTW.</p>
+
+<blockquote class="code">inkoop 31-01 LCIER "Materiaal" 100,00@L</blockquote>
+<p>Pas het lage BTW tarief toe.</p>
+
+<blockquote class="code">inkoop 31-01 LCIER "Materiaal" 100,00@L-</blockquote>
+<p>Pas het lage BTW tarief toe. Het opgegeven bedrag is exclusief de BTW.</p>
+
+<blockquote class="code">inkoop 01-10 LCIER "Materiaal" 100,00@h19-</blockquote>
+<p>Pas BTW tarief &lsquo;<code>h19</code>&rsquo; toe. Het opgegeven bedrag is exclusief de BTW.</p>
+
 
 <a name="Afr"></a><h2>BTW-afrondingen</h2>
 
@@ -254,11 +338,11 @@ de configuratie-optie <a href="../config.html#strategy_iv_vc"><code>iv_vc</code>
       <img src="../images/validcss.png" alt="[Valid CSS]" border="0" width="88" height="31">
 
       </p>
-      <p class="info">Copyright &copy; 2005-2010 <a href="http://www.squirrel.nl">Squirrel Consultancy</a>. All Rights Reserved.<br />
+      <p class="info">Copyright &copy; 2005-2012 <a href="http://www.squirrel.nl">Squirrel Consultancy</a>. All Rights Reserved.<br />
 Deze site is gemaakt met de 
-<a href='http://www.squirrel.nl/people/jvromans/tt2site/'>TT2Site
+<a href='http://johan.vromans.org/tt2site/'>TT2Site
 Site Builder</a>.<br />
-bookings/btw.html laatste aanpassing 12 februari 2009, 16:37:33
+bookings/btw.html laatste aanpassing 18 september 2012, 11:03:21
 </p>
 
     </td>

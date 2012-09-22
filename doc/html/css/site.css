@@ -76,6 +76,12 @@ div.sidemenu {
     margin-left: 0.2in;
 }
 
+/* Indentation for the social info */
+div.social {
+    margin-top: 0.2in;
+    margin-left: 0.2in;
+}
+
 blockquote.code {
     margin-left: 2em;
     margin-right: 2em;

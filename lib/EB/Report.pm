@@ -5,20 +5,17 @@ package main;
 our $dbh;
 
 # Report.pm -- Report tools
-# RCS Info        : $Id: Report.pm,v 1.8 2009/10/09 15:33:08 jv Exp $
 # Author          : Johan Vromans
 # Created On      : Mon Nov 14 21:46:04 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Wed Oct  7 11:32:02 2009
-# Update Count    : 43
+# Last Modified On: Tue Nov  1 10:53:12 2011
+# Update Count    : 45
 # Status          : Unknown, Use with caution!
 
 package EB::Report;
 
 use strict;
 use warnings;
-
-our $VERSION = sprintf "%d.%03d", q$Revision: 1.8 $ =~ /(\d+)/g;
 
 use EB;
 use EB::Format qw(numfmt);
@@ -139,6 +136,10 @@ sub GetTAccountsRes {
 		       " WHERE acc_id = ?",
 		       $acc_balance, $acc_id)->finish;
     }
+
+    # zet eindsaldo op beginsaldo
+    $dbh->sql_exec("UPDATE TAccounts".
+           " SET acc_balance = acc_ibalance")->finish;
 
     # eindsaldo(r, t2) = beginsaldo(r, t1) + sum(journaal, r, t1..t2)
     $sth = $dbh->sql_exec("SELECT jnl_acc_id,SUM(jnl_amount)".

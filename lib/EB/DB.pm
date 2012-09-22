@@ -2,12 +2,11 @@
 
 use utf8;
 
-# RCS Id          : $Id: DB.pm,v 1.63 2009/12/22 21:20:49 jv Exp $
 # Author          : Johan Vromans
 # Created On      : Sat May  7 09:18:15 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Tue Dec 22 22:20:26 2009
-# Update Count    : 441
+# Last Modified On: Thu Jun  7 14:23:32 2012
+# Update Count    : 448
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -21,10 +20,9 @@ package EB::DB;
 use strict;
 use warnings;
 
-our $VERSION = sprintf "%d.%03d", q$Revision: 1.63 $ =~ /(\d+)/g;
-
 use EB;
 use DBI;
+use File::Glob qw(:glob);	# glob that allows space (for Windows);
 
 my $dbh;			# singleton for DB
 
@@ -161,6 +159,11 @@ sub setup {
     setupdb();
 
     # Create temp table for account mangling.
+    # This table has the purpose of copying the data from Accounts, so that
+    # data from already completed financial years can be corrected when
+    # creating overviews, such as Balance statements and Result accounts.
+    # This way no backdated calculations need to be made when transitions
+    # to previous financial years are involved.
     my $sql = "SELECT * INTO TEMP TAccounts FROM Accounts WHERE acc_id = 0";
     $sql = $self->feature("filter")->($sql) if $self->feature("filter");
     $dbh->do($sql) if $sql;
@@ -187,7 +190,8 @@ sub store_journal {
     my ($self, $jnl) = @_;
     foreach ( @$jnl ) {
 	$self->sql_insert("Journal",
-			  [qw(jnl_date jnl_dbk_id jnl_bsk_id jnl_bsr_date jnl_bsr_seq jnl_acc_id jnl_amount
+			  [qw(jnl_date jnl_dbk_id jnl_bsk_id jnl_bsr_date jnl_bsr_seq jnl_seq
+			      jnl_type jnl_acc_id jnl_amount
 			      jnl_damount jnl_desc jnl_rel jnl_rel_dbk  jnl_bsk_ref)],
 			  @$_);
     }
@@ -236,7 +240,7 @@ sub bskid {
     if ( $nr =~ /^([[:alpha:]][^:]+)(?::([^:]+))?:(\d+)$/ ) {
 	$rr = $self->do("SELECT dbk_id, dbk_desc".
 			" FROM Dagboeken".
-			" WHERE dbk_desc ILIKE ?", $1);
+			" WHERE upper(dbk_desc) LIKE ?", uc($1));
 	unless ( $rr ) {
 	    return wantarray ? (undef, undef, __x("Onbekend dagboek: {dbk}", dbk => $1)) : undef;
 	}
@@ -691,6 +695,20 @@ sub do {
     $rr;
 }
 
+sub da {			# do_all
+    my $self = shift;
+    my $sql = shift;
+    my $atts = ref($_[0]) eq 'HASH' ? shift : undef;
+    my @args = @_;
+    my $sth = $self->sql_exec($sql, @args);
+    my $res;
+    while ( my $rr = $sth->fetchrow_arrayref ) {
+	push( @$res, [@$rr] );
+    }
+    $sth->finish;
+    $res;
+}
+
 sub errstr {
     $dbh->errstr;
 }
@@ -710,14 +728,8 @@ sub checktx {
     $allow ? warn("!$msg\n") : die("?$msg\n");
 }
 
-sub rollback {
-    my ($self) = @_;
-    warn("=> ROLLBACK WORK;", $dbh ? "" : " (ignored)", "\n") if $trace;
-    return unless $dbh;
-    die("?INTERNAL ERROR: ROLLBACK while not in transaction\n") unless $tx;
-    $tx = 0;
-    $dbh->rollback
-}
+#
+# http://en.wikipedia.org/wiki/Database_transaction#In_SQL 
 
 sub begin_work {
     my ($self) = @_;
@@ -734,6 +746,15 @@ sub commit {
     die("?INTERNAL ERROR: COMMIT while not in transaction\n") unless $tx;
     $tx = 0;
     $dbh->commit;
+}
+
+sub rollback {
+    my ($self) = @_;
+    warn("=> ROLLBACK WORK;", $dbh ? "" : " (ignored)", "\n") if $trace;
+    return unless $dbh;
+    die("?INTERNAL ERROR: ROLLBACK while not in transaction\n") unless $tx;
+    $tx = 0;
+    $dbh->rollback
 }
 
 END {
