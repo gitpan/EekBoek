@@ -181,9 +181,9 @@ verwerken indien ze aanwezig zijn:</p>
 <p>De gegevens uit de specifieke bestanden hebben voorrang boven die uit
 meer generieke bestanden.</p>
 
-<p>Aan de EekBoek programma's kan bovendien op de command line een
-configuratie-optie <a href="ebshell/clo.html#clo_config">
-<code>--config</code></a> worden meegegeven. Met deze optie wordt een
+<p>Aan de EekBoek programma's kan bovendien op de command line een <a
+href="ebshell/clo.html#config">configuratie-optie</a>
+<code>--config</code> worden meegegeven. Met deze optie wordt een
 niet-standaard configuratiebestand aangewezen dat in de plaats van het
 administratie-specifieke bestand komt. Tevens is het mogelijk om met
 de command line optie <code>-X</code> op te geven dat alle
@@ -410,15 +410,6 @@ het gebruikte database systeem deze vereist.</p>
 	boekingsdatum dan de betaling mag liggen.
   </tr>
   <tr valign="top">
-    <td><a name="strategy_btw_adapt"></a><code>btw_adapt</code></td>
-    <td>Als bij het boeken een BTW tariefcode is toegepast die op de
-	boekingsdatum niet meer geldig is, dan wordt automatisch een
-	overeenkomstige, geldige, tariefcode bepaald en toegepast.
-	<br>Let op: Controleer altijd de journaalpost of na correctie
-	de juiste tariefcode is toegepast. Zie ook de setting <a
-	href="#prefs_journal">journal</a> in sectie Preferences.
-  </tr>
-  <tr valign="top">
     <td><a name="strategy_iv_vc"></a><code>iv_vc</code></td>
     <td>Bij het boeken in een Inkoop- of Verkoopdagboek wordt BTW
 	berekend per boekstukregel. Sommige leveranciers berekenen
@@ -438,14 +429,6 @@ het gebruikte database systeem deze vereist.</p>
 <p><a name="shell"></a><b>Sectie "Shell"</b></p>
 
 <table border="1" width="100%" cellpadding="5">
-  <tr valign="top">
-    <td><a name="shell_errexit"></a><code>errexit</code></td>
-    <td>Indien deze ongelijk aan nul is dan zal de EekBoek shell de
-	verwerking van een serie opdrachten onmiddellijk afbreken bij de
-	eerste fout die wordt gevonden.
-	<p>Zie ook de command line optie <a href="ebshell/clo.html#clo_errexit">--errexit</a>.
-    </td>
-  </tr>
   <tr valign="top">
     <td><a name="shell_prompt"></a><code>prompt</code></td>
     <td>De prompt waarmee de EekBoek shell kenbaar maakt dat het
@@ -596,11 +579,11 @@ ongewenste problemen leiden.</em></p>
       <img src="images/validcss.png" alt="[Valid CSS]" border="0" width="88" height="31">
 
       </p>
-      <p class="info">Copyright &copy; 2005-2012 <a href="http://www.squirrel.nl">Squirrel Consultancy</a>. All Rights Reserved.<br />
+      <p class="info">Copyright &copy; 2005-2010 <a href="http://www.squirrel.nl">Squirrel Consultancy</a>. All Rights Reserved.<br />
 Deze site is gemaakt met de 
 <a href='http://johan.vromans.org/tt2site/'>TT2Site
 Site Builder</a>.<br />
-config.html laatste aanpassing 18 september 2012, 10:18:02
+config.html laatste aanpassing 28 juli 2010, 20:20:12
 </p>
 
     </td>

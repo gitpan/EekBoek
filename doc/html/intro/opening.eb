@@ -31,7 +31,7 @@ adm_balans 3100  2443,18        # Kapitaal
 
 # Openstaande posten uit voorgaande boekjaren als volgt:
 # Eerst, indien nodig, de betreffende relatie toevoegen:
-#relatie --dagboek=inkoop KESTER "Repro van Kesteren" 6950
+#relatie KESTER "Repro van Kesteren" 6950
 # Dan het openstaande boekstuk:
 #adm_relatie inkoop:2006:67 2006-12-11 "KESTER" "Printwerk" 48,79
 

@@ -168,7 +168,7 @@ schema. In het schema worden de volgende gegevens gedefinieerd:</p>
 <ul>
   <li><a href="#acc">Het rekeningschema</a>;</li>
   <li><a href="#dbk">De dagboeken</a>;</li>
-  <li><a href="#btw">De BTW tarieven</a>.</li>
+  <li><a href="#btw">De BTW tariefgroepen</a>.</li>
 </ul>
 
 <p>Algemene syntaxregels voor het schema-bestand:</p>
@@ -336,13 +336,6 @@ opgegeven.</p>
 te bepalen dat in overzichtsboekingen van dit dagboek de debet- en
 creditboekingen afzonderlijk worden getotaliseerd.</p>
 
-<p>De naam van het dagboek mag spaties bevatten, deze worden intern
-vervangen door onderstreeptekens. De volgende schema regels zijn
-gelijkwaardig:</p>
-
-<blockquote class="code">   T  Triodos Bank    :type=bank       :rekening=2340
-   T Triodos_Bank    :type=bank       :rekening=2340</blockquote>
-
 <a name="btw"></a><h3>De BTW tarieven</h3>
 
 <p>De BTW tarieven worden gespecificeerd in het onderdeel &ldquo;btw
@@ -357,33 +350,21 @@ waar deze boeking zal worden opgegeven. Binnen elke tariefgroep zijn
 meerdere tarieven mogelijk, hoewel dit in de praktijk niet snel zal
 voorkomen.</p>
 
-<p>Elke tarief heeft een unieke naam of numerieke code. Deze kan o.m. worden
+<p>Elke tarief heeft een unieke, numerieke code. Deze kan o.m. worden
 gebruikt om expliciet een BTW tarief op te geven bij het boeken. Voor
 elk tarief (behalve die van groep "nul") moet verder het percentage
 worden opgegeven. Met de aanduiding &lsquo;<code>:exclusief</code>&rsquo; kan
 worden opgegeven dat boekingen op rekeningen met deze tariefgroep
 standaard het bedrag exclusief BTW aangeven.</p>
-<p>Bij elk tarief kan een geldigheidsduur worden opgegeven. Hiermee
-kan worden voorkomen dat een tarief wordt toegepast dat niet meer, of
-nog niet, geldig is. Bijvoorbeeld, op 1 oktober 2012 ging het hoge
-BTW tarief omhoog van 19% naar 21%. In het onderstaande lijstje zijn
-daarom twee tariefcodes gedefineerd voor het hoge tarief, met een
-geldigheidsduur:</p>
+
+<p>Een illustratief voorbeeld:</p>
 
 <blockquote class="code">BTW Tarieven
-  0     BTW 0%         :tariefgroep=nul
-  h19   BTW 19%        :tariefgroep=hoog :perc=19,00 :tot=2012-10-01
-  3     BTW 6,0% incl. :tariefgroep=laag :perc=6,00
-  4     BTW 6,0% excl. :tariefgroep=laag :perc=6,00  :exclusief
-  h21   BTW 21%        :tariefgroep=hoog :perc=21,00 :vanaf=2012-10-01</blockquote>
-
-<p>In het bovenstaande voorbeeld zijn de tarieven
-&lsquo;<code>h19</code>&rsquo; en &lsquo;<code>h21</code>&rsquo;
-inclusief, de bijbehorende tarieven exclusief worden automatisch aangemaakt.</p>
-
-<p>Let op: De datum in de <code>:tot</code> is echt &lsquo;tot&rsquo;,
-dus niet &lsquo;tot en met&rsquo;. In geval van een BTW wijziging is
-deze datum dus gelijk aan de ingangsdatum van het nieuwe tarief.</p>
+   0  BTW 0%            :tariefgroep=nul
+   1  BTW 19% incl.     :tariefgroep=hoog :perc=19,00
+   2  BTW 19% excl.     :tariefgroep=hoog :perc=19,00 :exclusief
+   3  BTW 6,0% incl.    :tariefgroep=laag :perc=6,00
+   4  BTW 6,0% excl.    :tariefgroep=laag :perc=6,00  :exclusief</blockquote>
 
 <p>De rekeningen waarop de BTW moet worden geboekt worden
 gespecifieerd met <a href="../stdacc.html">koppelingen</a>.
@@ -437,11 +418,11 @@ kan worden gebruikt om in te voeren.</p>
       <img src="../images/validcss.png" alt="[Valid CSS]" border="0" width="88" height="31">
 
       </p>
-      <p class="info">Copyright &copy; 2005-2012 <a href="http://www.squirrel.nl">Squirrel Consultancy</a>. All Rights Reserved.<br />
+      <p class="info">Copyright &copy; 2005-2010 <a href="http://www.squirrel.nl">Squirrel Consultancy</a>. All Rights Reserved.<br />
 Deze site is gemaakt met de 
 <a href='http://johan.vromans.org/tt2site/'>TT2Site
 Site Builder</a>.<br />
-setup/schema.html laatste aanpassing 18 september 2012, 11:22:12
+setup/schema.html laatste aanpassing 04 december 2010, 15:59:47
 </p>
 
     </td>
